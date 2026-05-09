@@ -24,24 +24,33 @@ export const actions = {
     const flavorTags    = data.getAll('flavorTags');
     const notes         = data.get('notes') || '';
 
-    if (!beanId || isNaN(dose) || isNaN(grindSize) || isNaN(extractionTime) || isNaN(yieldG) || isNaN(rating)) {
+    if (!beanId || isNaN(dose) || isNaN(grindSize) || isNaN(extractionTime) || isNaN(yieldG)) {
       return fail(400, { error: 'Bitte alle Pflichtfelder ausfüllen.' });
+    }
+
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      return fail(400, { error: 'Bitte eine Bewertung (1–5 Sterne) auswählen.' });
     }
 
     const brewRatio = Math.round((yieldG / dose) * 100) / 100;
 
-    await Shot.create({
-      beanId,
-      dose,
-      grindSize,
-      extractionTime,
-      yield: yieldG,
-      temperature,
-      rating,
-      brewRatio,
-      flavorTags,
-      notes
-    });
+    try {
+      await Shot.create({
+        beanId,
+        dose,
+        grindSize,
+        extractionTime,
+        yield: yieldG,
+        temperature,
+        rating,
+        brewRatio,
+        flavorTags,
+        notes
+      });
+    } catch (err) {
+      console.error('Shot.create error:', err);
+      return fail(500, { error: 'Shot konnte nicht gespeichert werden. Bitte erneut versuchen.' });
+    }
 
     return { success: true };
   }

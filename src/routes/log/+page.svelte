@@ -167,7 +167,7 @@
 
     <!-- Bewertung -->
     <div class="field">
-      <label>Bewertung *</label>
+      <label>Bewertung * {#if rating === 0}<span class="rating-hint">← Sterne antippen</span>{/if}</label>
       <RatingStars bind:rating />
       <input type="hidden" name="rating" value={rating} />
     </div>
@@ -263,6 +263,20 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text3);
+  }
+
+  .rating-hint {
+    font-size: 0.7rem;
+    color: var(--amber);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
   }
 
   .sr-only {
