@@ -6,7 +6,7 @@
 
   const bestShotSet = $derived(new Set(data.bestShotIds));
 
-  const grouped = $derived(() => {
+  const grouped = $derived.by(() => {
     const groups = new Map();
     for (const shot of data.shots) {
       const key = new Date(shot.createdAt).toLocaleDateString('de-CH', {
@@ -47,7 +47,7 @@
       <a href="/log" class="btn btn-primary" style="margin-top:var(--space-md)">Ersten Shot loggen</a>
     </div>
   {:else}
-    {#each grouped() as [date, shots]}
+    {#each grouped as [date, shots]}
       <section class="date-group">
         <h2 class="date-label">{date}</h2>
         <div class="shots-list">

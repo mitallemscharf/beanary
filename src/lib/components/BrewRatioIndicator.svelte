@@ -3,29 +3,29 @@
 
   const ratio = $derived(dose > 0 && yieldG > 0 ? yieldG / dose : null);
 
-  const status = $derived(() => {
+  const status = $derived.by(() => {
     if (!ratio) return 'neutral';
     if (ratio >= 1.8 && ratio <= 2.2) return 'green';
     if ((ratio >= 1.5 && ratio < 1.8) || (ratio > 2.2 && ratio <= 2.5)) return 'amber';
     return 'red';
   });
 
-  const label = $derived(() => {
+  const label = $derived.by(() => {
     if (!ratio) return '—';
     return ratio.toFixed(2);
   });
 
-  const hint = $derived(() => {
+  const hint = $derived.by(() => {
     if (!ratio) return 'Dosis und Yield eingeben';
-    if (status() === 'green') return 'Optimal';
-    if (status() === 'amber') return 'Akzeptabel';
+    if (status === 'green') return 'Optimal';
+    if (status === 'amber') return 'Akzeptabel';
     return 'Ausserhalb';
   });
 </script>
 
-<div class="ratio-indicator ratio--{status()}">
-  <span class="ratio-value">{label()}</span>
-  <span class="ratio-hint">{hint()}</span>
+<div class="ratio-indicator ratio--{status}">
+  <span class="ratio-value">{label}</span>
+  <span class="ratio-hint">{hint}</span>
 </div>
 
 <style>

@@ -1,7 +1,7 @@
 <script>
   let { roastDate } = $props();
 
-  const info = $derived(() => {
+  const info = $derived.by(() => {
     if (!roastDate) return { label: 'Kein Datum', color: 'neutral' };
     const days = Math.floor((Date.now() - new Date(roastDate).getTime()) / 86400000);
     if (days <= 14)  return { label: `${days}d frisch`, color: 'green' };
@@ -10,4 +10,4 @@
   });
 </script>
 
-<span class="badge badge-{info().color}">{info().label}</span>
+<span class="badge badge-{info.color}">{info.label}</span>

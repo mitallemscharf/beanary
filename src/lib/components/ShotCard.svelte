@@ -4,7 +4,7 @@
 
   let { shot, beanName = '', isBest = false } = $props();
 
-  const dotColor = $derived(() => {
+  const dotColor = $derived.by(() => {
     if (shot.rating >= 4) return 'green';
     if (shot.rating === 3) return 'amber';
     return 'red';
@@ -22,7 +22,7 @@
 <div class="shot-card card">
   <div class="shot-card__header">
     <div style="display:flex; align-items:center; gap:var(--space-xs);">
-      <span class="dot dot--{dotColor()}"></span>
+      <span class="dot dot--{dotColor}"></span>
       {#if beanName}
         <span class="bean-name">{beanName}</span>
       {/if}
