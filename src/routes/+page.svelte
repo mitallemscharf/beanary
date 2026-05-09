@@ -117,7 +117,7 @@
               {/if}
             </div>
             <div class="recent-params">
-              <span>{shot.dose}g → {shot.yield}g</span>
+              <span>{shot.dose}g → {shot.yieldG}g</span>
               <span>{shot.extractionTime}s</span>
             </div>
           </a>

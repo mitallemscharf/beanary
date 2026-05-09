@@ -44,7 +44,7 @@
     </div>
     <div class="param">
       <span class="param-label">Yield</span>
-      <span class="param-value">{shot.yield}g</span>
+      <span class="param-value">{shot.yieldG}g</span>
     </div>
     <div class="param">
       <span class="param-label">Zeit</span>

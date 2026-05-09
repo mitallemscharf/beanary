@@ -74,7 +74,7 @@
           </div>
           <div class="sweet-param">
             <span class="param-label">Yield</span>
-            <span class="param-value">{sweetSpot.yield}g</span>
+            <span class="param-value">{sweetSpot.yieldG}g</span>
           </div>
           <div class="sweet-param">
             <span class="param-label">Zeit</span>
@@ -87,7 +87,7 @@
         </div>
         <div style="margin-top:var(--space-sm); display:flex; align-items:center; justify-content:space-between;">
           <RatingStars rating={sweetSpot.rating} readonly />
-          <BrewRatioIndicator dose={sweetSpot.dose} yieldG={sweetSpot.yield} />
+          <BrewRatioIndicator dose={sweetSpot.dose} yieldG={sweetSpot.yieldG} />
         </div>
       </div>
     </section>
@@ -113,7 +113,7 @@
               <span class="shot-date">{formatDate(shot.createdAt)}</span>
             </div>
             <div class="shot-params">
-              <span>{shot.dose}g → {shot.yield}g</span>
+              <span>{shot.dose}g → {shot.yieldG}g</span>
               <span>{shot.extractionTime}s</span>
               <span>#{shot.grindSize}</span>
               {#if shot.brewRatio}

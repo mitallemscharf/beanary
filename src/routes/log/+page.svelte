@@ -94,11 +94,11 @@
         />
       </div>
       <div class="field">
-        <label for="yield">Yield (g) *</label>
+        <label for="yieldG">Yield (g) *</label>
         <input
           type="number"
-          id="yield"
-          name="yield"
+          id="yieldG"
+          name="yieldG"
           min="1"
           max="200"
           step="0.1"

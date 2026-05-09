@@ -18,7 +18,7 @@ export const actions = {
     const dose          = parseFloat(data.get('dose'));
     const grindSize     = parseFloat(data.get('grindSize'));
     const extractionTime = parseFloat(data.get('extractionTime'));
-    const yieldG        = parseFloat(data.get('yield'));
+    const yieldG        = parseFloat(data.get('yieldG'));
     const temperature   = data.get('temperature') || '2';
     const rating        = parseInt(data.get('rating'));
     const flavorTags    = data.getAll('flavorTags');
@@ -40,7 +40,7 @@ export const actions = {
         dose,
         grindSize,
         extractionTime,
-        yield: yieldG,
+        yieldG,
         temperature,
         rating,
         brewRatio,

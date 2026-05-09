@@ -5,7 +5,7 @@ const shotSchema = new mongoose.Schema({
   dose:           { type: Number, required: true },
   grindSize:      { type: Number, required: true },
   extractionTime: { type: Number, required: true },
-  yield:          { type: Number, required: true },
+  yieldG:         { type: Number, required: true },
   temperature:    { type: String, enum: ['1', '2', '3', '4'], default: '2' },
   rating:         { type: Number, min: 1, max: 5, required: true },
   brewRatio:      { type: Number },
@@ -16,7 +16,7 @@ const shotSchema = new mongoose.Schema({
 
 shotSchema.pre('save', function (next) {
   if (this.dose > 0) {
-    this.brewRatio = Math.round((this.yield / this.dose) * 100) / 100;
+    this.brewRatio = Math.round((this.yieldG / this.dose) * 100) / 100;
   }
   next();
 });

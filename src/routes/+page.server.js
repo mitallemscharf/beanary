@@ -42,7 +42,7 @@ export async function load() {
     beanName: beanMap[s.beanId.toString()] ?? '—',
     rating: s.rating,
     dose: s.dose,
-    yield: s.yield,
+    yieldG: s.yieldG,
     extractionTime: s.extractionTime,
     brewRatio: s.brewRatio,
     createdAt: s.createdAt?.toISOString() ?? null
