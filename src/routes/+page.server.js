@@ -42,9 +42,9 @@ export async function load() {
     beanName: beanMap[s.beanId.toString()] ?? '—',
     rating: s.rating,
     dose: s.dose,
-    yieldG: s.yieldG,
+    yieldG: s.yieldG ?? s.yield ?? null,
     extractionTime: s.extractionTime,
-    brewRatio: s.brewRatio,
+    brewRatio: s.brewRatio ?? null,
     createdAt: s.createdAt?.toISOString() ?? null
   }));
 

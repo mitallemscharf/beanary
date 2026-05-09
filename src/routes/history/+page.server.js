@@ -28,9 +28,17 @@ export async function load({ url }) {
 
   function serializeShot(s) {
     return {
-      ...s,
       _id: s._id.toString(),
       beanId: s.beanId.toString(),
+      dose: s.dose,
+      grindSize: s.grindSize,
+      extractionTime: s.extractionTime,
+      yieldG: s.yieldG ?? s.yield ?? null,
+      temperature: s.temperature,
+      rating: s.rating,
+      brewRatio: s.brewRatio ?? null,
+      flavorTags: s.flavorTags ?? [],
+      notes: s.notes ?? '',
       createdAt: s.createdAt?.toISOString() ?? null
     };
   }
