@@ -1,11 +1,16 @@
 <script>
-	import favicon from '$lib/assets/favicon.svg';
+  import '../app.css';
+  import BottomNav from '$lib/components/BottomNav.svelte';
+  import Toast from '$lib/components/Toast.svelte';
 
-	let { children } = $props();
+  let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+  <title>Beanary</title>
 </svelte:head>
 
 {@render children()}
+
+<BottomNav />
+<Toast />
