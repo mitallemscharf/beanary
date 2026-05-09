@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import { env } from '$env/dynamic/private';
 
 let cached = global._mongoose ?? (global._mongoose = { conn: null, promise: null });
 
 export async function connectDB() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) throw new Error('MONGODB_URI environment variable is not set');
+  const uri = env.MONGODB_URI;
+  if (!uri) throw new Error('MONGODB_URI is not set — add it to .env');
 
   if (cached.conn) return cached.conn;
 
