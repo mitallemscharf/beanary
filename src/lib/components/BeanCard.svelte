@@ -63,7 +63,7 @@
 
   .bean-card__image {
     height: 160px;
-    background-image: url('https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400');
+    background-image: url('/bean-card-bg.webp');
     background-size: cover;
     background-position: center;
     position: relative;

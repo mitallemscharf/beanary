@@ -34,7 +34,7 @@
 
     <div class="hero-photo-wrap">
       <img
-        src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80"
+        src="/hero-bag-to-cup.webp"
         alt="Kaffee"
         class="hero-photo"
       />
