@@ -47,6 +47,19 @@ html, body {
 
 body {
   overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(139, 90, 43, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(139, 90, 43, 0.08) 0%, transparent 55%);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 h1, h2, h3 {
@@ -74,15 +87,17 @@ input, select, textarea {
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: var(--space-xs) var(--space-sm);
+  padding: 0.7rem var(--space-sm);
   width: 100%;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--coffee);
+  box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.12);
 }
+
 
 input::placeholder, textarea::placeholder {
   color: var(--text3);
@@ -108,6 +123,7 @@ label {
   padding-bottom: calc(var(--nav-height) + var(--space-sm));
   padding-top: var(--space-md);
   padding-inline: var(--space-sm);
+  animation: fadeInUp 0.35s ease both;
 }
 
 .page-header {
@@ -163,6 +179,13 @@ label {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-md);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+a.card:hover {
+  border-color: rgba(196, 135, 74, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
 .field {

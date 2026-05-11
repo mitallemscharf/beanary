@@ -20,15 +20,15 @@
 <style>
   .stars {
     display: flex;
-    gap: 2px;
+    gap: 4px;
   }
 
   .star {
-    font-size: 1.75rem;
+    font-size: 2.2rem;
     color: var(--text3);
-    transition: color 0.1s, transform 0.1s;
+    transition: color 0.12s, transform 0.12s;
     line-height: 1;
-    padding: 0 2px;
+    padding: 0 3px;
   }
 
   .star.filled {
@@ -37,11 +37,16 @@
 
   .stars:not(.readonly) .star:hover {
     color: var(--coffee-light);
-    transform: scale(1.1);
+    transform: scale(1.15);
+  }
+
+  .stars:not(.readonly) .star:active {
+    transform: scale(0.95);
   }
 
   .stars.readonly .star {
     cursor: default;
     font-size: 1.1rem;
+    padding: 0 1px;
   }
 </style>

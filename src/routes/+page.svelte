@@ -6,20 +6,25 @@
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Guten Morgen' : hour < 17 ? 'Guten Tag' : 'Guten Abend';
 
-  // SVG chart dimensions
   const chartW = 320;
-  const chartH = 80;
-  const barW = 24;
+  const chartH = 100;
+  const barW = 26;
   const maxRating = 5;
 
   function barHeight(rating) {
     return (rating / maxRating) * chartH;
   }
 
-  function barColor(rating) {
-    if (rating >= 4) return 'var(--green)';
-    if (rating === 3) return 'var(--amber)';
-    return 'var(--red)';
+  function barColorTop(rating) {
+    if (rating >= 4) return '#6BAE7F';
+    if (rating === 3) return '#EF9F27';
+    return '#c47a7a';
+  }
+
+  function barColorBot(rating) {
+    if (rating >= 4) return '#4A7C59';
+    if (rating === 3) return '#a06b10';
+    return '#8B3A3A';
   }
 
   function formatDate(iso) {
@@ -29,31 +34,37 @@
 </script>
 
 <div class="page">
-  <!-- Header -->
-  <div class="page-header">
-    <p class="greeting">{greeting},</p>
-    <h1 class="logo">Beanary</h1>
-    <p class="page-subtitle">Dein Kaffee-Tagebuch</p>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="greeting">{greeting}</p>
+      <h1 class="logo">Beanary</h1>
+      <p class="hero-sub">Dein Kaffee-Tagebuch</p>
+    </div>
   </div>
 
   <!-- Metric Cards -->
   <div class="metrics-grid">
     <div class="metric-card">
+      <span class="metric-icon">☕</span>
       <span class="metric-value">{data.totalShots}</span>
       <span class="metric-label">Shots total</span>
     </div>
     <div class="metric-card">
+      <span class="metric-icon" style="color: var(--amber)">★</span>
       <span class="metric-value">
         {data.avgRating > 0 ? data.avgRating.toFixed(1) : '—'}
-        {#if data.avgRating > 0}<span class="metric-unit">★</span>{/if}
       </span>
       <span class="metric-label">Ø Bewertung</span>
     </div>
-    <div class="metric-card">
+    <div class="metric-card metric-card--wide">
+      <span class="metric-icon">♛</span>
       <span class="metric-value metric-value--sm">{data.bestBeanName ?? '—'}</span>
       <span class="metric-label">Beste Bohne</span>
     </div>
     <div class="metric-card">
+      <span class="metric-icon" style="color: var(--green-light)">◎</span>
       <span class="metric-value">{data.activeBeans}</span>
       <span class="metric-label">Aktive Bohnen</span>
     </div>
@@ -65,10 +76,28 @@
       <h2 class="section-title">Bewertungsverlauf</h2>
       <div class="chart-wrap">
         <svg
-          viewBox="0 0 {chartW} {chartH + 24}"
+          viewBox="0 0 {chartW} {chartH + 28}"
           width="100%"
           aria-label="Bewertungsverlauf der letzten Shots"
         >
+          <defs>
+            {#each data.chartData as bar, i}
+              <linearGradient id="grad{i}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color={barColorTop(bar.rating)} />
+                <stop offset="100%" stop-color={barColorBot(bar.rating)} stop-opacity="0.6" />
+              </linearGradient>
+            {/each}
+          </defs>
+
+          <!-- Horizontal guide lines -->
+          {#each [1, 2, 3, 4, 5] as level}
+            {@const gy = chartH - (level / maxRating) * chartH}
+            <line
+              x1="0" y1={gy} x2={chartW} y2={gy}
+              stroke="rgba(255,255,255,0.05)" stroke-width="1"
+            />
+          {/each}
+
           {#each data.chartData as bar, i}
             {@const x = i * (barW + 8) + 4}
             {@const h = barHeight(bar.rating)}
@@ -78,13 +107,12 @@
               y={y}
               width={barW}
               height={h}
-              rx="4"
-              fill={barColor(bar.rating)}
-              opacity="0.85"
+              rx="5"
+              fill="url(#grad{i})"
             />
             <text
               x={x + barW / 2}
-              y={chartH + 16}
+              y={chartH + 18}
               text-anchor="middle"
               font-size="8"
               fill="var(--text3)"
@@ -99,9 +127,9 @@
   <!-- Last 3 Shots -->
   {#if data.lastShots.length > 0}
     <section class="recent-section">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm);">
+      <div class="section-header">
         <h2 class="section-title">Zuletzt geloggt</h2>
-        <a href="/history" style="font-size:0.8rem; color:var(--text2);">Alle ansehen →</a>
+        <a href="/history" class="see-all">Alle ansehen →</a>
       </div>
       <div class="recent-list">
         {#each data.lastShots as shot (shot._id)}
@@ -110,7 +138,7 @@
               <span class="recent-bean">{shot.beanName}</span>
               <span class="recent-date">{formatDate(shot.createdAt)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:var(--space-xs);">
+            <div class="recent-shot__mid">
               <RatingStars rating={shot.rating} readonly />
               {#if shot.brewRatio}
                 <span class="recent-ratio">1:{shot.brewRatio}</span>
@@ -134,20 +162,61 @@
 </div>
 
 <style>
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-sm)) var(--space-lg);
+    height: 230px;
+    background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center 55%;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 12, 10, 0.25) 0%,
+      rgba(15, 12, 10, 0.6) 55%,
+      rgba(15, 12, 10, 0.92) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-md) var(--space-sm);
+  }
+
   .greeting {
-    font-size: 0.875rem;
-    color: var(--text3);
+    font-size: 0.8rem;
+    color: rgba(245, 230, 204, 0.7);
+    letter-spacing: 0.06em;
     margin-bottom: 2px;
   }
 
   .logo {
     font-family: var(--font-display);
-    font-size: 2.8rem;
+    font-size: 3rem;
     font-weight: 500;
     color: var(--crema);
     line-height: 1;
   }
 
+  .hero-sub {
+    font-size: 0.8rem;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* ── Metrics ── */
   .metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -162,12 +231,23 @@
     padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: 4px;
+  }
+
+  .metric-card--wide {
+    grid-column: span 2;
+  }
+
+  .metric-icon {
+    font-size: 1rem;
+    color: var(--coffee-light);
+    line-height: 1;
+    margin-bottom: 2px;
   }
 
   .metric-value {
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: var(--crema);
     line-height: 1;
     overflow: hidden;
@@ -176,15 +256,9 @@
   }
 
   .metric-value--sm {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     white-space: normal;
-    overflow: visible;
     line-height: 1.2;
-  }
-
-  .metric-unit {
-    font-size: 1.2rem;
-    color: var(--amber);
   }
 
   .metric-label {
@@ -194,13 +268,14 @@
     color: var(--text3);
   }
 
+  /* ── Chart ── */
   .chart-section {
     margin-bottom: var(--space-lg);
   }
 
   .section-title {
     font-family: var(--font-display);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: var(--crema);
     margin-bottom: var(--space-sm);
   }
@@ -209,13 +284,29 @@
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: var(--space-sm);
+    padding: var(--space-sm) var(--space-sm) var(--space-xs);
     overflow-x: auto;
   }
 
+  /* ── Recent ── */
   .recent-section {
     margin-bottom: var(--space-lg);
   }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .see-all {
+    font-size: 0.8rem;
+    color: var(--text2);
+    transition: color 0.15s;
+  }
+
+  .see-all:hover { color: var(--coffee-light); }
 
   .recent-list {
     display: flex;
@@ -226,21 +317,17 @@
   .recent-shot {
     display: block;
     text-decoration: none;
-    transition: border-color 0.15s;
-  }
-
-  .recent-shot:hover {
-    border-color: rgba(196, 135, 74, 0.3);
   }
 
   .recent-shot__top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: var(--space-xs);
   }
 
   .recent-bean {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--coffee-light);
   }
@@ -250,6 +337,13 @@
     color: var(--text3);
   }
 
+  .recent-shot__mid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+  }
+
   .recent-ratio {
     font-size: 0.8rem;
     color: var(--coffee-light);
@@ -257,7 +351,6 @@
   }
 
   .recent-params {
-    margin-top: var(--space-xs);
     display: flex;
     gap: var(--space-sm);
     font-size: 0.75rem;

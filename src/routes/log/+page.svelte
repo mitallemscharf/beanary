@@ -38,7 +38,7 @@
 <div class="page">
   <div class="page-header">
     <h1 class="page-title">Shot loggen</h1>
-    <p class="page-subtitle">Espresso erfassen</p>
+    <p class="page-subtitle">Espresso erfassen ·  {new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
   </div>
 
   {#if form?.error}
@@ -110,8 +110,7 @@
     </div>
 
     <!-- Brew-Ratio Live -->
-    <div class="field">
-      <label>Brew-Ratio (Yield ÷ Dosis)</label>
+    <div class="field brew-ratio-field">
       <BrewRatioIndicator dose={doseParsed} yieldG={yieldParsed} />
     </div>
 
@@ -166,9 +165,11 @@
     </div>
 
     <!-- Bewertung -->
-    <div class="field">
+    <div class="field rating-field">
       <label>Bewertung * {#if rating === 0}<span class="rating-hint">← Sterne antippen</span>{/if}</label>
-      <RatingStars bind:rating />
+      <div class="rating-wrap">
+        <RatingStars bind:rating />
+      </div>
       <input type="hidden" name="rating" value={rating} />
     </div>
 
@@ -194,10 +195,10 @@
 
     <button
       type="submit"
-      class="btn btn-primary btn-full"
+      class="btn btn-primary btn-full submit-btn"
       disabled={submitting || rating === 0}
     >
-      {submitting ? 'Wird gespeichert…' : 'Shot speichern'}
+      {submitting ? 'Wird gespeichert…' : '☕ Shot speichern'}
     </button>
   </form>
 </div>
@@ -263,6 +264,30 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text3);
+  }
+
+  .rating-field {
+    margin-bottom: var(--space-lg);
+  }
+
+  .rating-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+    display: flex;
+    justify-content: center;
+  }
+
+  .brew-ratio-field {
+    margin-bottom: var(--space-lg);
+  }
+
+  .submit-btn {
+    height: 52px;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    margin-top: var(--space-sm);
   }
 
   .rating-hint {

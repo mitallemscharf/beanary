@@ -41,17 +41,43 @@
 <style>
   .bean-card {
     display: block;
-    background: var(--bg2);
+    position: relative;
+    overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: var(--space-md);
-    transition: border-color 0.15s, transform 0.1s;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     text-decoration: none;
+    background-color: var(--bg2);
+    background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=600&q=60');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .bean-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(18, 14, 10, 0.91);
+    transition: background 0.2s;
+    z-index: 0;
   }
 
   .bean-card:hover {
-    border-color: rgba(196, 135, 74, 0.3);
-    transform: translateY(-1px);
+    border-color: rgba(196, 135, 74, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  }
+
+  .bean-card:hover::before {
+    background: rgba(18, 14, 10, 0.86);
+  }
+
+  .bean-card__top,
+  .bean-card__tags,
+  .bean-card__footer {
+    position: relative;
+    z-index: 1;
   }
 
   .bean-card__top {
