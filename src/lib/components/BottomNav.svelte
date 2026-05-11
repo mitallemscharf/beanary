@@ -63,12 +63,14 @@
     left: 0;
     right: 0;
     height: var(--nav-height);
-    background: var(--bg2);
+    background: var(--bg);
     border-top: 1px solid var(--border);
     display: flex;
     align-items: stretch;
     z-index: 50;
     padding-bottom: env(safe-area-inset-bottom, 0);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .bottom-nav__tab {
@@ -84,7 +86,7 @@
   }
 
   .bottom-nav__tab.active {
-    color: var(--coffee-light);
+    color: var(--coffee);
   }
 
   .bottom-nav__icon {

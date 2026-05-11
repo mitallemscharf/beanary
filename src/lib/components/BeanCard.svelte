@@ -57,8 +57,8 @@
 
   .bean-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-    border-color: rgba(196, 135, 74, 0.35);
+    box-shadow: 0 12px 36px rgba(44, 30, 20, 0.18);
+    border-color: rgba(139, 90, 43, 0.35);
   }
 
   .bean-card__image {
@@ -72,7 +72,7 @@
   .bean-card__image-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 30%, var(--bg2) 100%);
+    background: linear-gradient(to bottom, rgba(30,20,10,0.1) 0%, var(--bg2) 100%);
   }
 
   .bean-card__body {
@@ -89,7 +89,7 @@
   .bean-card__name {
     font-family: var(--font-display);
     font-size: 1.3rem;
-    color: var(--crema);
+    color: var(--text);
     font-weight: 500;
   }
 

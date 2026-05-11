@@ -55,7 +55,7 @@
     padding: var(--space-md) var(--space-md);
     border-radius: var(--radius);
     border: 1px solid var(--border);
-    background: var(--bg3);
+    background: var(--bg2);
     transition: background 0.25s, border-color 0.25s;
   }
 
@@ -171,5 +171,5 @@
   .ratio--red .ratio-value    { color: #c47a7a; }
   .ratio--red .ratio-fill     { background: #c47a7a; }
 
-  .ratio--neutral .ratio-value { color: var(--text3); }
+  .ratio--neutral .ratio-value { color: var(--text2); }
 </style>
