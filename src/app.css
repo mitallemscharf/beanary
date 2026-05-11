@@ -174,17 +174,17 @@ label {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-md);
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition: all 0.25s ease;
 }
 
 a.card:hover {
-  border-color: rgba(139, 90, 43, 0.25);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(44, 30, 20, 0.12);
+  border-color: rgba(139, 90, 43, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(44, 30, 20, 0.14);
 }
 
 .field {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .badge {

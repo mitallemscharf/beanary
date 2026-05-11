@@ -3,7 +3,7 @@
 
   const tabs = [
     {
-      href: '/',
+      href: '/dashboard',
       label: 'Home',
       icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -37,7 +37,6 @@
   ];
 
   function isActive(href) {
-    if (href === '/') return page.url.pathname === '/';
     return page.url.pathname.startsWith(href);
   }
 </script>
@@ -69,8 +68,8 @@
     align-items: stretch;
     z-index: 50;
     padding-bottom: env(safe-area-inset-bottom, 0);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .bottom-nav__tab {
@@ -81,23 +80,35 @@
     justify-content: center;
     gap: 3px;
     color: var(--text3);
-    transition: color 0.15s;
+    transition: color 0.15s, transform 0.15s;
     padding-block: var(--space-xs);
+    text-decoration: none;
   }
 
   .bottom-nav__tab.active {
     color: var(--coffee);
   }
 
+  .bottom-nav__tab.active .bottom-nav__icon {
+    transform: scale(1.18);
+  }
+
   .bottom-nav__icon {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.15s ease;
   }
 
   .bottom-nav__label {
     font-size: 0.65rem;
-    font-weight: 500;
+    font-weight: 400;
     letter-spacing: 0.02em;
+    transition: font-size 0.15s, font-weight 0.15s;
+  }
+
+  .bottom-nav__tab.active .bottom-nav__label {
+    font-size: 0.72rem;
+    font-weight: 600;
   }
 </style>
