@@ -40,9 +40,10 @@
     <div class="log-header__text">
       <p class="log-header__date">{new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
       <h1 class="log-header__title">Shot loggen</h1>
-      <p class="log-header__sub">Espresso erfassen</p>
     </div>
-    <div class="log-header__icon">☕</div>
+    <div class="log-header__icon" aria-hidden="true">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+    </div>
   </div>
 
   {#if form?.error}
@@ -65,144 +66,103 @@
     }}
   >
     <!-- Bohne -->
-    <div class="field">
-      <label for="beanId">Bohne *</label>
-      {#if data.beans.length === 0}
-        <div class="empty-hint">
-          Noch keine Bohnen erfasst. <a href="/beans/new">Jetzt hinzufügen →</a>
+    <div class="form-section">
+      <p class="form-section__label">Bohne</p>
+      <div class="field">
+        {#if data.beans.length === 0}
+          <div class="empty-hint">
+            Noch keine Bohnen erfasst. <a href="/beans/new">Jetzt hinzufügen →</a>
+          </div>
+        {:else}
+          <select name="beanId" id="beanId" required>
+            <option value="" disabled selected>Bohne auswählen…</option>
+            {#each data.beans as bean}
+              <option value={bean._id}>{bean.name} — {bean.roaster}</option>
+            {/each}
+          </select>
+        {/if}
+      </div>
+    </div>
+
+    <!-- Extraktion -->
+    <div class="form-section">
+      <p class="form-section__label">Extraktion</p>
+      <div class="row-2">
+        <div class="field">
+          <label for="dose">Dosis (g)</label>
+          <input type="number" id="dose" name="dose" min="1" max="50" step="0.1" placeholder="18" required bind:value={dose} />
         </div>
-      {:else}
-        <select name="beanId" id="beanId" required>
-          <option value="" disabled selected>Bohne auswählen…</option>
-          {#each data.beans as bean}
-            <option value={bean._id}>{bean.name} — {bean.roaster}</option>
-          {/each}
-        </select>
-      {/if}
-    </div>
-
-    <!-- Dosis & Yield -->
-    <div class="row-2">
-      <div class="field">
-        <label for="dose">Dosis (g) *</label>
-        <input
-          type="number"
-          id="dose"
-          name="dose"
-          min="1"
-          max="50"
-          step="0.1"
-          placeholder="18"
-          required
-          bind:value={dose}
-        />
+        <div class="field">
+          <label for="yieldG">Yield (g)</label>
+          <input type="number" id="yieldG" name="yieldG" min="1" max="200" step="0.1" placeholder="36" required bind:value={yieldG} />
+        </div>
       </div>
       <div class="field">
-        <label for="yieldG">Yield (g) *</label>
-        <input
-          type="number"
-          id="yieldG"
-          name="yieldG"
-          min="1"
-          max="200"
-          step="0.1"
-          placeholder="36"
-          required
-          bind:value={yieldG}
-        />
+        <BrewRatioIndicator dose={doseParsed} yieldG={yieldParsed} />
       </div>
-    </div>
-
-    <!-- Brew-Ratio Live -->
-    <div class="field brew-ratio-field">
-      <BrewRatioIndicator dose={doseParsed} yieldG={yieldParsed} />
-    </div>
-
-    <!-- Mahlgrad & Zeit -->
-    <div class="row-2">
-      <div class="field">
-        <label for="grindSize">Mahlgrad *</label>
-        <input
-          type="number"
-          id="grindSize"
-          name="grindSize"
-          min="1"
-          max="100"
-          step="0.5"
-          placeholder="12"
-          required
-        />
-      </div>
-      <div class="field">
-        <label for="extractionTime">Zeit (s) *</label>
-        <input
-          type="number"
-          id="extractionTime"
-          name="extractionTime"
-          min="1"
-          max="120"
-          step="1"
-          placeholder="27"
-          required
-        />
+      <div class="row-2">
+        <div class="field">
+          <label for="grindSize">Mahlgrad</label>
+          <input type="number" id="grindSize" name="grindSize" min="1" max="100" step="0.5" placeholder="12" required />
+        </div>
+        <div class="field">
+          <label for="extractionTime">Zeit (s)</label>
+          <input type="number" id="extractionTime" name="extractionTime" min="1" max="120" step="1" placeholder="27" required />
+        </div>
       </div>
     </div>
 
     <!-- Temperatur -->
-    <div class="field">
-      <label>Temperatur (Heiss)</label>
-      <div class="temp-selector">
-        {#each temperatures as t}
-          <label class="temp-option" class:selected={selectedTemp === t.value} title={t.title}>
-            <input
-              type="radio"
-              name="temperature"
-              value={t.value}
-              bind:group={selectedTemp}
-              class="sr-only"
-            />
-            <span>{t.label}</span>
-            <span class="temp-label">{t.title}</span>
-          </label>
-        {/each}
+    <div class="form-section">
+      <p class="form-section__label">Temperatur</p>
+      <div class="field">
+        <div class="temp-selector">
+          {#each temperatures as t}
+            <label class="temp-option" class:selected={selectedTemp === t.value} title={t.title}>
+              <input type="radio" name="temperature" value={t.value} bind:group={selectedTemp} class="sr-only" />
+              <span class="temp-dots">{t.label}</span>
+              <span class="temp-label">{t.title}</span>
+            </label>
+          {/each}
+        </div>
       </div>
     </div>
 
     <!-- Bewertung -->
-    <div class="field rating-field">
-      <label>Bewertung * {#if rating === 0}<span class="rating-hint">← Sterne antippen</span>{/if}</label>
-      <div class="rating-wrap">
-        <RatingStars bind:rating />
+    <div class="form-section">
+      <p class="form-section__label">
+        Bewertung
+        {#if rating === 0}<span class="rating-hint">← antippen</span>{/if}
+      </p>
+      <div class="field">
+        <div class="rating-wrap">
+          <RatingStars bind:rating />
+        </div>
+        <input type="hidden" name="rating" value={rating} />
       </div>
-      <input type="hidden" name="rating" value={rating} />
     </div>
 
-    <!-- Geschmackstags -->
-    <div class="field">
-      <label>Geschmack</label>
-      <FlavorTags bind:selected={selectedTags} />
-      {#each selectedTags as tag}
-        <input type="hidden" name="flavorTags" value={tag} />
-      {/each}
+    <!-- Geschmack -->
+    <div class="form-section">
+      <p class="form-section__label">Geschmack</p>
+      <div class="field">
+        <FlavorTags bind:selected={selectedTags} />
+        {#each selectedTags as tag}
+          <input type="hidden" name="flavorTags" value={tag} />
+        {/each}
+      </div>
     </div>
 
     <!-- Notizen -->
-    <div class="field">
-      <label for="notes">Notizen</label>
-      <textarea
-        id="notes"
-        name="notes"
-        rows="3"
-        placeholder="Beobachtungen, Anpassungen für nächstes Mal…"
-      ></textarea>
+    <div class="form-section">
+      <p class="form-section__label">Notizen</p>
+      <div class="field">
+        <textarea id="notes" name="notes" rows="3" placeholder="Beobachtungen, Anpassungen für nächstes Mal…"></textarea>
+      </div>
     </div>
 
-    <button
-      type="submit"
-      class="btn btn-primary btn-full submit-btn"
-      disabled={submitting || rating === 0}
-    >
-      {submitting ? 'Wird gespeichert…' : '☕ Shot speichern'}
+    <button type="submit" class="btn btn-primary btn-full submit-btn" disabled={submitting || rating === 0}>
+      {submitting ? 'Wird gespeichert…' : 'Shot speichern'}
     </button>
   </form>
 </div>
@@ -216,39 +176,52 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--espresso);
-    margin: 0 calc(-1 * var(--space-sm));
-    padding: var(--space-xl) var(--space-sm) var(--space-lg);
-    margin-bottom: var(--space-lg);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: var(--space-xl) 0 var(--space-lg);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
   }
 
   .log-header__date {
-    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(250, 248, 245, 0.45);
-    margin-bottom: 4px;
+    letter-spacing: 0.14em;
+    color: var(--text3);
+    margin-bottom: 8px;
   }
 
   .log-header__title {
     font-family: var(--font-display);
-    font-size: 2.4rem;
+    font-size: 44px;
     font-weight: 500;
-    color: #FAF8F5;
-    line-height: 1;
+    color: var(--crema);
+    line-height: 1.1;
+    letter-spacing: -1px;
   }
 
-  .log-header__sub {
-    font-size: 0.85rem;
-    color: rgba(250, 248, 245, 0.55);
-    margin-top: 5px;
-    font-style: italic;
+  /* ── Form Sections ── */
+  .form-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
   }
 
-  .log-header__icon {
-    font-size: 2.5rem;
-    opacity: 0.6;
+  .form-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .form-section__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--coffee-light);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .row-2 {
@@ -258,87 +231,66 @@
   }
 
   .error-banner {
-    background: rgba(139, 58, 58, 0.2);
-    border: 1px solid rgba(139, 58, 58, 0.4);
+    background: rgba(139, 58, 58, 0.15);
+    border: 1px solid rgba(139, 58, 58, 0.35);
     color: #c47a7a;
     padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-sm);
-    font-size: 0.875rem;
+    font-size: 13px;
     margin-bottom: var(--space-md);
   }
 
   .empty-hint {
-    font-size: 0.875rem;
+    font-size: 13px;
     color: var(--text2);
     padding: var(--space-xs) 0;
   }
 
-  .empty-hint a {
-    color: var(--coffee-light);
-  }
+  .empty-hint a { color: var(--coffee-light); }
 
+  /* ── Temp Selector ── */
   .temp-selector {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-xs);
+    gap: 8px;
   }
 
   .temp-option {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    padding: var(--space-xs);
+    gap: 4px;
+    padding: 10px 6px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    background: var(--bg3);
+    background: var(--bg2);
     cursor: pointer;
-    transition: all 0.15s;
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: 0.85rem;
-    color: var(--text2);
-  }
-
-  .temp-option.selected {
-    border-color: var(--coffee);
-    background: rgba(139, 90, 43, 0.15);
-    color: var(--crema);
-  }
-
-  .temp-label {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    font-size: 13px;
     color: var(--text3);
   }
 
-  .rating-field {
-    margin-bottom: var(--space-lg);
+  .temp-option.selected {
+    border-color: rgba(139, 90, 43, 0.5);
+    background: rgba(139, 90, 43, 0.12);
+    color: var(--crema);
+    box-shadow: 0 0 12px rgba(139, 90, 43, 0.15);
   }
 
-  .rating-wrap {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-sm) var(--space-md);
-    display: flex;
-    justify-content: center;
+  .temp-dots { font-size: 11px; letter-spacing: 1px; }
+
+  .temp-label {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: inherit;
   }
 
-  .brew-ratio-field {
-    margin-bottom: var(--space-lg);
-  }
-
-  .submit-btn {
-    height: 52px;
-    font-size: 1rem;
-    letter-spacing: 0.03em;
-    margin-top: var(--space-sm);
-  }
-
+  /* ── Rating ── */
   .rating-hint {
-    font-size: 0.7rem;
+    font-family: var(--font-body);
+    font-size: 10px;
     color: var(--amber);
     text-transform: none;
     letter-spacing: 0;
@@ -348,7 +300,25 @@
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.5; }
+    50% { opacity: 0.4; }
+  }
+
+  .rating-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── Submit ── */
+  .submit-btn {
+    height: 52px;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: var(--space-md);
   }
 
   .sr-only {

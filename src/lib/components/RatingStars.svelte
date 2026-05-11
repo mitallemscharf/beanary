@@ -24,11 +24,11 @@
   }
 
   .star {
-    font-size: 36px;
-    color: var(--text3);
+    font-size: 32px;
+    color: var(--surface);
     transition: color 0.12s, transform 0.12s;
     line-height: 1;
-    padding: 0 3px;
+    padding: 0 2px;
   }
 
   .star.filled {
@@ -36,8 +36,8 @@
   }
 
   .stars:not(.readonly) .star:hover {
-    color: var(--coffee-light);
-    transform: scale(1.15);
+    color: var(--amber);
+    transform: scale(1.12);
   }
 
   .stars:not(.readonly) .star:active {

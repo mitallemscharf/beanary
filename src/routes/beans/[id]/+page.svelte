@@ -20,7 +20,7 @@
   <!-- Photo Hero -->
   <div class="bean-hero">
     <img
-      src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80"
+      src="/hero-grind.webp"
       alt=""
       class="bean-hero__img"
     />
@@ -244,9 +244,10 @@
   }
 
   .info-value {
-    font-size: 0.95rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
     color: var(--text);
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .bean-info {
@@ -297,9 +298,10 @@
   }
 
   .param-value {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
     color: var(--crema);
+    font-weight: 500;
   }
 
   .shots-list {
@@ -323,7 +325,8 @@
   .shot-params {
     display: flex;
     gap: var(--space-sm);
-    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--text2);
     flex-wrap: wrap;
   }

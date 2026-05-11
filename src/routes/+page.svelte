@@ -4,63 +4,60 @@
   <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Willkommen bei</p>
-      <h1 class="hero-title">Beanary</h1>
-      <p class="hero-subtitle">Dein persönliches Espresso-Tagebuch</p>
-      <a href="/dashboard" class="hero-cta">App öffnen →</a>
+      <p class="hero-eyebrow">Das Kaffee-Tagebuch</p>
+      <h1 class="hero-wordmark">Beanary</h1>
+      <p class="hero-headline">Finde deinen<br/>perfekten Shot.</p>
+      <p class="hero-subline">Erfasse jeden Espresso mit Präzision.<br/>Erkenne, was wirklich funktioniert.</p>
+      <a href="/dashboard" class="hero-cta">
+        <span>App öffnen</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
-    <div class="hero-scroll-hint">↓</div>
-  </section>
-
-  <!-- ── EDITORIAL SPLIT ── -->
-  <section class="editorial">
-    <div class="editorial-photo">
-      <img src="/hero-bag-to-cup.webp" alt="Vom Bohnen zum Espresso" />
-    </div>
-    <div class="editorial-text">
-      <p class="editorial-overline">Das Konzept</p>
-      <h2 class="editorial-heading">Vom Bohnen<br/>zum<br/>perfekten Shot.</h2>
-      <p class="editorial-body">Beanary begleitet dich auf deiner Reise — von der ersten Bohne bis zum Sweet Spot. Jeder Shot zählt.</p>
+    <div class="hero-scroll" aria-hidden="true">
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+        <rect x="1" y="1" width="14" height="22" rx="7" stroke="currentColor" stroke-width="1.5" stroke-opacity="0.3"/>
+        <circle cx="8" cy="7" r="2.5" fill="currentColor" fill-opacity="0.4" class="scroll-dot"/>
+      </svg>
     </div>
   </section>
 
   <!-- ── FEATURES ── -->
   <section class="features">
-    <p class="features-label">Was dich erwartet</p>
+    <p class="features-eyebrow">Was Beanary kann</p>
 
-    <div class="feature-card">
-      <span class="feature-num">01</span>
-      <div class="feature-text">
-        <h3 class="feature-title">Shots loggen</h3>
-        <p class="feature-desc">Erfasse jeden Espresso mit Dosis, Yield, Mahlgrad, Zeit und Bewertung. Die Brew-Ratio wird automatisch berechnet.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+        </div>
+        <div class="feature-body">
+          <h3 class="feature-title">Shot Logger</h3>
+          <p class="feature-desc">Dosis, Yield, Mahlgrad, Extraktionszeit — alle Parameter auf einen Blick. Nie wieder die beste Einstellung vergessen.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="feature-card">
-      <span class="feature-num">02</span>
-      <div class="feature-text">
-        <h3 class="feature-title">Bohnen verwalten</h3>
-        <p class="feature-desc">Behalte den Überblick über alle deine Kaffeebohnen — von der Herkunft bis zum Frischegrad nach dem Röstdatum.</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="5.5" transform="rotate(-30 12 12)"/><path d="M12 6.5 Q9.5 12 12 17.5"/></svg>
+        </div>
+        <div class="feature-body">
+          <h3 class="feature-title">Bohnen-Bibliothek</h3>
+          <p class="feature-desc">Röster, Herkunft, Röstdatum und Frische-Indikator. Sieh sofort, welche Bohnen aktuell im optimalen Fenster sind.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="feature-card">
-      <span class="feature-num">03</span>
-      <div class="feature-text">
-        <h3 class="feature-title">Sweet Spot finden</h3>
-        <p class="feature-desc">Entdecke deine besten Einstellungen für jeden Blend. Der Sweet Spot zeigt dir den höchstbewerteten Shot je Bohne.</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="feature-body">
+          <h3 class="feature-title">Sweet Spot Finder</h3>
+          <p class="feature-desc">Beanary erkennt automatisch den höchstbewerteten Shot pro Bohne — dein persönlicher Sweet Spot, immer griffbereit.</p>
+        </div>
       </div>
     </div>
 
     <a href="/dashboard" class="features-cta">Jetzt starten →</a>
-  </section>
-
-  <!-- ── GRIND PHOTO ── -->
-  <section class="grind-section">
-    <img src="/hero-grind.webp" alt="Mahlgrad" class="grind-photo" />
-    <div class="grind-overlay">
-      <p class="grind-text">"Präzision im Mahlgrad.<br/>Perfektion im Cup."</p>
-    </div>
   </section>
 
 </div>
@@ -68,65 +65,82 @@
 <style>
   .landing {
     min-height: 100dvh;
-    background: var(--espresso);
+    background: var(--bg);
   }
 
   /* ── HERO ── */
   .hero {
     position: relative;
-    min-height: 72dvh;
+    min-height: 100dvh;
     background-image: url('/hero-portafilters.webp');
     background-size: cover;
-    background-position: center top;
+    background-position: center 40%;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    justify-content: space-between;
+    justify-content: flex-end;
+    align-items: stretch;
   }
 
   .hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      160deg,
-      rgba(15, 10, 5, 0.08) 0%,
-      rgba(15, 10, 5, 0.55) 55%,
-      rgba(15, 10, 5, 0.92) 100%
+      to bottom,
+      rgba(11, 9, 7, 0.25) 0%,
+      rgba(11, 9, 7, 0.55) 45%,
+      rgba(11, 9, 7, 0.96) 100%
     );
   }
 
   .hero-content {
     position: relative;
     z-index: 1;
-    padding: var(--space-xl) var(--space-sm) var(--space-xl);
-    width: 100%;
-    margin-top: auto;
+    padding: 0 var(--space-sm) var(--space-xl);
+    animation: fadeIn 0.9s ease both;
   }
 
   .hero-eyebrow {
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
     text-transform: uppercase;
-    color: rgba(250, 248, 245, 0.5);
-    margin-bottom: 10px;
+    letter-spacing: 0.18em;
+    color: var(--coffee-light);
+    margin-bottom: var(--space-sm);
+    opacity: 0.8;
+    animation: fadeIn 0.6s ease both;
   }
 
-  .hero-title {
+  .hero-wordmark {
     font-family: var(--font-display);
-    font-size: clamp(64px, 20vw, 88px);
-    font-weight: 600;
-    color: #FAF8F5;
+    font-size: 80px;
+    font-weight: 500;
+    color: var(--crema);
     line-height: 0.88;
-    letter-spacing: -0.02em;
-    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-md);
+    animation: fadeIn 0.7s 0.05s ease both;
   }
 
-  .hero-subtitle {
-    font-size: 1rem;
-    color: rgba(250, 248, 245, 0.65);
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 400;
     font-style: italic;
+    color: rgba(232, 201, 154, 0.65);
+    line-height: 1.3;
+    letter-spacing: 0.005em;
+    margin-bottom: var(--space-md);
+    animation: fadeIn 0.7s 0.1s ease both;
+  }
+
+  .hero-subline {
+    font-size: 0.875rem;
+    color: var(--text2);
+    line-height: 1.65;
     margin-bottom: var(--space-xl);
-    line-height: 1.5;
+    max-width: 32ch;
+    animation: fadeIn 0.7s 0.15s ease both;
   }
 
   .hero-cta {
@@ -134,205 +148,134 @@
     align-items: center;
     gap: 10px;
     background: var(--coffee);
-    color: #FAF8F5;
-    font-size: 0.95rem;
+    color: var(--crema);
+    font-family: var(--font-body);
+    font-size: 14px;
     font-weight: 500;
-    padding: 15px 30px;
-    border-radius: var(--radius-lg);
+    padding: 15px 28px;
+    border-radius: var(--radius);
     letter-spacing: 0.03em;
     transition: all 0.25s ease;
     text-decoration: none;
+    animation: fadeIn 0.7s 0.2s ease both;
   }
 
   .hero-cta:hover {
     background: var(--coffee-light);
     transform: translateY(-3px);
-    box-shadow: 0 14px 36px rgba(139, 90, 43, 0.5);
+    box-shadow: 0 12px 32px rgba(139, 90, 43, 0.5);
   }
 
-  .hero-scroll-hint {
+  .hero-scroll {
     position: relative;
     z-index: 1;
-    color: rgba(250, 248, 245, 0.3);
-    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
     padding: var(--space-sm);
-    animation: float 2.5s ease-in-out infinite;
-    align-self: center;
+    color: var(--crema);
   }
 
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(6px); }
+  .scroll-dot {
+    animation: scrollBob 2.5s ease-in-out infinite;
   }
 
-  /* ── EDITORIAL SPLIT ── */
-  .editorial {
-    background: var(--bg);
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .editorial-photo {
-    height: 280px;
-    overflow: hidden;
-  }
-
-  .editorial-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 30%;
-    display: block;
-    transition: transform 0.6s ease;
-  }
-
-  .editorial-photo:hover img {
-    transform: scale(1.03);
-  }
-
-  .editorial-text {
-    padding: var(--space-xl) var(--space-sm);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .editorial-overline {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--coffee);
-    margin-bottom: var(--space-sm);
-  }
-
-  .editorial-heading {
-    font-family: var(--font-display);
-    font-size: 2.6rem;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    margin-bottom: var(--space-md);
-  }
-
-  .editorial-body {
-    font-size: 0.9rem;
-    color: var(--text2);
-    line-height: 1.65;
-    max-width: 36ch;
+  @keyframes scrollBob {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(6px); opacity: 0.8; }
   }
 
   /* ── FEATURES ── */
   .features {
-    background: var(--espresso);
+    background: var(--bg);
     padding: var(--space-xl) var(--space-sm);
-    padding-bottom: var(--space-xl);
+    padding-bottom: calc(var(--space-xl) + var(--space-lg));
   }
 
-  .features-label {
-    font-size: 0.62rem;
+  .features-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: rgba(250, 248, 245, 0.3);
+    letter-spacing: 0.2em;
+    color: var(--text3);
     margin-bottom: var(--space-xl);
     padding-bottom: var(--space-sm);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .features-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: var(--space-lg);
   }
 
   .feature-card {
     display: flex;
     align-items: flex-start;
     gap: var(--space-md);
-    padding: var(--space-md) 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    transition: all 0.2s ease;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    transition: all 0.25s ease;
   }
 
-  .feature-card:last-of-type {
-    border-bottom: none;
+  .feature-card:hover {
+    transform: translateX(4px);
+    border-color: rgba(139, 90, 43, 0.3);
+    background: var(--bg3);
   }
 
-  .feature-num {
-    font-family: var(--font-display);
-    font-size: 2.2rem;
-    color: rgba(196, 135, 74, 0.35);
-    font-weight: 400;
-    line-height: 1;
+  .feature-icon {
     flex-shrink: 0;
-    width: 48px;
-    padding-top: 2px;
-    transition: color 0.2s;
-  }
-
-  .feature-card:hover .feature-num {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 90, 43, 0.1);
+    border: 1px solid rgba(139, 90, 43, 0.18);
+    border-radius: var(--radius-sm);
     color: var(--coffee-light);
   }
 
   .feature-title {
     font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: #FAF8F5;
+    font-size: 1.25rem;
+    color: var(--crema);
     font-weight: 500;
-    margin-bottom: 8px;
-    letter-spacing: 0.01em;
+    margin-bottom: 6px;
+    letter-spacing: 0;
+    line-height: 1.2;
   }
 
   .feature-desc {
-    font-size: 0.85rem;
-    color: rgba(250, 248, 245, 0.5);
+    font-size: 13px;
+    color: var(--text2);
     line-height: 1.6;
   }
 
   .features-cta {
     display: block;
     text-align: center;
-    background: var(--coffee);
-    color: #FAF8F5;
-    font-size: 0.95rem;
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--coffee-light);
+    font-family: var(--font-body);
+    font-size: 14px;
     font-weight: 500;
-    padding: 16px;
+    padding: 15px;
     border-radius: var(--radius);
-    margin-top: var(--space-xl);
+    margin-top: var(--space-lg);
     transition: all 0.25s ease;
     text-decoration: none;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
 
   .features-cta:hover {
-    background: var(--coffee-light);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(139, 90, 43, 0.4);
-  }
-
-  /* ── GRIND PHOTO ── */
-  .grind-section {
-    position: relative;
-    height: 260px;
-    overflow: hidden;
-  }
-
-  .grind-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 40%;
-    display: block;
-  }
-
-  .grind-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, rgba(15, 10, 5, 0.75) 0%, rgba(15, 10, 5, 0.2) 100%);
-    display: flex;
-    align-items: center;
-    padding: var(--space-md) var(--space-sm);
-  }
-
-  .grind-text {
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 400;
-    font-style: italic;
-    color: rgba(250, 248, 245, 0.9);
-    line-height: 1.45;
-    max-width: 22ch;
+    background: var(--coffee);
+    border-color: var(--coffee);
+    color: var(--crema);
+    box-shadow: 0 8px 24px rgba(139, 90, 43, 0.35);
   }
 </style>

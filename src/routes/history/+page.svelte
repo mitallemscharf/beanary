@@ -26,18 +26,25 @@
 
 <div class="page">
   <div class="page-header">
-    <h1 class="page-title">History</h1>
-    <p class="page-subtitle">{data.shots.length} Shot{data.shots.length !== 1 ? 's' : ''}</p>
+    <div>
+      <h1 class="page-title">History</h1>
+      <p class="page-subtitle">
+        <span class="mono">{data.shots.length}</span> Shot{data.shots.length !== 1 ? 's' : ''}
+      </p>
+    </div>
   </div>
 
   <!-- Filter -->
   <div class="filter-row">
-    <select onchange={onFilterChange} value={data.beanFilter}>
-      <option value="">Alle Bohnen</option>
-      {#each data.beans as bean}
-        <option value={bean._id}>{bean.name}</option>
-      {/each}
-    </select>
+    <div class="filter-wrap">
+      <svg class="filter-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <select onchange={onFilterChange} value={data.beanFilter} class="filter-select">
+        <option value="">Alle Bohnen</option>
+        {#each data.beans as bean}
+          <option value={bean._id}>{bean.name}</option>
+        {/each}
+      </select>
+    </div>
   </div>
 
   {#if data.shots.length === 0}
@@ -65,8 +72,30 @@
 </div>
 
 <style>
+  .page-subtitle .mono {
+    font-family: var(--font-mono);
+  }
+
   .filter-row {
     margin-bottom: var(--space-lg);
+  }
+
+  .filter-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .filter-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text3);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .filter-select {
+    padding-left: 36px;
   }
 
   .date-group {
@@ -74,18 +103,21 @@
   }
 
   .date-label {
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     color: var(--text3);
     margin-bottom: var(--space-sm);
     padding-bottom: var(--space-xs);
     border-bottom: 1px solid var(--border);
+    line-height: 1.4;
   }
 
   .shots-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: 8px;
   }
 </style>
