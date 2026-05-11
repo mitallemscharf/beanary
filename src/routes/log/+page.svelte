@@ -35,10 +35,14 @@
   }
 </script>
 
-<div class="page">
-  <div class="page-header">
-    <h1 class="page-title">Shot loggen</h1>
-    <p class="page-subtitle">Espresso erfassen ·  {new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+<div class="page log-page">
+  <div class="log-header">
+    <div class="log-header__text">
+      <p class="log-header__date">{new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+      <h1 class="log-header__title">Shot loggen</h1>
+      <p class="log-header__sub">Espresso erfassen</p>
+    </div>
+    <div class="log-header__icon">☕</div>
   </div>
 
   {#if form?.error}
@@ -204,6 +208,49 @@
 </div>
 
 <style>
+  .log-page {
+    padding-top: 0;
+  }
+
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--espresso);
+    margin: 0 calc(-1 * var(--space-sm));
+    padding: var(--space-xl) var(--space-sm) var(--space-lg);
+    margin-bottom: var(--space-lg);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+
+  .log-header__date {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(250, 248, 245, 0.45);
+    margin-bottom: 4px;
+  }
+
+  .log-header__title {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 500;
+    color: #FAF8F5;
+    line-height: 1;
+  }
+
+  .log-header__sub {
+    font-size: 0.85rem;
+    color: rgba(250, 248, 245, 0.55);
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  .log-header__icon {
+    font-size: 2.5rem;
+    opacity: 0.6;
+  }
+
   .row-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;

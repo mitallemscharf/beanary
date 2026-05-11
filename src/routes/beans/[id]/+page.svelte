@@ -16,17 +16,27 @@
   }
 </script>
 
-<div class="page">
-  <div class="page-header" style="display:flex; align-items:center; gap:var(--space-sm);">
-    <a href="/beans" class="back-btn" aria-label="Zurück">←</a>
-    <div style="flex:1; min-width:0;">
-      <h1 class="page-title">{bean.name}</h1>
-      <p class="page-subtitle">{bean.roaster}</p>
+<div class="page bean-detail">
+  <!-- Photo Hero -->
+  <div class="bean-hero">
+    <img
+      src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80"
+      alt=""
+      class="bean-hero__img"
+    />
+    <div class="bean-hero__overlay"></div>
+    <div class="bean-hero__top">
+      <a href="/beans" class="back-btn" aria-label="Zurück">←</a>
+      <FreshnessIndicator roastDate={bean.roastDate} />
     </div>
-    <FreshnessIndicator roastDate={bean.roastDate} />
+    <div class="bean-hero__bottom">
+      <h1 class="bean-hero__name">{bean.name}</h1>
+      <p class="bean-hero__roaster">{bean.roaster}</p>
+    </div>
   </div>
 
   <!-- Bean Info -->
+  <div class="bean-content">
   <div class="card bean-info">
     <div class="info-grid">
       {#if bean.origin}
@@ -133,15 +143,85 @@
       </div>
     {/if}
   </section>
+  </div><!-- bean-content -->
 </div>
 
 <style>
+  .bean-detail {
+    padding-top: 0;
+    padding-inline: 0;
+  }
+
+  /* ── Hero ── */
+  .bean-hero {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+  }
+
+  .bean-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .bean-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 10, 5, 0.45) 0%,
+      rgba(15, 10, 5, 0.2) 40%,
+      rgba(15, 10, 5, 0.75) 100%
+    );
+  }
+
+  .bean-hero__top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm);
+  }
+
+  .bean-hero__bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-sm) var(--space-sm) var(--space-md);
+  }
+
+  .bean-hero__name {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: #FAF8F5;
+    line-height: 1.1;
+  }
+
+  .bean-hero__roaster {
+    font-size: 0.85rem;
+    color: rgba(250, 248, 245, 0.7);
+    margin-top: 3px;
+  }
+
   .back-btn {
     font-size: 1.4rem;
-    color: var(--text2);
+    color: rgba(250, 248, 245, 0.9);
     line-height: 1;
     padding: var(--space-xs);
     flex-shrink: 0;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  .bean-content {
+    padding-inline: var(--space-sm);
+    padding-top: var(--space-md);
   }
 
   .info-grid {
@@ -192,8 +272,8 @@
   }
 
   .sweet-spot-card {
-    border-color: rgba(239, 159, 39, 0.25);
-    background: rgba(239, 159, 39, 0.05);
+    border-color: rgba(192, 128, 16, 0.3);
+    background: rgba(192, 128, 16, 0.06);
   }
 
   .sweet-spot-row {
