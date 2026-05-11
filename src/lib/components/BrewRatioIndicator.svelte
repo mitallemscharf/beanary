@@ -52,7 +52,7 @@
 
 <style>
   .ratio-wrap {
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-md) var(--space-md);
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--bg3);
@@ -99,11 +99,12 @@
 
   .ratio-value {
     font-family: var(--font-display);
-    font-size: 2.4rem;
+    font-size: 3rem;
     font-weight: 500;
     line-height: 1;
     margin-bottom: var(--space-sm);
     transition: color 0.25s;
+    text-align: center;
   }
 
   .ratio-track {

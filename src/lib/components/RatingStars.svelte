@@ -24,7 +24,7 @@
   }
 
   .star {
-    font-size: 2.2rem;
+    font-size: 36px;
     color: var(--text3);
     transition: color 0.12s, transform 0.12s;
     line-height: 1;

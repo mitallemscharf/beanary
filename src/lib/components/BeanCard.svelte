@@ -5,79 +5,78 @@
 </script>
 
 <a href="/beans/{bean._id}" class="bean-card">
-  <div class="bean-card__top">
-    <div>
-      <h3 class="bean-card__name">{bean.name}</h3>
-      <p class="bean-card__roaster">{bean.roaster}</p>
-    </div>
-    <FreshnessIndicator roastDate={bean.roastDate} />
+  <div class="bean-card__image">
+    <div class="bean-card__image-gradient"></div>
   </div>
 
-  {#if bean.flavorTags?.length}
-    <div class="bean-card__tags">
-      {#each bean.flavorTags as tag}
-        <span class="tag">{tag}</span>
-      {/each}
+  <div class="bean-card__body">
+    <div class="bean-card__top">
+      <div>
+        <h3 class="bean-card__name">{bean.name}</h3>
+        <p class="bean-card__roaster">{bean.roaster}</p>
+      </div>
+      <FreshnessIndicator roastDate={bean.roastDate} />
     </div>
-  {/if}
 
-  <div class="bean-card__footer">
-    <span class="stat">
-      <span class="stat__value">{bean.shotCount ?? 0}</span>
-      <span class="stat__label">Shots</span>
-    </span>
-    {#if bean.roastLevel}
-      <span class="roast-badge">{bean.roastLevel}</span>
+    {#if bean.flavorTags?.length}
+      <div class="bean-card__tags">
+        {#each bean.flavorTags as tag}
+          <span class="tag">{tag}</span>
+        {/each}
+      </div>
     {/if}
-    {#if bean.avgRating}
+
+    <div class="bean-card__footer">
       <span class="stat">
-        <span class="stat__value">★ {bean.avgRating.toFixed(1)}</span>
-        <span class="stat__label">Ø Bewertung</span>
+        <span class="stat__value">{bean.shotCount ?? 0}</span>
+        <span class="stat__label">Shots</span>
       </span>
-    {/if}
+      {#if bean.roastLevel}
+        <span class="roast-badge">{bean.roastLevel}</span>
+      {/if}
+      {#if bean.avgRating}
+        <span class="stat">
+          <span class="stat__value">★ {bean.avgRating.toFixed(1)}</span>
+          <span class="stat__label">Ø Bewertung</span>
+        </span>
+      {/if}
+    </div>
   </div>
 </a>
 
 <style>
   .bean-card {
     display: block;
-    position: relative;
-    overflow: hidden;
+    background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: var(--space-md);
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
     text-decoration: none;
-    background-color: var(--bg2);
-    background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=600&q=60');
-    background-size: cover;
-    background-position: center;
-  }
-
-  .bean-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(18, 14, 10, 0.91);
-    transition: background 0.2s;
-    z-index: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
   }
 
   .bean-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
     border-color: rgba(196, 135, 74, 0.35);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
   }
 
-  .bean-card:hover::before {
-    background: rgba(18, 14, 10, 0.86);
-  }
-
-  .bean-card__top,
-  .bean-card__tags,
-  .bean-card__footer {
+  .bean-card__image {
+    height: 160px;
+    background-image: url('https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400');
+    background-size: cover;
+    background-position: center;
     position: relative;
-    z-index: 1;
+  }
+
+  .bean-card__image-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 30%, var(--bg2) 100%);
+  }
+
+  .bean-card__body {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
   }
 
   .bean-card__top {

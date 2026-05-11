@@ -33,18 +33,18 @@
   }
 </script>
 
-<div class="page">
+<div class="page dashboard">
   <!-- Hero -->
   <div class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <p class="greeting">{greeting}</p>
-      <h1 class="logo">Beanary</h1>
-      <p class="hero-sub">Dein Kaffee-Tagebuch</p>
+      <h1 class="hero-title">Beanary</h1>
+      <p class="hero-tagline">Dein persönliches Kaffee-Tagebuch</p>
     </div>
   </div>
 
-  <!-- Metric Cards -->
+  <!-- Metric Cards (overlap hero) -->
   <div class="metrics-grid">
     <div class="metric-card">
       <span class="metric-icon">☕</span>
@@ -52,10 +52,8 @@
       <span class="metric-label">Shots total</span>
     </div>
     <div class="metric-card">
-      <span class="metric-icon" style="color: var(--amber)">★</span>
-      <span class="metric-value">
-        {data.avgRating > 0 ? data.avgRating.toFixed(1) : '—'}
-      </span>
+      <span class="metric-icon" style="color:var(--amber)">★</span>
+      <span class="metric-value">{data.avgRating > 0 ? data.avgRating.toFixed(1) : '—'}</span>
       <span class="metric-label">Ø Bewertung</span>
     </div>
     <div class="metric-card">
@@ -64,7 +62,7 @@
       <span class="metric-label">Beste Bohne</span>
     </div>
     <div class="metric-card">
-      <span class="metric-icon" style="color: var(--green-light)">◎</span>
+      <span class="metric-icon" style="color:var(--green-light)">◎</span>
       <span class="metric-value">{data.activeBeans}</span>
       <span class="metric-label">Aktive Bohnen</span>
     </div>
@@ -88,35 +86,19 @@
               </linearGradient>
             {/each}
           </defs>
-
-          <!-- Horizontal guide lines -->
-          {#each [1, 2, 3, 4, 5] as level}
+          {#each [1,2,3,4,5] as level}
             {@const gy = chartH - (level / maxRating) * chartH}
-            <line
-              x1="0" y1={gy} x2={chartW} y2={gy}
-              stroke="rgba(255,255,255,0.05)" stroke-width="1"
-            />
+            <line x1="0" y1={gy} x2={chartW} y2={gy} stroke="rgba(255,255,255,0.05)" stroke-width="1" />
           {/each}
-
           {#each data.chartData as bar, i}
             {@const x = i * (barW + 8) + 4}
             {@const h = barHeight(bar.rating)}
             {@const y = chartH - h}
-            <rect
-              x={x}
-              y={y}
-              width={barW}
-              height={h}
-              rx="5"
-              fill="url(#grad{i})"
-            />
+            <rect x={x} y={y} width={barW} height={h} rx="5" fill="url(#grad{i})" />
             <text
-              x={x + barW / 2}
-              y={chartH + 18}
-              text-anchor="middle"
-              font-size="8"
-              fill="var(--text3)"
-              font-family="var(--font-body)"
+              x={x + barW / 2} y={chartH + 18}
+              text-anchor="middle" font-size="8"
+              fill="var(--text3)" font-family="var(--font-body)"
             >{bar.date}</text>
           {/each}
         </svg>
@@ -162,16 +144,18 @@
 </div>
 
 <style>
+  .dashboard {
+    padding-top: 0;
+    padding-inline: 0;
+  }
+
   /* ── Hero ── */
   .hero {
     position: relative;
-    margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-sm)) var(--space-lg);
-    height: 230px;
-    background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80');
+    height: 300px;
+    background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200');
     background-size: cover;
     background-position: center 55%;
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-    overflow: hidden;
   }
 
   .hero-overlay {
@@ -179,9 +163,9 @@
     inset: 0;
     background: linear-gradient(
       to bottom,
-      rgba(15, 12, 10, 0.25) 0%,
-      rgba(15, 12, 10, 0.6) 55%,
-      rgba(15, 12, 10, 0.92) 100%
+      rgba(15, 12, 10, 0.2) 0%,
+      rgba(15, 12, 10, 0.55) 50%,
+      rgba(15, 12, 10, 0.85) 100%
     );
   }
 
@@ -192,41 +176,49 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: var(--space-md) var(--space-sm);
+    padding: 0 var(--space-sm) var(--space-xl);
   }
 
   .greeting {
     font-size: 0.8rem;
-    color: rgba(245, 230, 204, 0.7);
-    letter-spacing: 0.06em;
-    margin-bottom: 2px;
+    color: rgba(245, 230, 204, 0.65);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
   }
 
-  .logo {
+  .hero-title {
     font-family: var(--font-display);
-    font-size: 3rem;
+    font-size: 48px;
     font-weight: 500;
     color: var(--crema);
     line-height: 1;
+    letter-spacing: 0.02em;
   }
 
-  .hero-sub {
-    font-size: 0.8rem;
+  .hero-tagline {
+    font-size: 0.875rem;
     color: var(--text2);
-    margin-top: 4px;
+    margin-top: 6px;
   }
 
-  /* ── Metrics ── */
+  /* ── Metrics (overlap hero) ── */
   .metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    padding-inline: var(--space-sm);
+    margin-top: -44px;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 2rem;
   }
 
   .metric-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: var(--space-md);
     display: flex;
@@ -252,7 +244,7 @@
   }
 
   .metric-value--sm {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     white-space: normal;
     line-height: 1.2;
   }
@@ -266,7 +258,8 @@
 
   /* ── Chart ── */
   .chart-section {
-    margin-bottom: var(--space-lg);
+    padding-inline: var(--space-sm);
+    margin-bottom: 2rem;
   }
 
   .section-title {
@@ -286,7 +279,8 @@
 
   /* ── Recent ── */
   .recent-section {
-    margin-bottom: var(--space-lg);
+    padding-inline: var(--space-sm);
+    margin-bottom: 2rem;
   }
 
   .section-header {
@@ -301,7 +295,6 @@
     color: var(--text2);
     transition: color 0.15s;
   }
-
   .see-all:hover { color: var(--coffee-light); }
 
   .recent-list {

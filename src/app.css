@@ -52,14 +52,9 @@ body {
     radial-gradient(ellipse at 85% 100%, rgba(139, 90, 43, 0.08) 0%, transparent 55%);
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 h1, h2, h3 {
@@ -87,7 +82,7 @@ input, select, textarea {
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 0.7rem var(--space-sm);
+  padding: 14px 16px;
   width: 100%;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -123,7 +118,7 @@ label {
   padding-bottom: calc(var(--nav-height) + var(--space-sm));
   padding-top: var(--space-md);
   padding-inline: var(--space-sm);
-  animation: fadeInUp 0.35s ease both;
+  animation: fadeIn 0.3s ease both;
 }
 
 .page-header {
