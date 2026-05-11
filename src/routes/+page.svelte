@@ -58,7 +58,7 @@
       </span>
       <span class="metric-label">Ø Bewertung</span>
     </div>
-    <div class="metric-card metric-card--wide">
+    <div class="metric-card">
       <span class="metric-icon">♛</span>
       <span class="metric-value metric-value--sm">{data.bestBeanName ?? '—'}</span>
       <span class="metric-label">Beste Bohne</span>
@@ -232,10 +232,6 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-  }
-
-  .metric-card--wide {
-    grid-column: span 2;
   }
 
   .metric-icon {
