@@ -19,7 +19,7 @@
   }
 </script>
 
-<div class="shot-card card {accentClass}">
+<div class="shot-card {accentClass}">
   <div class="shot-card__header">
     <div class="shot-card__left">
       {#if beanName}
@@ -41,7 +41,7 @@
       <span class="param-label">Dose</span>
       <span class="param-value">{shot.dose}g</span>
     </div>
-    <div class="param-sep">→</div>
+    <span class="param-arrow">→</span>
     <div class="param">
       <span class="param-label">Yield</span>
       <span class="param-value">{shot.yieldG}g</span>
@@ -78,13 +78,20 @@
 
 <style>
   .shot-card {
-    border-left-width: 3px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-left-width: 2px;
     border-left-style: solid;
-    transition: all 0.2s ease;
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color 0.2s, transform 0.2s;
   }
 
   .shot-card:hover {
     transform: translateX(2px);
+    border-top-color: var(--border2);
+    border-right-color: var(--border2);
+    border-bottom-color: var(--border2);
   }
 
   .accent--green { border-left-color: var(--green-light); }
@@ -95,7 +102,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 10px;
     gap: var(--space-xs);
   }
 
@@ -117,21 +124,22 @@
   }
 
   .best-badge {
-    font-family: var(--font-body);
-    font-size: 9px;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    background: rgba(74, 124, 89, 0.2);
+    background: rgba(74, 124, 89, 0.18);
     color: var(--green-light);
+    border: 1px solid rgba(74, 124, 89, 0.28);
     border-radius: var(--radius-full);
-    padding: 3px 8px;
+    padding: 2px 8px;
     flex-shrink: 0;
   }
 
   .shot-time {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text3);
     white-space: nowrap;
     flex-shrink: 0;
@@ -155,47 +163,47 @@
     gap: 1px;
   }
 
-  .param-sep {
-    font-size: 12px;
+  .param-arrow {
+    font-size: 11px;
     color: var(--text3);
     align-self: flex-end;
     padding-bottom: 2px;
+    letter-spacing: 0;
   }
 
   .param-divider {
     width: 1px;
-    height: 24px;
+    height: 22px;
     background: var(--border);
     align-self: center;
   }
 
   .param-label {
-    font-size: 9px;
+    font-family: var(--font-mono);
+    font-size: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--text3);
-    font-weight: 500;
   }
 
   .param-value {
     font-family: var(--font-mono);
     font-size: 14px;
     color: var(--text);
-    font-weight: 400;
     line-height: 1.2;
   }
 
   .param-value--ratio { color: var(--coffee-light); }
 
-  .shot-tags { margin-top: var(--space-xs); }
+  .shot-tags { margin-top: 10px; }
 
   .shot-notes {
-    margin-top: var(--space-xs);
+    margin-top: 10px;
     font-size: 12px;
     color: var(--text2);
     font-style: italic;
     line-height: 1.5;
     border-top: 1px solid var(--border);
-    padding-top: var(--space-xs);
+    padding-top: 8px;
   }
 </style>

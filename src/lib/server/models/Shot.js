@@ -14,11 +14,10 @@ const shotSchema = new mongoose.Schema({
   createdAt:      { type: Date, default: Date.now }
 });
 
-shotSchema.pre('save', function (next) {
+shotSchema.pre('save', function () {
   if (this.dose > 0) {
     this.brewRatio = Math.round((this.yieldG / this.dose) * 100) / 100;
   }
-  next();
 });
 
 export default mongoose.models.Shot || mongoose.model('Shot', shotSchema);

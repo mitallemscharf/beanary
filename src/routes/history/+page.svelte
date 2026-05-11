@@ -26,18 +26,14 @@
 
 <div class="page">
   <div class="page-header">
-    <div>
-      <h1 class="page-title">History</h1>
-      <p class="page-subtitle">
-        <span class="mono">{data.shots.length}</span> Shot{data.shots.length !== 1 ? 's' : ''}
-      </p>
-    </div>
+    <h1 class="page-title">History</h1>
+    <p class="page-subtitle"><span class="mono">{data.shots.length}</span> Shot{data.shots.length !== 1 ? 's' : ''} erfasst</p>
   </div>
 
   <!-- Filter -->
   <div class="filter-row">
     <div class="filter-wrap">
-      <svg class="filter-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <svg class="filter-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
       <select onchange={onFilterChange} value={data.beanFilter} class="filter-select">
         <option value="">Alle Bohnen</option>
         {#each data.beans as bean}
@@ -49,14 +45,17 @@
 
   {#if data.shots.length === 0}
     <div class="empty-state">
-      <p style="font-size:2rem">📋</p>
+      <p style="font-size:2rem; margin-bottom: var(--space-sm)">📋</p>
       <p>Noch keine Shots erfasst.</p>
       <a href="/log" class="btn btn-primary" style="margin-top:var(--space-md)">Ersten Shot loggen</a>
     </div>
   {:else}
     {#each grouped as [date, shots]}
       <section class="date-group">
-        <h2 class="date-label">{date}</h2>
+        <div class="date-header">
+          <span class="date-label">{date}</span>
+          <span class="date-count">{shots.length}</span>
+        </div>
         <div class="shots-list">
           {#each shots as shot (shot._id)}
             <ShotCard
@@ -99,7 +98,24 @@
   }
 
   .date-group {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .date-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .date-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    /* already handled by border-bottom on parent, just spacer */
+    display: none;
   }
 
   .date-label {
@@ -107,12 +123,21 @@
     font-size: 9px;
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     color: var(--text3);
-    margin-bottom: var(--space-sm);
-    padding-bottom: var(--space-xs);
-    border-bottom: 1px solid var(--border);
     line-height: 1.4;
+  }
+
+  .date-count {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 1px 7px;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
   }
 
   .shots-list {

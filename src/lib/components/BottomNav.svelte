@@ -22,7 +22,7 @@
       href: '/log',
       label: 'Shot',
       isCenter: true,
-      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
         <line x1="12" y1="5" x2="12" y2="19"/>
         <line x1="5" y1="12" x2="19" y2="12"/>
       </svg>`
@@ -74,6 +74,7 @@
         class:active={isActive(tab.href)}
         aria-label={tab.label}
       >
+        <span class="active-pip" aria-hidden="true"></span>
         <span class="bottom-nav__icon">{@html tab.icon}</span>
         <span class="bottom-nav__label">{tab.label}</span>
       </a>
@@ -88,15 +89,15 @@
     left: 0;
     right: 0;
     height: var(--nav-height);
-    background: rgba(11, 9, 7, 0.96);
-    border-top: 1px solid var(--border);
+    background: rgba(10, 8, 6, 0.97);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     z-index: 50;
     padding: 0 4px;
     padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
   }
 
   .bottom-nav__tab {
@@ -110,28 +111,48 @@
     transition: color 0.2s;
     text-decoration: none;
     height: 100%;
+    position: relative;
   }
 
   .bottom-nav__tab.active {
     color: var(--crema);
   }
 
-  .bottom-nav__tab.active .bottom-nav__icon {
-    filter: drop-shadow(0 0 6px rgba(232, 201, 154, 0.45));
+  /* ── Active pip indicator ── */
+  .active-pip {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 20px;
+    height: 2px;
+    background: var(--crema);
+    border-radius: 0 0 2px 2px;
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .bottom-nav__tab.active .active-pip {
+    opacity: 0.7;
+    transform: translateX(-50%) scaleX(1);
   }
 
   .bottom-nav__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease, filter 0.2s ease;
+    transition: transform 0.2s ease;
+  }
+
+  .bottom-nav__tab.active .bottom-nav__icon {
+    filter: drop-shadow(0 0 8px rgba(232, 201, 154, 0.35));
   }
 
   .bottom-nav__label {
-    font-family: var(--font-body);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1;
   }
@@ -148,27 +169,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: var(--coffee);
     color: var(--crema);
-    box-shadow: 0 0 0 3px var(--bg), 0 8px 24px rgba(139, 90, 43, 0.55);
+    box-shadow: 0 0 0 2px var(--bg), 0 6px 20px rgba(139, 90, 43, 0.5);
     transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
   }
 
   .bottom-nav__tab--center.active .center-btn {
     background: var(--coffee-light);
-    box-shadow: 0 0 0 3px var(--bg), 0 8px 32px rgba(196, 135, 74, 0.65);
+    box-shadow: 0 0 0 2px var(--bg), 0 8px 28px rgba(196, 135, 74, 0.6);
   }
 
   .bottom-nav__tab--center:active .center-btn {
-    transform: scale(0.93);
+    transform: scale(0.92);
   }
 
   .bottom-nav__tab--center .bottom-nav__label {
     color: var(--text3);
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .bottom-nav__tab--center.active .bottom-nav__label {

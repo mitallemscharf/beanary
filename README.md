@@ -97,10 +97,12 @@
   - **Fehlerseite (`+error.svelte`):** Statuscodes, Fehlermeldung, Link zur Startseite
 
 - **Designentscheidungen:**
-  - Farbpalette: `--bg: #0f0c0a` (fast schwarz), `--crema: #E8C99A` (Crema-Beige), `--coffee: #8B5A2B` (Kaffeebraun) — auf Kaffee-Atmosphäre abgestimmt
-  - Schriften: Cormorant Garamond (Display/Zahlen, elegant) + DM Sans (Body, lesbar auf kleinen Screens)
+  - Farbpalette: `--bg: #0f0c0a` (fast schwarz), `--crema: #E8C99A` (Crema-Beige), `--coffee: #8B5A2B` (Kaffeebraun) — auf Kaffee-Atmosphäre abgestimmt; ergänzt durch `--ink: #FAFAF8` (Near-White für Headlines) und `--gold-light: #D4A853`
+  - Schriften: Cormorant Garamond (Display/Zahlen, elegant) + DM Sans (Body, lesbar auf kleinen Screens) + IBM Plex Mono (Labels, Metriken)
+  - Editorial Design: Nummerierte Sections (01–06) im Shot-Logger und Bohnenformular, `.ruled-header`-Pattern (Section-Titel + Linie) auf allen Screens — inspiriert von spotagency.io/coffeeapp
   - Brew-Ratio-Farbkodierung: grün (1,8–2,2 = Specialty-Coffee-Standard), gelb (akzeptabel), rot (ausserhalb)
   - Frische-Badge: grün (≤ 14 Tage seit Röstung), gelb (15–30 Tage), rot (> 30 Tage)
+  - Bottom-Navigation: aktiver Tab mit animiertem Pip-Indikator (2 px Linie oben); zentraler Shot-FAB als kreisförmiger Button
 
 #### 3.4.2. Umsetzung (Technik)
 
@@ -140,7 +142,9 @@
   - **DB-Verbindung:** Singleton-Pattern mit `global._mongoose`-Cache (verhindert zu viele Verbindungen bei Dev-HMR)
   - **Umgebungsvariable:** `MONGODB_URI` via `$env/dynamic/private` (sicher, nie an Client übermittelt)
 
-- **Deployment:** Netlify — URL gemäss Netlify-Dashboard (automatisches Deployment via GitHub-Verknüpfung)
+- **Deployment:** [https://beanary-app.netlify.app](https://beanary-app.netlify.app) — automatisches Deployment via GitHub-Verknüpfung
+
+- **Bekannte technische Besonderheit:** Mongoose 9 ruft `pre('save')`-Hooks ohne `next`-Parameter auf. Die Hook-Definition wurde von `function(next) { next(); }` auf `function() { ... }` umgestellt (Mongoose ≥ 8 erwartet Promise-basierte oder parameterlose Hooks).
 
 - **Besondere Entscheidungen:**
   - Kein separates API-Layer: SvelteKit Form Actions ermöglichen sichere serverseitige Verarbeitung ohne REST-Endpunkte

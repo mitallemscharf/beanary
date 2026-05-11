@@ -36,14 +36,12 @@
 </script>
 
 <div class="page log-page">
+
+  <!-- Header -->
   <div class="log-header">
-    <div class="log-header__text">
-      <p class="log-header__date">{new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-      <h1 class="log-header__title">Shot loggen</h1>
-    </div>
-    <div class="log-header__icon" aria-hidden="true">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
-    </div>
+    <p class="log-header__date">{new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+    <h1 class="log-header__title">Shot loggen</h1>
+    <div class="log-header__rule"></div>
   </div>
 
   {#if form?.error}
@@ -65,9 +63,13 @@
       };
     }}
   >
-    <!-- Bohne -->
+
+    <!-- 01 Bohne -->
     <div class="form-section">
-      <p class="form-section__label">Bohne</p>
+      <div class="section-num-row">
+        <span class="section-num">01</span>
+        <span class="section-num-label">Bohne</span>
+      </div>
       <div class="field">
         {#if data.beans.length === 0}
           <div class="empty-hint">
@@ -84,9 +86,12 @@
       </div>
     </div>
 
-    <!-- Extraktion -->
+    <!-- 02 Extraktion -->
     <div class="form-section">
-      <p class="form-section__label">Extraktion</p>
+      <div class="section-num-row">
+        <span class="section-num">02</span>
+        <span class="section-num-label">Extraktion</span>
+      </div>
       <div class="row-2">
         <div class="field">
           <label for="dose">Dosis (g)</label>
@@ -112,9 +117,12 @@
       </div>
     </div>
 
-    <!-- Temperatur -->
+    <!-- 03 Temperatur -->
     <div class="form-section">
-      <p class="form-section__label">Temperatur</p>
+      <div class="section-num-row">
+        <span class="section-num">03</span>
+        <span class="section-num-label">Temperatur</span>
+      </div>
       <div class="field">
         <div class="temp-selector">
           {#each temperatures as t}
@@ -128,12 +136,15 @@
       </div>
     </div>
 
-    <!-- Bewertung -->
+    <!-- 04 Bewertung -->
     <div class="form-section">
-      <p class="form-section__label">
-        Bewertung
-        {#if rating === 0}<span class="rating-hint">← antippen</span>{/if}
-      </p>
+      <div class="section-num-row">
+        <span class="section-num">04</span>
+        <span class="section-num-label">
+          Bewertung
+          {#if rating === 0}<span class="rating-hint">← antippen</span>{/if}
+        </span>
+      </div>
       <div class="field">
         <div class="rating-wrap">
           <RatingStars bind:rating />
@@ -142,9 +153,12 @@
       </div>
     </div>
 
-    <!-- Geschmack -->
+    <!-- 05 Geschmack -->
     <div class="form-section">
-      <p class="form-section__label">Geschmack</p>
+      <div class="section-num-row">
+        <span class="section-num">05</span>
+        <span class="section-num-label">Geschmack</span>
+      </div>
       <div class="field">
         <FlavorTags bind:selected={selectedTags} />
         {#each selectedTags as tag}
@@ -153,9 +167,12 @@
       </div>
     </div>
 
-    <!-- Notizen -->
-    <div class="form-section">
-      <p class="form-section__label">Notizen</p>
+    <!-- 06 Notizen -->
+    <div class="form-section form-section--last">
+      <div class="section-num-row">
+        <span class="section-num">06</span>
+        <span class="section-num-label">Notizen</span>
+      </div>
       <div class="field">
         <textarea id="notes" name="notes" rows="3" placeholder="Beobachtungen, Anpassungen für nächstes Mal…"></textarea>
       </div>
@@ -173,52 +190,67 @@
   }
 
   .log-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: var(--space-xl) 0 var(--space-lg);
-    margin-bottom: var(--space-md);
-    border-bottom: 1px solid var(--border);
   }
 
   .log-header__date {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     color: var(--text3);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .log-header__title {
     font-family: var(--font-display);
-    font-size: 44px;
+    font-size: 52px;
     font-weight: 500;
-    color: var(--crema);
-    line-height: 1.1;
-    letter-spacing: -1px;
+    color: var(--ink);
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: var(--space-md);
   }
 
-  /* ── Form Sections ── */
+  .log-header__rule {
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ── Numbered form sections ── */
   .form-section {
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-md);
+    padding: var(--space-lg) 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .form-section:last-of-type {
+  .form-section--last {
     border-bottom: none;
   }
 
-  .form-section__label {
+  .section-num-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: var(--space-md);
+  }
+
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .section-num-label {
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     color: var(--coffee-light);
-    margin-bottom: var(--space-sm);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -231,8 +263,8 @@
   }
 
   .error-banner {
-    background: rgba(139, 58, 58, 0.15);
-    border: 1px solid rgba(139, 58, 58, 0.35);
+    background: rgba(139, 58, 58, 0.12);
+    border: 1px solid rgba(139, 58, 58, 0.3);
     color: #c47a7a;
     padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-sm);
@@ -259,8 +291,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 10px 6px;
+    gap: 5px;
+    padding: 12px 6px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--bg2);
@@ -271,19 +303,19 @@
   }
 
   .temp-option.selected {
-    border-color: rgba(139, 90, 43, 0.5);
-    background: rgba(139, 90, 43, 0.12);
+    border-color: rgba(139, 90, 43, 0.45);
+    background: rgba(139, 90, 43, 0.1);
     color: var(--crema);
-    box-shadow: 0 0 12px rgba(139, 90, 43, 0.15);
+    box-shadow: 0 0 16px rgba(139, 90, 43, 0.12);
   }
 
-  .temp-dots { font-size: 11px; letter-spacing: 1px; }
+  .temp-dots { font-size: 10px; letter-spacing: 1px; }
 
   .temp-label {
     font-family: var(--font-mono);
-    font-size: 8px;
+    font-size: 7px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: inherit;
   }
 
@@ -295,12 +327,12 @@
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
-    animation: pulse 1.5s ease-in-out infinite;
+    animation: pulse 1.6s ease-in-out infinite;
   }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+    50% { opacity: 0.3; }
   }
 
   .rating-wrap {
@@ -315,10 +347,11 @@
   /* ── Submit ── */
   .submit-btn {
     height: 52px;
-    font-size: 14px;
-    letter-spacing: 0.06em;
+    font-size: 13px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-top: var(--space-md);
+    margin-bottom: var(--space-lg);
   }
 
   .sr-only {

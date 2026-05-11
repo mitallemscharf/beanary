@@ -6,20 +6,19 @@
 
 <a href="/beans/{bean._id}" class="bean-card">
   <div class="bean-card__image">
-    <div class="bean-card__image-gradient"></div>
+    <div class="bean-card__gradient"></div>
     {#if bean.roastLevel}
       <span class="roast-pill">{bean.roastLevel}</span>
     {/if}
   </div>
 
   <div class="bean-card__body">
-    <div class="bean-card__top">
-      <div class="bean-card__names">
-        <h3 class="bean-card__name">{bean.name}</h3>
-        <p class="bean-card__roaster">{bean.roaster}</p>
-      </div>
+    <div class="bean-card__freshness">
       <FreshnessIndicator roastDate={bean.roastDate} />
     </div>
+
+    <h3 class="bean-card__name">{bean.name}</h3>
+    <p class="bean-card__roaster">{bean.roaster}</p>
 
     {#if bean.flavorTags?.length}
       <div class="bean-card__tags">
@@ -56,73 +55,78 @@
   }
 
   .bean-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-    border-color: var(--border2);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   .bean-card__image {
-    height: 130px;
+    height: 110px;
     background-image: url('/bean-card-bg.webp');
     background-size: cover;
     background-position: center;
     position: relative;
   }
 
-  .bean-card__image-gradient {
+  .bean-card__gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 30%, var(--bg2) 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(11, 9, 7, 0.1) 0%,
+      rgba(26, 21, 16, 0.85) 100%
+    );
   }
 
   .roast-pill {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    font-family: var(--font-body);
-    font-size: 9px;
-    font-weight: 500;
+    bottom: 10px;
+    left: 12px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     padding: 3px 8px;
-    background: rgba(15, 12, 10, 0.7);
-    border: 1px solid var(--border2);
+    background: rgba(15, 12, 10, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-full);
-    color: var(--coffee-light);
+    color: var(--text3);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
 
   .bean-card__body {
-    padding: 14px 16px 16px;
+    padding: 12px 14px 14px;
   }
 
-  .bean-card__top {
+  .bean-card__freshness {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    gap: var(--space-xs);
+    justify-content: flex-end;
+    margin-bottom: 8px;
   }
-
-  .bean-card__names { flex: 1; min-width: 0; }
 
   .bean-card__name {
     font-family: var(--font-display);
-    font-size: 20px;
-    color: var(--crema);
+    font-size: 1.25rem;
+    color: var(--ink);
     font-weight: 500;
     line-height: 1.2;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .bean-card__roaster {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text3);
-    margin-top: 2px;
+    margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -131,19 +135,20 @@
   .bean-card__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 4px;
     margin-bottom: 10px;
   }
 
   .tag {
-    font-size: 10px;
-    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 2px 7px;
     background: transparent;
     border: 1px solid var(--border);
     border-radius: var(--radius-full);
     color: var(--text3);
-    font-weight: 400;
     line-height: 1.4;
+    letter-spacing: 0.04em;
   }
 
   .bean-card__footer {
@@ -162,8 +167,8 @@
 
   .stat__value {
     font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 400;
     color: var(--text);
     line-height: 1;
   }
@@ -171,10 +176,10 @@
   .stat__value--amber { color: var(--amber); }
 
   .stat__label {
-    font-size: 9px;
+    font-family: var(--font-mono);
+    font-size: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--text3);
-    font-weight: 500;
   }
 </style>
