@@ -3,6 +3,7 @@ import { connectDB } from '$lib/server/db';
 import { Bean } from '$lib/server/models/Bean';
 
 const DEFAULT_BEANS = [
+	// ── Panama — Boquete Coffee Traders ──
 	{
 		name: 'Kotowa Arabica',
 		roastery: 'Boquete Coffee Traders / Kotowa',
@@ -49,6 +50,43 @@ const DEFAULT_BEANS = [
 		time: '26s',
 		status: 'Peak',
 		img: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=600&h=400&auto=format&fit=crop&q=85',
+		favorited: false
+	},
+	// ── World Specialty Classics ──
+	{
+		name: 'Yirgacheffe G1 Washed',
+		roastery: 'Moonlight Roasters',
+		origin: 'Ethiopia, Yirgacheffe',
+		tags: ['Jasmine', 'Bergamot', 'Lemon', 'Tea-like'],
+		dose: '18.5g',
+		yield: '38g',
+		time: '28s',
+		status: 'Peak',
+		img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&auto=format&fit=crop&q=85',
+		favorited: true
+	},
+	{
+		name: 'Huila Pink Bourbon',
+		roastery: 'Vanguard Lab',
+		origin: 'Colombia, Huila',
+		tags: ['Stone Fruit', 'Vanilla', 'Brown Sugar', 'Rose'],
+		dose: '19g',
+		yield: '40g',
+		time: '30s',
+		status: 'Fresh',
+		img: 'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=600&h=400&auto=format&fit=crop&q=85',
+		favorited: false
+	},
+	{
+		name: 'Cerrado Amarelo',
+		roastery: 'Altitude Roasters',
+		origin: 'Brazil, Cerrado',
+		tags: ['Dark Chocolate', 'Hazelnut', 'Caramel'],
+		dose: '18g',
+		yield: '36g',
+		time: '27s',
+		status: 'Past Peak',
+		img: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?w=600&h=400&auto=format&fit=crop&q=85',
 		favorited: false
 	}
 ];
