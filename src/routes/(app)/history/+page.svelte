@@ -2,6 +2,7 @@
 	import { shots } from '$lib/stores/shots';
 	import { reveal } from '$lib/actions/reveal';
 	import { showToast } from '$lib/stores/toast';
+	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 
 	let filterOpen = $state(false);
 	let filterQuery = $state('');
@@ -29,17 +30,29 @@
 	let openMenuId: string | null = $state(null);
 	let deletingId: string | null = $state(null);
 
-	async function deleteShot(id: string, beanName: string) {
-		if (!confirm(`Delete this shot of ${beanName}? This cannot be undone.`)) return;
-		deletingId = id;
+	// Confirm modal state
+	let confirmOpen = $state(false);
+	let pendingDelete: { id: string; bean: string } | null = $state(null);
+
+	function requestDelete(id: string, bean: string) {
 		openMenuId = null;
+		pendingDelete = { id, bean };
+		confirmOpen = true;
+	}
+
+	async function confirmDelete() {
+		if (!pendingDelete) return;
+		const { id, bean } = pendingDelete;
+		confirmOpen = false;
+		deletingId = id;
 		try {
 			await shots.remove(id);
-			showToast(`Removed ${beanName}`, 'delete');
+			showToast(`Removed ${bean} shot`, 'delete');
 		} catch {
 			showToast('Failed to delete — try again', 'error');
 		} finally {
 			deletingId = null;
+			pendingDelete = null;
 		}
 	}
 
@@ -57,6 +70,15 @@
 <svelte:head>
 	<title>Shot History | Beanery</title>
 </svelte:head>
+
+<ConfirmModal
+	open={confirmOpen}
+	title="Delete this shot?"
+	message={pendingDelete ? `Remove your ${pendingDelete.bean} shot? This cannot be undone.` : ''}
+	confirmLabel="Delete"
+	onconfirm={confirmDelete}
+	oncancel={() => { confirmOpen = false; pendingDelete = null; }}
+/>
 
 <div class="grain-texture" aria-hidden="true"></div>
 
@@ -193,7 +215,7 @@
 											style="animation: menuIn 0.15s ease-out"
 										>
 											<button
-												onclick={() => deleteShot(shot.id, shot.bean)}
+												onclick={() => requestDelete(shot.id, shot.bean)}
 												class="flex w-full items-center gap-3 px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
 											>
 												<span class="material-symbols-outlined text-[17px]">delete</span>

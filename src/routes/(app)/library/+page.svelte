@@ -2,8 +2,13 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { beans, type Bean } from '$lib/stores/beans';
 	import { showToast } from '$lib/stores/toast';
+	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 
 	let savingBean = $state(false);
+
+	// Confirm modal state
+	let confirmOpen = $state(false);
+	let pendingRemove: { id: string; name: string } | null = $state(null);
 
 	let search = $state('');
 
@@ -18,12 +23,20 @@
 			: $beans
 	);
 
-	async function removeBean(id: string, name: string) {
-		if (!confirm(`Remove "${name}" from your library? This cannot be undone.`)) return;
+	function requestRemove(id: string, name: string) {
+		pendingRemove = { id, name };
+		confirmOpen = true;
+	}
+
+	async function confirmRemove() {
+		if (!pendingRemove) return;
+		const { id, name } = pendingRemove;
+		confirmOpen = false;
+		pendingRemove = null;
 		try {
 			await beans.remove(id);
 			selectedBean = null;
-			showToast('Bean removed from library', 'delete');
+			showToast(`${name} removed from library`, 'delete');
 		} catch {
 			showToast('Failed to remove bean — try again', 'error');
 		}
@@ -110,6 +123,15 @@
 	<title>Bean Library | Beanery</title>
 </svelte:head>
 
+<ConfirmModal
+	open={confirmOpen}
+	title="Remove this bean?"
+	message={pendingRemove ? `Remove "${pendingRemove.name}" from your library? Your logged shots will remain in your journal.` : ''}
+	confirmLabel="Remove"
+	onconfirm={confirmRemove}
+	oncancel={() => { confirmOpen = false; pendingRemove = null; }}
+/>
+
 <!-- Backdrop -->
 {#if drawerOpen}
 	<button
@@ -192,7 +214,7 @@
 					Log Shot with This Bean
 				</a>
 				<button
-					onclick={() => removeBean(selectedBean!.id, selectedBean!.name)}
+					onclick={() => requestRemove(selectedBean!.id, selectedBean!.name)}
 					class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full border border-error/20 py-3 text-error uppercase tracking-widest transition-all hover:bg-error/5 active:scale-95"
 				>
 					<span class="material-symbols-outlined text-[18px]">delete</span>
@@ -390,6 +412,19 @@
 				<span class="material-symbols-outlined mb-4 text-[48px] text-crema-gold/30">search_off</span>
 				<p class="text-headline-md text-on-surface-variant">No beans match "<em>{search}</em>"</p>
 				<button onclick={() => (search = '')} class="text-label-sm mt-4 text-crema-gold underline decoration-crema-gold underline-offset-4">Clear search</button>
+			</div>
+		{:else if $beans.length === 0}
+			<div class="flex flex-col items-center rounded-xl border border-dashed border-outline-variant/40 py-20 text-center" use:reveal={0}>
+				<span class="material-symbols-outlined mb-5 text-[52px] text-crema-gold/30">local_cafe</span>
+				<h3 class="text-headline-md mb-2 text-on-surface-variant">Your library is empty</h3>
+				<p class="text-body-md mb-8 text-on-surface-variant/60">Add your first bean to start tracking extractions.</p>
+				<button
+					onclick={() => { selectedBean = null; showAddForm = true; }}
+					class="text-label-caps rounded-full bg-crema-gold px-8 py-3.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
+				>
+					<span class="material-symbols-outlined mr-2 text-[16px]">add</span>
+					Add Your First Bean
+				</button>
 			</div>
 		{/if}
 	</div>
