@@ -1,8 +1,36 @@
-import { json, error } from '@sveltejs/kit';
-import { connectDB } from '$lib/server/db';
-import { Bean } from '$lib/server/models/Bean';
+// One-time seed script — run with: node seed.js
+import mongoose from 'mongoose';
 
-const DEFAULT_BEANS = [
+const MONGODB_URI =
+	'mongodb+srv://admin:Admin1234@cluster0.yuemosk.mongodb.net/beanery?retryWrites=true&w=majority';
+
+const beanSchema = new mongoose.Schema(
+	{
+		name: String,
+		roastery: String,
+		origin: String,
+		tags: [String],
+		dose: String,
+		yield: String,
+		time: String,
+		status: String,
+		img: String,
+		favorited: Boolean
+	},
+	{ timestamps: true }
+);
+
+beanSchema.set('toJSON', {
+	transform: (_doc, ret) => {
+		ret.id = ret._id.toString();
+		delete ret._id;
+		delete ret.__v;
+	}
+});
+
+const Bean = mongoose.models.Bean ?? mongoose.model('Bean', beanSchema);
+
+const REAL_BEANS = [
 	{
 		name: 'Kotowa Arabica',
 		roastery: 'Boquete Coffee Traders / Kotowa',
@@ -53,41 +81,17 @@ const DEFAULT_BEANS = [
 	}
 ];
 
-export async function GET() {
-	try {
-		await connectDB();
-		let beans = await Bean.find().sort({ createdAt: -1 });
-		if (beans.length === 0) {
-			beans = await Bean.insertMany(DEFAULT_BEANS);
-		}
-		return json(beans.map((b) => b.toJSON()));
-	} catch (err) {
-		console.error('GET /api/beans error:', err);
-		throw error(500, 'Failed to fetch beans');
-	}
-}
+console.log('Connecting to MongoDB Atlas…');
+await mongoose.connect(MONGODB_URI);
+console.log('Connected.');
 
-export async function POST({ request }) {
-	try {
-		await connectDB();
-		const data = await request.json();
-		const bean = new Bean(data);
-		await bean.save();
-		return json(bean.toJSON(), { status: 201 });
-	} catch (err) {
-		console.error('POST /api/beans error:', err);
-		throw error(500, 'Failed to save bean');
-	}
-}
+// Clear existing beans and insert real ones
+await Bean.deleteMany({});
+console.log('Cleared existing beans.');
 
-export async function DELETE() {
-	try {
-		await connectDB();
-		await Bean.deleteMany({});
-		const beans = await Bean.insertMany(DEFAULT_BEANS);
-		return json(beans.map((b) => b.toJSON()));
-	} catch (err) {
-		console.error('DELETE /api/beans error:', err);
-		throw error(500, 'Failed to reset beans');
-	}
-}
+const inserted = await Bean.insertMany(REAL_BEANS);
+console.log(`\n✓ Inserted ${inserted.length} beans into MongoDB:\n`);
+inserted.forEach((b) => console.log(`  • ${b.name} (${b.status})`));
+
+await mongoose.disconnect();
+console.log('\nDone. Refresh your app to see the beans.');
