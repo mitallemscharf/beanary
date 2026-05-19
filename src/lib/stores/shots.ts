@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
 
 export interface Shot {
 	id: string;
@@ -17,90 +16,50 @@ export interface Shot {
 	img: string;
 }
 
-const DEFAULT_SHOTS: Shot[] = [
-	{
-		id: '1',
-		bean: 'Ethiopia Yirgacheffe',
-		dose: 18.5,
-		yield: 37.0,
-		time: 28,
-		temp: 93,
-		grind: '2.4 / 12 clicks',
-		notes: 'Bergamot, jasmine, bright clean acidity. Silky mouthfeel.',
-		rating: 5,
-		date: 'Today',
-		process: 'Washed Process',
-		roast: 'Light Roast',
-		img: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&auto=format&fit=crop&q=80'
-	},
-	{
-		id: '2',
-		bean: 'Colombia Huila',
-		dose: 19.0,
-		yield: 42.0,
-		time: 24,
-		temp: 91,
-		grind: '2.7 / 15 clicks',
-		notes: 'Panela, stone fruit, slightly underextracted. Adjust grind finer.',
-		rating: 3,
-		date: 'Today',
-		process: 'Natural Process',
-		roast: 'Medium Roast',
-		img: 'https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=200&h=200&auto=format&fit=crop&q=80'
-	},
-	{
-		id: '3',
-		bean: 'Brazil Cerrado',
-		dose: 18.0,
-		yield: 36.0,
-		time: 31,
-		temp: 92,
-		grind: '2.2 / 10 clicks',
-		notes: 'Dark chocolate, hazelnut, smooth body. Great for espresso blends.',
-		rating: 4,
-		date: 'Yesterday',
-		process: 'Pulped Natural',
-		roast: 'Dark Roast',
-		img: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?w=200&h=200&auto=format&fit=crop&q=80'
-	},
-	{
-		id: '4',
-		bean: 'Kenya AA Nyeri',
-		dose: 18.5,
-		yield: 45.0,
-		time: 22,
-		temp: 95,
-		grind: '3.1 / 18 clicks',
-		notes: 'Tomato-like acidity, overextracted. Too long shot time.',
-		rating: 2,
-		date: 'October 24, 2024',
-		process: 'Washed',
-		roast: 'Light-Nordic Roast',
-		img: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=200&h=200&auto=format&fit=crop&q=80'
-	}
-];
-
 function createShotsStore() {
-	const stored = browser ? localStorage.getItem('beanery-shots') : null;
-	const initial: Shot[] = stored ? JSON.parse(stored) : DEFAULT_SHOTS;
-
-	const { subscribe, set, update } = writable<Shot[]>(initial);
-
-	function persist(shots: Shot[]) {
-		if (browser) localStorage.setItem('beanery-shots', JSON.stringify(shots));
-		return shots;
-	}
+	const { subscribe, set, update } = writable<Shot[]>([]);
 
 	return {
 		subscribe,
-		add(shot: Shot) {
-			update((shots) => persist([shot, ...shots]));
+
+		async load() {
+			const res = await fetch('/api/shots');
+			if (res.ok) {
+				const data: Shot[] = await res.json();
+				set(data);
+			}
 		},
-		remove(id: string) {
-			update((shots) => persist(shots.filter((s) => s.id !== id)));
+
+		async add(shotData: Omit<Shot, 'id'>): Promise<Shot> {
+			const res = await fetch('/api/shots', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(shotData)
+			});
+			if (!res.ok) throw new Error('Failed to save shot');
+			const saved: Shot = await res.json();
+			update((shots) => [saved, ...shots]);
+			return saved;
 		},
-		reset() {
-			set(persist(DEFAULT_SHOTS));
+
+		async remove(id: string) {
+			// Optimistic update
+			update((shots) => shots.filter((s) => s.id !== id));
+			const res = await fetch(`/api/shots/${id}`, { method: 'DELETE' });
+			if (!res.ok) {
+				// Revert by reloading
+				const data: Shot[] = await (await fetch('/api/shots')).json();
+				set(data);
+				throw new Error('Failed to delete shot');
+			}
+		},
+
+		async reset() {
+			const res = await fetch('/api/shots', { method: 'DELETE' });
+			if (res.ok) {
+				const data: Shot[] = await res.json();
+				set(data);
+			}
 		}
 	};
 }

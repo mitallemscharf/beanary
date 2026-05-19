@@ -3,6 +3,8 @@
 	import { beans, type Bean } from '$lib/stores/beans';
 	import { showToast } from '$lib/stores/toast';
 
+	let savingBean = $state(false);
+
 	let search = $state('');
 
 	const filtered = $derived(
@@ -16,10 +18,15 @@
 			: $beans
 	);
 
-	function removeBean(id: string) {
-		beans.remove(id);
-		selectedBean = null;
-		showToast('Bean removed from library', 'delete');
+	async function removeBean(id: string, name: string) {
+		if (!confirm(`Remove "${name}" from your library? This cannot be undone.`)) return;
+		try {
+			await beans.remove(id);
+			selectedBean = null;
+			showToast('Bean removed from library', 'delete');
+		} catch {
+			showToast('Failed to remove bean — try again', 'error');
+		}
 	}
 
 	const statusColors: Record<string, string> = {
@@ -59,35 +66,41 @@
 		'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600&h=400&auto=format&fit=crop&q=85'
 	];
 
-	function addBean() {
-		if (!newName.trim()) return;
+	async function addBean() {
+		if (!newName.trim() || savingBean) return;
+		savingBean = true;
 		const tags = newTagsStr
 			.split(',')
 			.map((t) => t.trim())
 			.filter(Boolean);
-		beans.add({
-			id: Date.now().toString(),
-			name: newName,
-			roastery: newRoastery || 'Unknown Roastery',
-			origin: newOrigin || 'Unknown Origin',
-			tags: tags.length ? tags : ['Single Origin'],
-			dose: newDose,
-			yield: newYield,
-			time: newTime,
-			status: newStatus,
-			img: coffeeImgs[Math.floor(Math.random() * coffeeImgs.length)],
-			favorited: false
-		});
-		showToast('Bean added to library', 'check_circle');
-		newName = '';
-		newRoastery = '';
-		newOrigin = '';
-		newTagsStr = '';
-		newDose = '18g';
-		newYield = '36g';
-		newTime = '30s';
-		newStatus = 'Fresh';
-		showAddForm = false;
+		try {
+			await beans.add({
+				name: newName,
+				roastery: newRoastery || 'Unknown Roastery',
+				origin: newOrigin || 'Unknown Origin',
+				tags: tags.length ? tags : ['Single Origin'],
+				dose: newDose,
+				yield: newYield,
+				time: newTime,
+				status: newStatus,
+				img: coffeeImgs[Math.floor(Math.random() * coffeeImgs.length)],
+				favorited: false
+			});
+			showToast('Bean added to library', 'check_circle');
+			newName = '';
+			newRoastery = '';
+			newOrigin = '';
+			newTagsStr = '';
+			newDose = '18g';
+			newYield = '36g';
+			newTime = '30s';
+			newStatus = 'Fresh';
+			showAddForm = false;
+		} catch {
+			showToast('Failed to add bean — check your connection', 'error');
+		} finally {
+			savingBean = false;
+		}
 	}
 
 	const drawerOpen = $derived(selectedBean !== null || showAddForm);
@@ -179,7 +192,7 @@
 					Log Shot with This Bean
 				</a>
 				<button
-					onclick={() => removeBean(selectedBean!.id)}
+					onclick={() => removeBean(selectedBean!.id, selectedBean!.name)}
 					class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full border border-error/20 py-3 text-error uppercase tracking-widest transition-all hover:bg-error/5 active:scale-95"
 				>
 					<span class="material-symbols-outlined text-[18px]">delete</span>
@@ -267,9 +280,14 @@
 			<div class="border-t border-outline-variant/10 pt-4">
 				<button type="submit"
 					class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full bg-crema-gold py-4 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95 disabled:opacity-40"
-					disabled={!newName.trim()}>
-					<span class="material-symbols-outlined text-[18px]">add</span>
-					Add to Library
+					disabled={!newName.trim() || savingBean}>
+					{#if savingBean}
+						<span class="material-symbols-outlined animate-spin text-[18px]">autorenew</span>
+						Saving to Database…
+					{:else}
+						<span class="material-symbols-outlined text-[18px]">add</span>
+						Add to Library
+					{/if}
 				</button>
 			</div>
 		</form>

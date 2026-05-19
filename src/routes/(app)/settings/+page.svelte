@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
 	import { shots } from '$lib/stores/shots';
+	import { beans } from '$lib/stores/beans';
 	import { showToast } from '$lib/stores/toast';
 	import { browser } from '$app/environment';
 
@@ -32,16 +33,24 @@
 	}
 
 	let confirmReset = $state(false);
+	let resetting = $state(false);
 
-	function resetData() {
+	async function resetData() {
 		if (!confirmReset) {
 			confirmReset = true;
 			setTimeout(() => (confirmReset = false), 4000);
 			return;
 		}
-		shots.reset();
+		resetting = true;
 		confirmReset = false;
-		showToast('Shot history reset to defaults', 'restart_alt');
+		try {
+			await Promise.all([shots.reset(), beans.reset()]);
+			showToast('Data reset to defaults', 'restart_alt');
+		} catch {
+			showToast('Reset failed — try again', 'error');
+		} finally {
+			resetting = false;
+		}
 	}
 
 	const sections = [

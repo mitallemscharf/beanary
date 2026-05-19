@@ -1,10 +1,23 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/stores/toast';
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
 	let { children } = $props();
+
+	let dataLoaded = $state(false);
+
+	onMount(async () => {
+		try {
+			await Promise.all([shots.load(), beans.load()]);
+		} catch {
+			showToast('Could not connect to database', 'error');
+		} finally {
+			dataLoaded = true;
+		}
+	});
 
 	const navItems = [
 		{ href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -70,6 +83,16 @@
 
 <!-- Grain texture overlay -->
 <div class="grain-texture" aria-hidden="true"></div>
+
+<!-- ── Data loading indicator ── -->
+{#if !dataLoaded}
+	<div class="fixed inset-0 z-[300] flex items-center justify-center bg-surface/80 backdrop-blur-sm" style="animation: fadeIn 0.3s ease-out">
+		<div class="flex flex-col items-center gap-4">
+			<span class="material-symbols-outlined animate-spin text-crema-gold text-[40px]">coffee_maker</span>
+			<p class="text-label-caps text-on-surface-variant">Loading your laboratory…</p>
+		</div>
+	</div>
+{/if}
 
 <!-- ── Global Search Overlay ── -->
 {#if searchOpen}

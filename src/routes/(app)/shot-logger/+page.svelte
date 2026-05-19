@@ -3,6 +3,7 @@
 	import { beans } from '$lib/stores/beans';
 	import { reveal } from '$lib/actions/reveal';
 	import { goto } from '$app/navigation';
+	import { showToast } from '$lib/stores/toast';
 
 	// Bean dropdown — live from the beans store (includes any newly added beans)
 	const beanOptions = $derived($beans);
@@ -21,6 +22,8 @@
 	let notes = $state('');
 	let rating = $state(4);
 	let showSuccess = $state(false);
+	let saving = $state(false);
+	let validationError = $state('');
 
 	const ratio = $derived(dose > 0 ? (yieldG / dose).toFixed(1) : '0.0');
 	const ratioNum = $derived(dose > 0 ? yieldG / dose : 0);
@@ -38,25 +41,48 @@
 		return 'Lungo';
 	});
 
-	function handleSave() {
-		const selectedBean = $beans.find((b) => b.name === bean);
-		shots.add({
-			id: Date.now().toString(),
-			bean,
-			dose,
-			yield: yieldG,
-			time,
-			temp,
-			grind,
-			notes,
-			rating,
-			date: 'Today',
-			process: 'Washed',
-			roast: 'Light Roast',
-			img: selectedBean?.img ?? 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&auto=format&fit=crop&q=80'
-		});
-		showSuccess = true;
-		setTimeout(() => goto('/history'), 2400);
+	async function handleSave() {
+		validationError = '';
+		if (!bean) {
+			validationError = 'Please select a bean from your library first.';
+			return;
+		}
+		if (!dose || dose <= 0) {
+			validationError = 'Dose must be greater than 0g.';
+			return;
+		}
+		if (!yieldG || yieldG <= 0) {
+			validationError = 'Yield must be greater than 0g.';
+			return;
+		}
+		if (!time || time <= 0) {
+			validationError = 'Extraction time must be greater than 0s.';
+			return;
+		}
+
+		saving = true;
+		try {
+			const selectedBean = $beans.find((b) => b.name === bean);
+			await shots.add({
+				bean,
+				dose,
+				yield: yieldG,
+				time,
+				temp,
+				grind,
+				notes,
+				rating,
+				date: 'Today',
+				process: selectedBean ? 'Washed' : 'Washed',
+				roast: 'Light Roast',
+				img: selectedBean?.img ?? 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&auto=format&fit=crop&q=80'
+			});
+			showSuccess = true;
+			setTimeout(() => goto('/history'), 2400);
+		} catch {
+			showToast('Failed to save shot — check your connection', 'error');
+			saving = false;
+		}
 	}
 </script>
 
@@ -222,14 +248,28 @@
 						</div>
 					</div>
 
+					<!-- Validation error -->
+					{#if validationError}
+						<div class="flex items-center gap-2 rounded-lg border border-error/20 bg-error/5 px-4 py-3">
+							<span class="material-symbols-outlined text-error text-[18px]">error</span>
+							<p class="text-label-sm text-error">{validationError}</p>
+						</div>
+					{/if}
+
 					<!-- Save button -->
 					<button
 						type="button"
 						onclick={handleSave}
-						class="text-label-caps flex w-full items-center justify-center gap-2.5 rounded-full bg-crema-gold py-5 text-white uppercase tracking-widest shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95"
+						disabled={saving}
+						class="text-label-caps flex w-full items-center justify-center gap-2.5 rounded-full bg-crema-gold py-5 text-white uppercase tracking-widest shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
 					>
-						<span class="material-symbols-outlined text-[20px]">archive</span>
-						Record Shot to Journal
+						{#if saving}
+							<span class="material-symbols-outlined animate-spin text-[20px]">autorenew</span>
+							Saving to Database…
+						{:else}
+							<span class="material-symbols-outlined text-[20px]">archive</span>
+							Record Shot to Journal
+						{/if}
 					</button>
 				</form>
 			</div>

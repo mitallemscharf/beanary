@@ -27,11 +27,20 @@
 	}
 
 	let openMenuId: string | null = $state(null);
+	let deletingId: string | null = $state(null);
 
-	function deleteShot(id: string, beanName: string) {
-		shots.remove(id);
+	async function deleteShot(id: string, beanName: string) {
+		if (!confirm(`Delete this shot of ${beanName}? This cannot be undone.`)) return;
+		deletingId = id;
 		openMenuId = null;
-		showToast(`Removed ${beanName}`, 'delete');
+		try {
+			await shots.remove(id);
+			showToast(`Removed ${beanName}`, 'delete');
+		} catch {
+			showToast('Failed to delete — try again', 'error');
+		} finally {
+			deletingId = null;
+		}
 	}
 
 	const processColors: Record<string, string> = {
@@ -117,7 +126,7 @@
 						{#each group as shot, i}
 							{@const isBest = shot.rating === 5}
 							<div
-								class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border border-primary/5 bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm"
+								class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border border-primary/5 bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm {deletingId === shot.id ? 'opacity-40 pointer-events-none' : ''}"
 							>
 								<!-- Left: image + info -->
 								<div class="flex min-w-[260px] flex-1 items-center gap-6">
