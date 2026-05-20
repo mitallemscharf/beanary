@@ -1,8 +1,23 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
 	import { beans, type Bean, getFreshness } from '$lib/stores/beans';
+	import { shots } from '$lib/stores/shots';
 	import { showToast } from '$lib/stores/toast';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+
+	function getRecommendation(beanName: string) {
+		const beanShots = $shots.filter((s) => s.bean === beanName);
+		if (beanShots.length < 3) return null;
+		const sorted = [...beanShots].sort((a, b) => b.rating - a.rating);
+		const best = sorted[0];
+		const top = sorted.slice(0, Math.min(3, sorted.length));
+		const avgDose = +(top.reduce((s, x) => s + x.dose, 0) / top.length).toFixed(1);
+		const avgYield = +(top.reduce((s, x) => s + x.yield, 0) / top.length).toFixed(1);
+		const avgTime = Math.round(top.reduce((s, x) => s + x.time, 0) / top.length);
+		const avgTemp = Math.round(top.reduce((s, x) => s + x.temp, 0) / top.length);
+		const grind = best.grind || null;
+		return { totalShots: beanShots.length, best, avgDose, avgYield, avgTime, avgTemp, grind, ratio: (avgYield / avgDose).toFixed(1) };
+	}
 
 	let savingBean = $state(false);
 
@@ -175,6 +190,8 @@
 	}
 
 	const drawerOpen = $derived(selectedBean !== null || showAddForm);
+	const rec = $derived(selectedBean ? getRecommendation(selectedBean.name) : null);
+	const selectedBeanShotCount = $derived(selectedBean ? $shots.filter((s) => s.bean === selectedBean.name).length : 0);
 </script>
 
 <svelte:head>
@@ -271,6 +288,39 @@
 						{/each}
 					</div>
 				</div>
+
+				<!-- Recommendation Engine -->
+				{#if rec}
+					<div class="mb-6 rounded-xl border border-crema-gold/25 bg-crema-gold/5 p-5">
+						<div class="mb-3 flex items-center gap-2">
+							<span class="material-symbols-outlined text-crema-gold text-[18px]" style="font-variation-settings:'FILL' 1">auto_awesome</span>
+							<p class="text-label-sm text-crema-gold uppercase">Brew Recommendation</p>
+						</div>
+						<p class="text-label-caps mb-3 text-on-surface-variant/60">Based on your {rec.totalShots} shots · top {Math.min(3, rec.totalShots)} rated</p>
+						<div class="mb-3 grid grid-cols-3 gap-2 text-center">
+							{#each [{ l: 'Dose', v: `${rec.avgDose}g` }, { l: 'Yield', v: `${rec.avgYield}g` }, { l: 'Time', v: `${rec.avgTime}s` }] as col}
+								<div class="rounded-lg bg-crema-gold/10 py-2.5">
+									<p class="text-label-caps text-crema-gold/70">{col.l}</p>
+									<p class="font-display text-[17px] font-semibold text-crema-gold">{col.v}</p>
+								</div>
+							{/each}
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="font-mono text-[12px] text-on-surface-variant">Ratio 1:{rec.ratio} · {rec.avgTemp}°C</span>
+							{#if rec.grind}
+								<span class="font-mono text-[12px] text-crema-gold">Grind {rec.grind}</span>
+							{/if}
+						</div>
+						<div class="mt-3 flex items-center gap-1.5 border-t border-crema-gold/15 pt-3">
+							<span class="material-symbols-outlined text-crema-gold text-[14px]" style="font-variation-settings:'FILL' 1">star</span>
+							<span class="text-label-caps text-on-surface-variant/60">Best shot: {rec.best.bean.split(' ').slice(0,2).join(' ')} · {rec.best.date} · ★{rec.best.rating}</span>
+						</div>
+					</div>
+				{:else if selectedBeanShotCount > 0}
+					<div class="mb-6 rounded-xl border border-outline-variant/20 bg-surface-container p-4">
+						<p class="text-label-caps text-on-surface-variant/50">Log {3 - selectedBeanShotCount} more shot{3 - selectedBeanShotCount > 1 ? 's' : ''} with this bean to unlock brew recommendations</p>
+					</div>
+				{/if}
 
 				<div class="mt-auto space-y-3">
 					<button
