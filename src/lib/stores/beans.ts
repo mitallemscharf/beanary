@@ -10,8 +10,44 @@ export interface Bean {
 	yield: string;
 	time: string;
 	status: 'Fresh' | 'Peak' | 'Past Peak';
+	roastDate?: string;
 	img: string;
 	favorited: boolean;
+}
+
+export type FreshnessInfo = {
+	label: 'Too Fresh' | 'Fresh' | 'Peak' | 'Past Peak' | 'Old';
+	daysAgo: number | null;
+	color: string;
+	icon: string;
+};
+
+export function getFreshness(roastDate?: string, fallbackStatus?: string): FreshnessInfo {
+	if (!roastDate) {
+		const label = (fallbackStatus as FreshnessInfo['label']) ?? 'Fresh';
+		return { label, daysAgo: null, color: freshnessColor(label), icon: freshnessIcon(label) };
+	}
+	const days = Math.floor((Date.now() - new Date(roastDate).getTime()) / 86_400_000);
+	if (days < 0)   return { label: 'Too Fresh', daysAgo: 0, color: '#6B7280', icon: 'hourglass_empty' };
+	if (days <= 7)  return { label: 'Too Fresh', daysAgo: days, color: '#6B7280', icon: 'hourglass_empty' };
+	if (days <= 21) return { label: 'Fresh',     daysAgo: days, color: '#16A34A', icon: 'check_circle' };
+	if (days <= 35) return { label: 'Peak',      daysAgo: days, color: '#C5A059', icon: 'star' };
+	if (days <= 60) return { label: 'Past Peak', daysAgo: days, color: '#D97706', icon: 'warning' };
+	return              { label: 'Old',       daysAgo: days, color: '#DC2626', icon: 'cancel' };
+}
+
+function freshnessColor(label: string): string {
+	if (label === 'Fresh') return '#16A34A';
+	if (label === 'Peak') return '#C5A059';
+	if (label === 'Past Peak') return '#D97706';
+	return '#6B7280';
+}
+
+function freshnessIcon(label: string): string {
+	if (label === 'Fresh') return 'check_circle';
+	if (label === 'Peak') return 'star';
+	if (label === 'Past Peak') return 'warning';
+	return 'hourglass_empty';
 }
 
 function createBeansStore() {

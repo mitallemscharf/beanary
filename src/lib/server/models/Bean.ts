@@ -11,6 +11,7 @@ export interface IBean extends Document {
 	yield: string;
 	time: string;
 	status: 'Fresh' | 'Peak' | 'Past Peak';
+	roastDate?: Date;
 	img: string;
 	favorited: boolean;
 }
@@ -30,6 +31,7 @@ const beanSchema = new mongoose.Schema<IBean>(
 			enum: ['Fresh', 'Peak', 'Past Peak'],
 			default: 'Fresh'
 		},
+		roastDate: { type: Date, required: false },
 		img: { type: String, default: '' },
 		favorited: { type: Boolean, default: false }
 	},

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
-	import { beans, type Bean } from '$lib/stores/beans';
+	import { beans, type Bean, getFreshness } from '$lib/stores/beans';
 	import { showToast } from '$lib/stores/toast';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 
@@ -63,6 +63,7 @@
 	let editYield = $state('');
 	let editTime = $state('');
 	let editStatus = $state<'Fresh' | 'Peak' | 'Past Peak'>('Fresh');
+	let editRoastDate = $state('');
 
 	function openBean(bean: Bean) {
 		showAddForm = false;
@@ -86,6 +87,7 @@
 		editYield = selectedBean.yield;
 		editTime = selectedBean.time;
 		editStatus = selectedBean.status;
+		editRoastDate = selectedBean.roastDate ? selectedBean.roastDate.slice(0, 10) : '';
 		editMode = true;
 	}
 
@@ -102,7 +104,8 @@
 				dose: editDose,
 				yield: editYield,
 				time: editTime,
-				status: editStatus
+				status: editStatus,
+				roastDate: editRoastDate || undefined
 			});
 			selectedBean = updated;
 			editMode = false;
@@ -123,6 +126,7 @@
 	let newYield = $state('36g');
 	let newTime = $state('30s');
 	let newStatus = $state<'Fresh' | 'Peak' | 'Past Peak'>('Fresh');
+	let newRoastDate = $state('');
 
 	const coffeeImgs = [
 		'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600&h=400&auto=format&fit=crop&q=85',
@@ -148,6 +152,7 @@
 				yield: newYield,
 				time: newTime,
 				status: newStatus,
+				roastDate: newRoastDate || undefined,
 				img: coffeeImgs[Math.floor(Math.random() * coffeeImgs.length)],
 				favorited: false
 			});
@@ -160,6 +165,7 @@
 			newYield = '36g';
 			newTime = '30s';
 			newStatus = 'Fresh';
+			newRoastDate = '';
 			showAddForm = false;
 		} catch {
 			showToast('Failed to add bean — check your connection', 'error');
@@ -202,6 +208,7 @@
 	>
 		{#if !editMode}
 			<!-- ── VIEW MODE ── -->
+			{@const df = getFreshness(selectedBean.roastDate, selectedBean.status)}
 			<div class="relative h-56 w-full flex-shrink-0 overflow-hidden">
 				<img src={selectedBean.img} alt={selectedBean.name} class="h-full w-full object-cover" />
 				<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
@@ -213,8 +220,11 @@
 					<span class="material-symbols-outlined text-[20px]">close</span>
 				</button>
 				<div class="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/50 px-3 py-1 backdrop-blur-sm">
-					<div class="h-2 w-2 rounded-full {statusColors[selectedBean.status] ?? 'bg-outline-variant'}"></div>
-					<span class="text-label-caps text-white">{selectedBean.status}</span>
+					<span class="material-symbols-outlined text-[12px]" style="color:{df.color};font-variation-settings:'FILL' 1">{df.icon}</span>
+					<span class="text-label-caps text-white">{df.label}</span>
+					{#if df.daysAgo !== null}
+						<span class="text-label-caps text-white/60">· {df.daysAgo}d</span>
+					{/if}
 				</div>
 			</div>
 
@@ -223,6 +233,9 @@
 					<div>
 						<h2 class="text-headline-lg leading-tight">{selectedBean.name}</h2>
 						<p class="text-label-caps mt-1 text-on-surface-variant/70">{selectedBean.roastery} • {selectedBean.origin}</p>
+						{#if df.daysAgo !== null}
+							<p class="text-label-caps mt-1" style="color:{df.color}">{df.daysAgo} days since roast · {df.label}</p>
+						{/if}
 					</div>
 					<button
 						onclick={() => { beans.toggleFav(selectedBean!.id); selectedBean = { ...selectedBean!, favorited: !selectedBean!.favorited }; }}
@@ -343,16 +356,30 @@
 				</div>
 
 				<div>
-					<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Freshness Status</p>
-					<div class="flex gap-2">
-						{#each (['Fresh', 'Peak', 'Past Peak'] as const) as s}
-							<button type="button" onclick={() => (editStatus = s)}
-								class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all {editStatus === s ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">
-								{s}
-							</button>
-						{/each}
-					</div>
+					<label for="edit-roast-date" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Roast Date</label>
+					<input id="edit-roast-date" type="date" bind:value={editRoastDate}
+						class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+					{#if editRoastDate}
+						{@const preview = getFreshness(editRoastDate)}
+						<p class="text-label-caps mt-1.5" style="color:{preview.color}">{preview.label}{preview.daysAgo !== null ? ` · ${preview.daysAgo}d ago` : ''}</p>
+					{:else}
+						<p class="text-label-caps mt-1.5 text-on-surface-variant/40">Leave blank to set status manually</p>
+					{/if}
 				</div>
+
+				{#if !editRoastDate}
+					<div>
+						<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Manual Status</p>
+						<div class="flex gap-2">
+							{#each (['Fresh', 'Peak', 'Past Peak'] as const) as s}
+								<button type="button" onclick={() => (editStatus = s)}
+									class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all {editStatus === s ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">
+									{s}
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
 
 				<div class="border-t border-outline-variant/10 pt-4 flex gap-3">
 					<button type="button" onclick={() => (editMode = false)}
@@ -439,16 +466,30 @@
 			</div>
 
 			<div>
-				<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Freshness Status</p>
-				<div class="flex gap-2">
-					{#each (['Fresh', 'Peak', 'Past Peak'] as const) as s}
-						<button type="button" onclick={() => (newStatus = s)}
-							class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all {newStatus === s ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">
-							{s}
-						</button>
-					{/each}
-				</div>
+				<label for="new-roast-date" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Roast Date</label>
+				<input id="new-roast-date" type="date" bind:value={newRoastDate}
+					class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+				{#if newRoastDate}
+					{@const preview = getFreshness(newRoastDate)}
+					<p class="text-label-caps mt-1.5" style="color:{preview.color}">{preview.label}{preview.daysAgo !== null ? ` · ${preview.daysAgo}d ago` : ''}</p>
+				{:else}
+					<p class="text-label-caps mt-1.5 text-on-surface-variant/40">Leave blank to set status manually</p>
+				{/if}
 			</div>
+
+			{#if !newRoastDate}
+				<div>
+					<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Manual Status</p>
+					<div class="flex gap-2">
+						{#each (['Fresh', 'Peak', 'Past Peak'] as const) as s}
+							<button type="button" onclick={() => (newStatus = s)}
+								class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all {newStatus === s ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">
+								{s}
+							</button>
+						{/each}
+					</div>
+				</div>
+			{/if}
 
 			<div class="border-t border-outline-variant/10 pt-4">
 				<button type="submit"
@@ -487,6 +528,7 @@
 		<!-- Grid -->
 		<div class="grid grid-cols-1 gap-stack-lg sm:grid-cols-2 xl:grid-cols-3">
 			{#each filtered as bean (bean.id)}
+				{@const freshness = getFreshness(bean.roastDate, bean.status)}
 				<div
 					class="group relative flex h-[490px] cursor-pointer flex-col overflow-hidden rounded-xl border border-primary/5 bg-surface-container-low transition-all duration-300 hover:-translate-y-1.5 hover:border-crema-gold/30 hover:shadow-xl"
 					onclick={() => openBean(bean)}
@@ -499,8 +541,8 @@
 						<img src={bean.img} alt={bean.name}
 							class="h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
 						<div class="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-bean-floral/75 px-3 py-1 backdrop-blur-sm">
-							<div class="h-2 w-2 rounded-full {statusColors[bean.status] ?? 'bg-outline-variant'}"></div>
-							<span class="text-label-caps text-white">{bean.status}</span>
+							<span class="material-symbols-outlined text-[12px]" style="color:{freshness.color};font-variation-settings:'FILL' 1">{freshness.icon}</span>
+							<span class="text-label-caps text-white">{freshness.label}</span>
 						</div>
 					</div>
 
