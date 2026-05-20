@@ -5,11 +5,15 @@
 	import { showToast } from '$lib/stores/toast';
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
-	let { children } = $props();
+	import type { PageData } from './$types';
 
-	function logout() {
+	let { children, data }: { children: import('svelte').Snippet; data: PageData } = $props();
+	const user = $derived(data.user);
+
+	async function logout() {
+		await fetch('/api/auth/logout', { method: 'POST' });
 		showToast('Logged out — see you next time', 'logout');
-		goto('/');
+		goto('/login');
 	}
 
 	let dataLoaded = $state(false);
@@ -255,13 +259,19 @@
 		class="hidden h-[calc(100vh-80px)] w-64 flex-col border-r border-outline-variant/20 bg-surface-container-low md:flex"
 		style="position: sticky; top: 80px;"
 	>
-		<div class="border-b border-outline-variant/10 px-6 py-7">
-			<div class="mb-1 flex items-center gap-3">
-				<div class="flex h-9 w-9 items-center justify-center rounded-full bg-crema-gold/10 ring-1 ring-crema-gold/20">
-					<span class="material-symbols-outlined text-crema-gold text-[18px]">science</span>
+		<div class="border-b border-outline-variant/10 px-6 py-5">
+			<div class="flex items-center gap-3">
+				<div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-crema-gold/10 ring-1 ring-crema-gold/20">
+					<span class="material-symbols-outlined text-crema-gold text-[18px]">person</span>
 				</div>
-				<div>
-					<p class="text-label-sm text-crema-gold">The Laboratory</p>
+				<div class="min-w-0">
+					<div class="flex items-center gap-2">
+						<p class="text-body-md truncate font-semibold leading-tight">{user?.name ?? 'Guest'}</p>
+						{#if user?.role === 'admin'}
+							<span class="flex-shrink-0 rounded bg-crema-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">Admin</span>
+						{/if}
+					</div>
+					<p class="text-label-caps truncate text-on-surface-variant/50">{user?.email ?? ''}</p>
 				</div>
 			</div>
 		</div>

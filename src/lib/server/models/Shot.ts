@@ -2,6 +2,7 @@ import mongoose, { type Document } from 'mongoose';
 
 export interface IShot extends Document {
 	id: string;
+	userId: string;
 	bean: string;
 	dose: number;
 	yield: number;
@@ -18,6 +19,7 @@ export interface IShot extends Document {
 
 const shotSchema = new mongoose.Schema<IShot>(
 	{
+		userId: { type: String, default: '' },
 		bean: { type: String, required: true },
 		dose: { type: Number, required: true },
 		yield: { type: Number, required: true },

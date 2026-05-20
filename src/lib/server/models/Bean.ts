@@ -2,6 +2,7 @@ import mongoose, { type Document } from 'mongoose';
 
 export interface IBean extends Document {
 	id: string;
+	userId: string;
 	name: string;
 	roastery: string;
 	origin: string;
@@ -16,6 +17,7 @@ export interface IBean extends Document {
 
 const beanSchema = new mongoose.Schema<IBean>(
 	{
+		userId: { type: String, default: '' },
 		name: { type: String, required: true },
 		roastery: { type: String, default: '' },
 		origin: { type: String, default: '' },

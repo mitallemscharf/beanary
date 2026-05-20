@@ -6,9 +6,10 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 
-	function logout() {
+	async function logout() {
+		await fetch('/api/auth/logout', { method: 'POST' });
 		showToast('Logged out — see you next time', 'logout');
-		goto('/');
+		goto('/login');
 	}
 
 	// Profile prefs stored in localStorage
