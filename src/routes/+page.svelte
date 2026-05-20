@@ -9,7 +9,7 @@
 
 <!-- ──────────── Header ──────────── -->
 <header class="sticky top-0 z-50 border-b border-outline-variant/20 bg-surface/90 backdrop-blur-md">
-	<div class="mx-auto flex h-20 w-full max-w-[1140px] items-center justify-between px-margin-desktop">
+	<div class="mx-auto flex h-20 w-full max-w-[1140px] items-center justify-between px-4 md:px-margin-desktop">
 		<div class="flex items-center gap-10">
 			<a
 				href="/"
@@ -74,7 +74,7 @@
 					class="h-full w-full scale-105 object-cover grayscale-[25%] transition-all duration-[1200ms] hover:scale-100 hover:grayscale-0"
 				/>
 			</div>
-			<div class="absolute -bottom-5 -left-5 border border-outline-variant/20 bg-surface-container-lowest/90 p-5 shadow-md backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+			<div class="absolute -bottom-2 left-2 sm:-bottom-5 sm:-left-5 border border-outline-variant/20 bg-surface-container-lowest/90 p-4 sm:p-5 shadow-md backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
 				<p class="text-headline-md text-crema-gold">98.2%</p>
 				<p class="text-label-caps text-on-surface-variant/60">Consistency Score</p>
 			</div>
@@ -202,14 +202,14 @@
 			<span class="text-label-sm block text-on-surface/80 uppercase tracking-widest">Beanery</span>
 			<p class="text-label-caps mt-1 text-on-surface-variant/50">© 2026 Beanery Coffee Labs</p>
 		</div>
-		<nav class="flex items-center gap-8">
+		<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-start md:gap-x-8">
 			{#each [
 				{ href: '/dashboard', label: 'Dashboard' },
 				{ href: '/shot-logger', label: 'Shot Logger' },
 				{ href: '/library', label: 'Library' },
 				{ href: '/history', label: 'History' }
 			] as link}
-				<a href={link.href} class="text-label-caps text-on-surface-variant/60 transition-all duration-200 hover:translate-x-0 hover:text-crema-gold">{link.label}</a>
+				<a href={link.href} class="text-label-caps text-on-surface-variant/60 transition-all duration-200 hover:text-crema-gold">{link.label}</a>
 			{/each}
 		</nav>
 	</div>

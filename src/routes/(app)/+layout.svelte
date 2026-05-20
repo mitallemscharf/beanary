@@ -208,7 +208,7 @@
 
 <!-- Top App Bar -->
 <header class="sticky top-0 z-50 border-b border-outline-variant/20 bg-surface/90 backdrop-blur-md">
-	<div class="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-margin-desktop">
+	<div class="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-4 md:px-margin-desktop">
 		<div class="flex items-center gap-12">
 			<a href="/" class="text-headline-md font-display tracking-[0.12em] text-crema-gold uppercase transition-opacity duration-300 hover:opacity-75">
 				Beanery
@@ -351,7 +351,7 @@
 	] as item}
 		<a
 			href={item.href}
-			class="flex flex-col items-center gap-0.5 {$page.url.pathname === item.href ? 'text-crema-gold' : 'text-on-surface-variant'}"
+			class="flex min-h-[48px] min-w-[52px] flex-col items-center justify-center gap-0.5 {$page.url.pathname === item.href ? 'text-crema-gold' : 'text-on-surface-variant'}"
 		>
 			<span class="material-symbols-outlined text-[22px]" style={$page.url.pathname === item.href ? "font-variation-settings: 'FILL' 1" : ''}>{item.icon}</span>
 			<span class="text-label-caps text-[9px]">{item.label}</span>

@@ -180,7 +180,7 @@
 		<div class="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
 
 			<!-- ── Form (7 cols) ── -->
-			<div class="rounded-xl border border-primary/5 bg-surface-container-low p-8 shadow-sm lg:col-span-7" use:reveal={0}>
+			<div class="rounded-xl border border-primary/5 bg-surface-container-low p-5 shadow-sm md:p-8 lg:col-span-7" use:reveal={0}>
 				<form class="space-y-stack-lg" onsubmit={(e) => e.preventDefault()}>
 
 					<!-- Bean select -->

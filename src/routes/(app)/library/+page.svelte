@@ -568,10 +568,10 @@
 				<h1 class="text-headline-xl text-primary">Bean Library</h1>
 				<p class="text-body-lg mt-2 text-on-surface-variant">Curating sensory notes and extraction parameters for your roasts.</p>
 			</div>
-			<div class="relative">
+			<div class="relative w-full md:w-auto">
 				<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
 				<input type="text" placeholder="Search beans, origins..." bind:value={search}
-					class="text-body-md w-64 rounded-full border-none bg-surface-container py-3 pl-11 pr-5 outline-none ring-0 transition-all duration-300 focus:ring-1 focus:ring-crema-gold hover:bg-surface-container-high" />
+					class="text-body-md w-full rounded-full border-none bg-surface-container py-3 pl-11 pr-5 outline-none ring-0 transition-all duration-300 focus:ring-1 focus:ring-crema-gold hover:bg-surface-container-high md:w-64" />
 			</div>
 		</header>
 

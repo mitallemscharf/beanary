@@ -97,8 +97,8 @@
 				<h1 class="text-headline-xl text-primary">Shot History</h1>
 				<p class="text-body-lg mt-2 text-on-surface-variant">Precision records from your daily espresso ritual.</p>
 			</div>
-			<div class="flex flex-col items-end gap-2">
-				<div class="flex gap-3">
+			<div class="flex flex-col items-start gap-2 md:items-end">
+				<div class="flex flex-wrap gap-3">
 					<button
 						onclick={() => { filterOpen = !filterOpen; if (!filterOpen) filterQuery = ''; }}
 						class="flex items-center gap-2 rounded-lg px-4 py-2.5 text-body-md transition-all duration-200 active:scale-95 {filterOpen ? 'bg-crema-gold/15 text-crema-gold ring-1 ring-crema-gold/30' : 'bg-surface-container-high hover:bg-surface-container-highest'}"
@@ -189,7 +189,7 @@
 									</div>
 
 									<!-- Center: data -->
-									<div class="flex items-center gap-10 text-sm">
+									<div class="flex flex-wrap items-center gap-4 text-sm sm:gap-10">
 										{#each [
 											{ label: 'Ratio', val: `${shot.dose}g / ${shot.yield}g` },
 											{ label: 'Time', val: `${shot.time}s` },
@@ -242,7 +242,7 @@
 								<!-- Inline expand panel -->
 								{#if isExpanded}
 									<div
-										class="rounded-b-xl border border-t-0 border-primary/5 bg-surface-container-low px-8 py-6"
+										class="rounded-b-xl border border-t-0 border-primary/5 bg-surface-container-low px-4 py-5 sm:px-8 sm:py-6"
 										style="animation: expandDown 0.22s cubic-bezier(0.22,1,0.36,1)"
 									>
 										<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
