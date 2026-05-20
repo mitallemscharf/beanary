@@ -36,6 +36,51 @@
 
 	onDestroy(() => { if (timerInterval) clearInterval(timerInterval); });
 
+	// ── Flavor Wheel ──
+	const FLAVOR_CATEGORIES = [
+		{ id: 'fruity',     label: 'Fruity',  color: '#EA580C', flavors: ['Blueberry', 'Cherry', 'Lemon', 'Apple'] },
+		{ id: 'floral',     label: 'Floral',  color: '#BE185D', flavors: ['Jasmine', 'Rose', 'Bergamot', 'Lavender'] },
+		{ id: 'sweet',      label: 'Sweet',   color: '#C5A059', flavors: ['Caramel', 'Vanilla', 'Honey', 'Brown Sugar'] },
+		{ id: 'nutty',      label: 'Nutty',   color: '#A16207', flavors: ['Almond', 'Hazelnut', 'Walnut', 'Pecan'] },
+		{ id: 'chocolatey', label: 'Choc',    color: '#78350F', flavors: ['Dark Choc', 'Milk Choc', 'Cocoa', 'Malt'] },
+		{ id: 'roasted',    label: 'Roasted', color: '#57534E', flavors: ['Tobacco', 'Cedar', 'Smoke', 'Toast'] },
+		{ id: 'spicy',      label: 'Spicy',   color: '#DC2626', flavors: ['Cinnamon', 'Clove', 'Pepper', 'Cardamom'] },
+		{ id: 'sour',       label: 'Sour',    color: '#4D7C0F', flavors: ['Wine-like', 'Fermented', 'Citric', 'Lactic'] },
+	];
+
+	function polarXY(deg: number, r: number, cx = 110, cy = 110): [number, number] {
+		const rad = (deg - 90) * (Math.PI / 180);
+		return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+	}
+
+	function wedgePath(a0: number, a1: number, ri: number, ro: number): string {
+		const [x0o, y0o] = polarXY(a0, ro);
+		const [x1o, y1o] = polarXY(a1, ro);
+		const [x1i, y1i] = polarXY(a1, ri);
+		const [x0i, y0i] = polarXY(a0, ri);
+		const lg = a1 - a0 > 180 ? 1 : 0;
+		return `M${x0o.toFixed(2)},${y0o.toFixed(2)} A${ro},${ro} 0 ${lg} 1 ${x1o.toFixed(2)},${y1o.toFixed(2)} L${x1i.toFixed(2)},${y1i.toFixed(2)} A${ri},${ri} 0 ${lg} 0 ${x0i.toFixed(2)},${y0i.toFixed(2)}Z`;
+	}
+
+	const SEG_ANGLE = 360 / FLAVOR_CATEGORIES.length;
+	const WHEEL = FLAVOR_CATEGORIES.map((cat, i) => {
+		const a0 = i * SEG_ANGLE + 1.5;
+		const a1 = (i + 1) * SEG_ANGLE - 1.5;
+		const mid = i * SEG_ANGLE + SEG_ANGLE / 2;
+		const [lx, ly] = polarXY(mid, 71);
+		const rot = mid > 90 && mid < 270 ? mid + 180 : mid;
+		return { ...cat, path: wedgePath(a0, a1, 42, 102), lx, ly, rot };
+	});
+
+	let activeCategory = $state<string | null>(null);
+	let selectedFlavors = $state<string[]>([]);
+
+	function toggleFlavor(f: string) {
+		selectedFlavors = selectedFlavors.includes(f)
+			? selectedFlavors.filter((x) => x !== f)
+			: [...selectedFlavors, f];
+	}
+
 	// Bean dropdown — live from the beans store (includes any newly added beans)
 	const beanOptions = $derived($beans);
 
@@ -89,6 +134,7 @@
 		saving = true;
 		try {
 			const selectedBean = $beans.find((b) => b.name === bean);
+			const finalNotes = [notes.trim(), selectedFlavors.length > 0 ? `Flavors: ${selectedFlavors.join(', ')}` : ''].filter(Boolean).join(' · ');
 			await shots.add({
 				bean,
 				dose,
@@ -96,7 +142,7 @@
 				time,
 				temp,
 				grind,
-				notes,
+				notes: finalNotes,
 				rating,
 				date: 'Today',
 				process: 'Washed',
@@ -390,35 +436,81 @@
 					</div>
 				</div>
 
-				<!-- Flavor Profile card -->
-				<div class="rounded-xl border border-primary/5 bg-surface-bright p-8 shadow-sm transition-shadow duration-300 hover:shadow-md">
-					<div class="mb-6 flex items-center justify-between">
+				<!-- Interactive Flavor Wheel -->
+				<div class="rounded-xl border border-primary/5 bg-surface-bright p-6 shadow-sm">
+					<div class="mb-4 flex items-center justify-between">
 						<p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Flavor Profile</p>
-						<button class="rounded-full p-1 transition-all hover:bg-surface-container-high active:scale-95">
-							<span class="material-symbols-outlined text-crema-gold text-[20px]">insights</span>
-						</button>
+						{#if selectedFlavors.length > 0}
+							<button type="button" onclick={() => { selectedFlavors = []; activeCategory = null; }}
+								class="text-label-caps text-on-surface-variant/50 transition-colors hover:text-error">Clear</button>
+						{/if}
 					</div>
 
-					<!-- Radar chart -->
-					<div class="relative flex aspect-square w-full cursor-crosshair items-center justify-center rounded-full border border-dashed border-outline-variant/30 bg-surface-container-low/30">
-						<div class="absolute inset-4 rounded-full border border-outline-variant/10 hover:border-crema-gold/25 transition-colors"></div>
-						<div class="absolute inset-12 rounded-full border border-outline-variant/10 hover:border-crema-gold/25 transition-colors"></div>
-						<div class="absolute inset-20 rounded-full border border-outline-variant/10 hover:border-crema-gold/25 transition-colors"></div>
-						<div class="spider-chart absolute inset-7 border border-crema-gold/80 bg-crema-gold/10 transition-all duration-500 hover:scale-105 hover:bg-crema-gold/20"></div>
-						<span class="absolute top-2 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest hover:text-crema-gold transition-colors cursor-pointer">Acidity</span>
-						<span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest hover:text-crema-gold transition-colors cursor-pointer">Body</span>
-						<span class="absolute bottom-2 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest hover:text-crema-gold transition-colors cursor-pointer">Sweet</span>
-						<span class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest hover:text-crema-gold transition-colors cursor-pointer">Floral</span>
-					</div>
-
-					<!-- Flavor tags -->
-					<div class="mt-5 flex flex-wrap gap-2">
-						{#each ['Bergamot', 'Jasmine', 'Milk Chocolate', 'Citrus', 'Caramel'] as tag}
-							<span class="cursor-pointer rounded-full bg-surface-container-high px-3 py-1 text-[11px] text-on-surface-variant transition-all duration-200 hover:bg-crema-gold hover:text-white">
-								{tag}
-							</span>
+					<!-- SVG Wheel -->
+					<svg viewBox="0 0 220 220" class="mx-auto w-full max-w-[210px]" aria-label="Flavor wheel">
+						{#each WHEEL as seg}
+							<path
+								d={seg.path}
+								fill={activeCategory === seg.id ? '#C5A059' : seg.color}
+								opacity={activeCategory !== null && activeCategory !== seg.id ? 0.38 : 0.88}
+								onclick={() => activeCategory = activeCategory === seg.id ? null : seg.id}
+								class="cursor-pointer transition-all duration-200 hover:opacity-100"
+								role="button"
+								aria-label={seg.label}
+							/>
+							<text
+								x={seg.lx} y={seg.ly}
+								text-anchor="middle" dominant-baseline="middle"
+								font-size="6.8" font-family="'Hanken Grotesk',sans-serif" font-weight="700"
+								fill="rgba(255,255,255,0.93)"
+								transform={`rotate(${seg.rot},${seg.lx},${seg.ly})`}
+								class="pointer-events-none select-none"
+								style="text-transform:uppercase;letter-spacing:0.7px"
+							>{seg.label}</text>
 						{/each}
-					</div>
+						<!-- Centre -->
+						<circle cx="110" cy="110" r="40" fill="#FBF9F4" />
+						<text x="110" y="107" text-anchor="middle" dominant-baseline="middle" font-size="20" class="select-none pointer-events-none">☕</text>
+						<text x="110" y="125" text-anchor="middle" dominant-baseline="middle"
+							font-size="6" font-family="'Hanken Grotesk',sans-serif" font-weight="700"
+							fill="#C5A059" style="letter-spacing:1.5px;text-transform:uppercase"
+							class="select-none pointer-events-none">tap a slice</text>
+					</svg>
+
+					<!-- Sub-flavors for active category -->
+					{#if activeCategory}
+						{@const activeSeg = WHEEL.find((s) => s.id === activeCategory)}
+						{#if activeSeg}
+							<div class="mt-4" style="animation: fadeDown 0.15s ease-out">
+								<p class="text-label-caps mb-2.5 text-on-surface-variant/60">{activeSeg.label} notes</p>
+								<div class="flex flex-wrap gap-2">
+									{#each activeSeg.flavors as flavor}
+										<button type="button" onclick={() => toggleFlavor(flavor)}
+											class="rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-all duration-200 active:scale-95 {selectedFlavors.includes(flavor) ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-crema-gold/10 hover:text-crema-gold'}"
+										>{flavor}</button>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					{:else}
+						<p class="mt-3 text-center text-label-caps text-on-surface-variant/30">Tap a segment to select flavors</p>
+					{/if}
+
+					<!-- Selected pills -->
+					{#if selectedFlavors.length > 0}
+						<div class="mt-4 border-t border-outline-variant/10 pt-4">
+							<p class="text-label-caps mb-2 text-crema-gold">Selected · {selectedFlavors.length}</p>
+							<div class="flex flex-wrap gap-1.5">
+								{#each selectedFlavors as flavor}
+									<button type="button" onclick={() => toggleFlavor(flavor)}
+										class="flex items-center gap-1 rounded-full bg-crema-gold/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-crema-gold transition-all hover:bg-crema-gold/20 active:scale-95">
+										{flavor}
+										<span class="material-symbols-outlined text-[11px]">close</span>
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -440,4 +532,8 @@
 	}
 	.timer-pulse       { animation: timerPulse 1.8s ease-in-out infinite; }
 	.timer-pulse-inner { animation: timerPulseInner 1.8s ease-in-out infinite 0.3s; }
+	@keyframes fadeDown {
+		from { opacity: 0; transform: translateY(-5px); }
+		to   { opacity: 1; transform: translateY(0); }
+	}
 </style>
