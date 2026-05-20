@@ -289,6 +289,20 @@
 					<span class="text-body-md">{item.label}</span>
 				</a>
 			{/each}
+
+			{#if user?.role === 'admin'}
+				<div class="my-2 border-t border-outline-variant/10"></div>
+				<a
+					href="/admin"
+					class="group flex items-center gap-4 rounded-r-lg px-4 py-3 transition-all duration-200 {isActive('/admin') ? 'border-l-4 border-crema-gold bg-primary-container text-on-primary-container font-semibold' : 'text-crema-gold/70 hover:bg-crema-gold/5 hover:text-crema-gold'}"
+				>
+					<span class="material-symbols-outlined text-[20px] transition-transform duration-200 {isActive('/admin') ? '' : 'group-hover:scale-110'}"
+						style={isActive('/admin') ? "font-variation-settings: 'FILL' 1, 'wght' 400" : ''}>
+						admin_panel_settings
+					</span>
+					<span class="text-body-md">Admin Panel</span>
+				</a>
+			{/if}
 		</nav>
 
 		<div class="border-t border-outline-variant/10 px-4 py-6">

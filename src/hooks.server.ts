@@ -24,5 +24,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		throw redirect(302, '/dashboard');
 	}
 
+	// Admin-only routes
+	if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+		if (user?.role !== 'admin') throw redirect(302, '/dashboard');
+	}
+
 	return resolve(event);
 };
