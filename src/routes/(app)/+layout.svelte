@@ -5,6 +5,7 @@
 	import { showToast } from '$lib/stores/toast';
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
+	import { darkMode } from '$lib/stores/theme';
 	import type { PageData } from './$types';
 
 	let { children, data }: { children: import('svelte').Snippet; data: PageData } = $props();
@@ -319,8 +320,15 @@
 				<span class="material-symbols-outlined text-[18px]">help_outline</span>Support
 			</a>
 			<button
+				onclick={() => darkMode.update((v) => !v)}
+				class="text-label-sm mt-1 flex w-full items-center gap-3 px-2 py-2 text-on-surface-variant/60 transition-colors hover:text-crema-gold"
+			>
+				<span class="material-symbols-outlined text-[18px]">{$darkMode ? 'light_mode' : 'dark_mode'}</span>
+				{$darkMode ? 'Light Mode' : 'Dark Mode'}
+			</button>
+			<button
 				onclick={logout}
-				class="text-label-sm mt-2 flex w-full items-center gap-3 px-2 py-2 text-on-surface-variant/60 transition-colors hover:text-error"
+				class="text-label-sm mt-1 flex w-full items-center gap-3 px-2 py-2 text-on-surface-variant/60 transition-colors hover:text-error"
 			>
 				<span class="material-symbols-outlined text-[18px]">logout</span>Log Out
 			</button>

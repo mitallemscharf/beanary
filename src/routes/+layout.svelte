@@ -2,6 +2,7 @@
 	import './layout.css';
 	import { onNavigate } from '$app/navigation';
 	import Toast from '$lib/components/Toast.svelte';
+	import { darkMode } from '$lib/stores/theme';
 	let { children } = $props();
 
 	onNavigate((navigation) => {
