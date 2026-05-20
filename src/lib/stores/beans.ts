@@ -65,6 +65,18 @@ function createBeansStore() {
 			}
 		},
 
+		async updateBean(id: string, data: Partial<Omit<Bean, 'id'>>): Promise<Bean> {
+			const res = await fetch(`/api/beans/${id}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(data)
+			});
+			if (!res.ok) throw new Error('Failed to update bean');
+			const updated: Bean = await res.json();
+			update((list) => list.map((b) => (b.id === id ? updated : b)));
+			return updated;
+		},
+
 		async reset() {
 			const res = await fetch('/api/beans', { method: 'DELETE' });
 			if (res.ok) {

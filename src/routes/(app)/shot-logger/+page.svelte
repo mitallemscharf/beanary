@@ -30,16 +30,12 @@
 
 	// SVG circle: circumference = 2π × 88 ≈ 552.9
 	const circumference = 552.9;
-	const dashOffset = $derived(() => {
-		const progress = ((ratioNum - 1) / 2) * circumference;
-		return Math.max(0, Math.min(circumference, circumference - progress));
-	});
-
-	const ratioLabel = $derived(() => {
-		if (ratioNum < 1.5) return 'Ristretto';
-		if (ratioNum < 2.2) return 'Balanced';
-		return 'Lungo';
-	});
+	const dashOffset = $derived(
+		Math.max(0, Math.min(circumference, circumference - ((ratioNum - 1) / 2) * circumference))
+	);
+	const ratioLabel = $derived(
+		ratioNum < 1.5 ? 'Ristretto' : ratioNum < 2.2 ? 'Balanced' : 'Lungo'
+	);
 
 	async function handleSave() {
 		validationError = '';
@@ -153,7 +149,8 @@
 
 					<!-- Bean select -->
 					<div>
-						<label for="bean-select" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Single Origin / Blend</label>
+						<label for="bean-select" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Single Origin / Blend</label>
+						<p class="text-label-caps mb-2 text-on-surface-variant/40">The coffee you're extracting — select from your library</p>
 						<select
 							id="bean-select"
 							bind:value={bean}
@@ -171,25 +168,28 @@
 					<div class="grid grid-cols-1 gap-stack-lg md:grid-cols-2">
 						<!-- Dose -->
 						<div>
-							<label class="text-label-sm mb-2 block text-on-surface-variant uppercase" for="dose">Dose (g)</label>
-							<input
-								id="dose"
-								type="number"
-								step="0.1"
-								bind:value={dose}
-								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-							/>
+							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="dose">Dose (g)</label>
+							<p class="text-label-caps mb-2 text-on-surface-variant/40">Grams of ground coffee in the portafilter — typically 14–20g</p>
+							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
+								<button type="button" onclick={() => dose = Math.max(1, Math.round((dose - 0.1) * 10) / 10)}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="dose" type="number" step="0.1" bind:value={dose}
+									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => dose = Math.round((dose + 0.1) * 10) / 10}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+							</div>
 						</div>
 
 						<!-- Grind -->
 						<div>
-							<label for="grind" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Grind Size</label>
+							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind Size</label>
+							<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer = slower flow, coarser = faster</p>
 							<div class="relative">
 								<input
 									id="grind"
 									type="text"
 									bind:value={grind}
-									placeholder="e.g. 2.4 / 14 clicks"
+									placeholder="e.g. 2.4 or 14 clicks"
 									class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 pr-12 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
 								/>
 								<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50 transition-colors hover:text-crema-gold" style="cursor:pointer">tune</span>
@@ -198,31 +198,37 @@
 
 						<!-- Yield -->
 						<div>
-							<label class="text-label-sm mb-2 block text-on-surface-variant uppercase" for="yield">Yield (g)</label>
-							<input
-								id="yield"
-								type="number"
-								step="0.1"
-								bind:value={yieldG}
-								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-							/>
+							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="yield">Yield (g)</label>
+							<p class="text-label-caps mb-2 text-on-surface-variant/40">Total weight of espresso in your cup — the liquid output</p>
+							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
+								<button type="button" onclick={() => yieldG = Math.max(1, Math.round((yieldG - 0.5) * 10) / 10)}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="yield" type="number" step="0.1" bind:value={yieldG}
+									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => yieldG = Math.round((yieldG + 0.5) * 10) / 10}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+							</div>
 						</div>
 
 						<!-- Time -->
 						<div>
-							<label for="time" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Time (s)</label>
-							<input
-								id="time"
-								type="number"
-								bind:value={time}
-								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-							/>
+							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Time (s)</label>
+							<p class="text-label-caps mb-2 text-on-surface-variant/40">Extraction duration in seconds — aim for 25–35s for espresso</p>
+							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
+								<button type="button" onclick={() => time = Math.max(1, time - 1)}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="time" type="number" bind:value={time}
+									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => time = time + 1}
+									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+							</div>
 						</div>
 					</div>
 
 					<!-- Temperature slider -->
 					<div>
-						<label for="temp-range" class="text-label-sm mb-3 block text-on-surface-variant uppercase">Water Temperature</label>
+						<label for="temp-range" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Water Temperature</label>
+						<p class="text-label-caps mb-3 text-on-surface-variant/40">Brew water temp — lighter roasts prefer 93–96°C, darker roasts 88–92°C</p>
 						<div class="flex items-center gap-5">
 							<input
 								id="temp-range"
@@ -244,7 +250,8 @@
 
 					<!-- Sensory notes -->
 					<div class="border-t border-outline-variant/10 pt-6">
-						<label for="notes" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Sensory Notes</label>
+						<label for="notes" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Sensory Notes</label>
+						<p class="text-label-caps mb-2 text-on-surface-variant/40">Your impressions — aroma, acidity, sweetness, mouthfeel, finish</p>
 						<textarea
 							id="notes"
 							bind:value={notes}
@@ -322,14 +329,14 @@
 								stroke-width="4"
 								stroke-linecap="round"
 								stroke-dasharray={circumference}
-								stroke-dashoffset={dashOffset()}
+								stroke-dashoffset={dashOffset}
 								style="transition: stroke-dashoffset 0.5s ease"
 							/>
 						</svg>
 						<div class="absolute inset-0 flex flex-col items-center justify-center">
 							<span class="text-label-caps text-on-surface-variant/50 mb-1">Current</span>
 							<span class="text-headline-lg text-primary font-display">1:{ratio}</span>
-							<span class="text-label-caps mt-1 text-crema-gold">{ratioLabel()}</span>
+							<span class="text-label-caps mt-1 text-crema-gold">{ratioLabel}</span>
 						</div>
 					</div>
 

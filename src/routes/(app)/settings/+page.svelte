@@ -4,6 +4,12 @@
 	import { beans } from '$lib/stores/beans';
 	import { showToast } from '$lib/stores/toast';
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+
+	function logout() {
+		showToast('Logged out — see you next time', 'logout');
+		goto('/');
+	}
 
 	// Profile prefs stored in localStorage
 	const PREFS_KEY = 'beanery-prefs';
@@ -121,12 +127,19 @@
 									class="text-body-md w-full max-w-md rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
 								/>
 							</div>
-							<div class="border-t border-outline-variant/10 pt-6">
+							<div class="border-t border-outline-variant/10 pt-6 flex items-center justify-between">
 								<button
 									onclick={savePrefs}
 									class="text-label-caps rounded-full bg-crema-gold px-8 py-3.5 text-white uppercase tracking-widest transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
 								>
 									Save Changes
+								</button>
+								<button
+									onclick={logout}
+									class="flex items-center gap-2 rounded-full border border-outline-variant/30 px-6 py-3 text-on-surface-variant/60 transition-all hover:border-error/30 hover:text-error active:scale-95"
+								>
+									<span class="material-symbols-outlined text-[18px]">logout</span>
+									<span class="text-label-sm uppercase tracking-widest">Log Out</span>
 								</button>
 							</div>
 						</div>

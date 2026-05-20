@@ -51,15 +51,67 @@
 	// ── Drawer state ──
 	let selectedBean: Bean | null = $state(null);
 	let showAddForm = $state(false);
+	let editMode = $state(false);
+	let savingEdit = $state(false);
+
+	// Edit-mode field mirrors
+	let editName = $state('');
+	let editRoastery = $state('');
+	let editOrigin = $state('');
+	let editTagsStr = $state('');
+	let editDose = $state('');
+	let editYield = $state('');
+	let editTime = $state('');
+	let editStatus = $state<'Fresh' | 'Peak' | 'Past Peak'>('Fresh');
 
 	function openBean(bean: Bean) {
 		showAddForm = false;
+		editMode = false;
 		selectedBean = bean;
 	}
 
 	function closeDrawer() {
 		selectedBean = null;
 		showAddForm = false;
+		editMode = false;
+	}
+
+	function startEdit() {
+		if (!selectedBean) return;
+		editName = selectedBean.name;
+		editRoastery = selectedBean.roastery;
+		editOrigin = selectedBean.origin;
+		editTagsStr = selectedBean.tags.join(', ');
+		editDose = selectedBean.dose;
+		editYield = selectedBean.yield;
+		editTime = selectedBean.time;
+		editStatus = selectedBean.status;
+		editMode = true;
+	}
+
+	async function saveEdit() {
+		if (!selectedBean || !editName.trim() || savingEdit) return;
+		savingEdit = true;
+		const tags = editTagsStr.split(',').map((t) => t.trim()).filter(Boolean);
+		try {
+			const updated = await beans.updateBean(selectedBean.id, {
+				name: editName.trim(),
+				roastery: editRoastery || 'Unknown Roastery',
+				origin: editOrigin || 'Unknown Origin',
+				tags: tags.length ? tags : selectedBean.tags,
+				dose: editDose,
+				yield: editYield,
+				time: editTime,
+				status: editStatus
+			});
+			selectedBean = updated;
+			editMode = false;
+			showToast('Bean updated', 'check_circle');
+		} catch {
+			showToast('Failed to update bean — check your connection', 'error');
+		} finally {
+			savingEdit = false;
+		}
 	}
 
 	// ── Add-bean form state ──
@@ -148,80 +200,179 @@
 		class="fixed right-0 top-0 z-50 flex h-full w-full flex-col overflow-y-auto bg-surface shadow-2xl sm:w-[420px]"
 		style="animation: slideInRight 0.3s cubic-bezier(0.22,1,0.36,1)"
 	>
-		<div class="relative h-56 w-full flex-shrink-0 overflow-hidden">
-			<img src={selectedBean.img} alt={selectedBean.name} class="h-full w-full object-cover" />
-			<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-			<button
-				onclick={closeDrawer}
-				class="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-all hover:bg-black/60 active:scale-95"
-				aria-label="Close"
-			>
-				<span class="material-symbols-outlined text-[20px]">close</span>
-			</button>
-			<div class="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/50 px-3 py-1 backdrop-blur-sm">
-				<div class="h-2 w-2 rounded-full {statusColors[selectedBean.status] ?? 'bg-outline-variant'}"></div>
-				<span class="text-label-caps text-white">{selectedBean.status}</span>
-			</div>
-		</div>
-
-		<div class="flex flex-1 flex-col p-7">
-			<div class="mb-5 flex items-start justify-between">
-				<div>
-					<h2 class="text-headline-lg leading-tight">{selectedBean.name}</h2>
-					<p class="text-label-caps mt-1 text-on-surface-variant/70">{selectedBean.roastery} • {selectedBean.origin}</p>
-				</div>
+		{#if !editMode}
+			<!-- ── VIEW MODE ── -->
+			<div class="relative h-56 w-full flex-shrink-0 overflow-hidden">
+				<img src={selectedBean.img} alt={selectedBean.name} class="h-full w-full object-cover" />
+				<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
 				<button
-					onclick={() => { beans.toggleFav(selectedBean!.id); selectedBean = { ...selectedBean!, favorited: !selectedBean!.favorited }; }}
-					class="flex-shrink-0 p-1.5 transition-all hover:scale-110 active:scale-90"
-					aria-label="Toggle favourite"
+					onclick={closeDrawer}
+					class="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-all hover:bg-black/60 active:scale-95"
+					aria-label="Close"
 				>
-					<span
-						class="material-symbols-outlined text-[24px]"
-						class:text-crema-gold={selectedBean.favorited}
-						class:text-on-surface-variant={!selectedBean.favorited}
-						style="font-variation-settings: 'FILL' {selectedBean.favorited ? 1 : 0}, 'wght' 300"
-					>favorite</span>
+					<span class="material-symbols-outlined text-[20px]">close</span>
 				</button>
+				<div class="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/50 px-3 py-1 backdrop-blur-sm">
+					<div class="h-2 w-2 rounded-full {statusColors[selectedBean.status] ?? 'bg-outline-variant'}"></div>
+					<span class="text-label-caps text-white">{selectedBean.status}</span>
+				</div>
 			</div>
 
-			<div class="mb-6 flex flex-wrap gap-2">
-				{#each selectedBean.tags as tag}
-					<span class="rounded bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">{tag}</span>
-				{/each}
-			</div>
+			<div class="flex flex-1 flex-col p-7">
+				<div class="mb-5 flex items-start justify-between">
+					<div>
+						<h2 class="text-headline-lg leading-tight">{selectedBean.name}</h2>
+						<p class="text-label-caps mt-1 text-on-surface-variant/70">{selectedBean.roastery} • {selectedBean.origin}</p>
+					</div>
+					<button
+						onclick={() => { beans.toggleFav(selectedBean!.id); selectedBean = { ...selectedBean!, favorited: !selectedBean!.favorited }; }}
+						class="flex-shrink-0 p-1.5 transition-all hover:scale-110 active:scale-90"
+						aria-label="Toggle favourite"
+					>
+						<span
+							class="material-symbols-outlined text-[24px]"
+							class:text-crema-gold={selectedBean.favorited}
+							class:text-on-surface-variant={!selectedBean.favorited}
+							style="font-variation-settings: 'FILL' {selectedBean.favorited ? 1 : 0}, 'wght' 300"
+						>favorite</span>
+					</button>
+				</div>
 
-			<div class="mb-7 rounded-xl border border-outline-variant/15 bg-surface-container-lowest/50 p-5">
-				<p class="text-label-sm mb-4 flex items-center gap-1.5 text-crema-gold">
-					<span class="material-symbols-outlined text-[14px]">shutter_speed</span>
-					Sweet Spot Settings
-				</p>
-				<div class="grid grid-cols-3 gap-3 text-center">
-					{#each [{ l: 'Dose', v: selectedBean.dose }, { l: 'Yield', v: selectedBean.yield }, { l: 'Time', v: selectedBean.time }] as col}
-						<div class="rounded-lg bg-surface-container-high/60 py-3">
-							<p class="text-label-caps text-on-surface-variant/50">{col.l}</p>
-							<p class="font-display text-[20px] font-semibold">{col.v}</p>
-						</div>
+				<div class="mb-6 flex flex-wrap gap-2">
+					{#each selectedBean.tags as tag}
+						<span class="rounded bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">{tag}</span>
 					{/each}
 				</div>
+
+				<div class="mb-7 rounded-xl border border-outline-variant/15 bg-surface-container-lowest/50 p-5">
+					<p class="text-label-sm mb-4 flex items-center gap-1.5 text-crema-gold">
+						<span class="material-symbols-outlined text-[14px]">shutter_speed</span>
+						Sweet Spot Settings
+					</p>
+					<div class="grid grid-cols-3 gap-3 text-center">
+						{#each [{ l: 'Dose', v: selectedBean.dose }, { l: 'Yield', v: selectedBean.yield }, { l: 'Time', v: selectedBean.time }] as col}
+							<div class="rounded-lg bg-surface-container-high/60 py-3">
+								<p class="text-label-caps text-on-surface-variant/50">{col.l}</p>
+								<p class="font-display text-[20px] font-semibold">{col.v}</p>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<div class="mt-auto space-y-3">
+					<button
+						onclick={startEdit}
+						class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full border border-crema-gold/30 py-3 text-crema-gold uppercase tracking-widest transition-all hover:bg-crema-gold/5 active:scale-95"
+					>
+						<span class="material-symbols-outlined text-[18px]">edit</span>
+						Edit Bean
+					</button>
+					<a
+						href="/shot-logger"
+						class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full bg-crema-gold py-3.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
+					>
+						<span class="material-symbols-outlined text-[18px]">biotech</span>
+						Log Shot with This Bean
+					</a>
+					<button
+						onclick={() => requestRemove(selectedBean!.id, selectedBean!.name)}
+						class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full border border-error/20 py-3 text-error uppercase tracking-widest transition-all hover:bg-error/5 active:scale-95"
+					>
+						<span class="material-symbols-outlined text-[18px]">delete</span>
+						Remove from Library
+					</button>
+				</div>
 			</div>
 
-			<div class="mt-auto space-y-3">
-				<a
-					href="/shot-logger"
-					class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full bg-crema-gold py-3.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
-				>
-					<span class="material-symbols-outlined text-[18px]">biotech</span>
-					Log Shot with This Bean
-				</a>
-				<button
-					onclick={() => requestRemove(selectedBean!.id, selectedBean!.name)}
-					class="text-label-caps flex w-full items-center justify-center gap-2 rounded-full border border-error/20 py-3 text-error uppercase tracking-widest transition-all hover:bg-error/5 active:scale-95"
-				>
-					<span class="material-symbols-outlined text-[18px]">delete</span>
-					Remove from Library
+		{:else}
+			<!-- ── EDIT MODE ── -->
+			<div class="flex items-center justify-between border-b border-outline-variant/10 px-7 py-5">
+				<div>
+					<h2 class="text-headline-md">Edit Bean</h2>
+					<p class="text-label-caps mt-0.5 text-crema-gold">Update the details</p>
+				</div>
+				<button onclick={() => (editMode = false)} class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-high active:scale-95" aria-label="Cancel edit">
+					<span class="material-symbols-outlined text-[20px]">close</span>
 				</button>
 			</div>
-		</div>
+
+			<form class="flex-1 space-y-5 p-7" onsubmit={(e) => { e.preventDefault(); saveEdit(); }}>
+				<div>
+					<label for="edit-name" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Bean Name *</label>
+					<input id="edit-name" type="text" bind:value={editName} required
+						class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+				</div>
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label for="edit-roastery" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Roastery</label>
+						<input id="edit-roastery" type="text" bind:value={editRoastery}
+							class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+					</div>
+					<div>
+						<label for="edit-origin" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Origin</label>
+						<input id="edit-origin" type="text" bind:value={editOrigin}
+							class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+					</div>
+				</div>
+				<div>
+					<label for="edit-tags" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Flavor Tags</label>
+					<input id="edit-tags" type="text" bind:value={editTagsStr}
+						class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+					<p class="text-label-caps mt-1.5 text-on-surface-variant/40">Separate with commas</p>
+				</div>
+
+				<div>
+					<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Sweet Spot Settings</p>
+					<div class="grid grid-cols-3 gap-3">
+						<div>
+							<label for="edit-dose" class="text-label-caps mb-1.5 block text-on-surface-variant/60">Dose</label>
+							<input id="edit-dose" type="text" bind:value={editDose}
+								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3 text-center outline-none focus:ring-2 focus:ring-crema-gold/60" />
+						</div>
+						<div>
+							<label for="edit-yield" class="text-label-caps mb-1.5 block text-on-surface-variant/60">Yield</label>
+							<input id="edit-yield" type="text" bind:value={editYield}
+								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3 text-center outline-none focus:ring-2 focus:ring-crema-gold/60" />
+						</div>
+						<div>
+							<label for="edit-time" class="text-label-caps mb-1.5 block text-on-surface-variant/60">Time</label>
+							<input id="edit-time" type="text" bind:value={editTime}
+								class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3 text-center outline-none focus:ring-2 focus:ring-crema-gold/60" />
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Freshness Status</p>
+					<div class="flex gap-2">
+						{#each (['Fresh', 'Peak', 'Past Peak'] as const) as s}
+							<button type="button" onclick={() => (editStatus = s)}
+								class="flex-1 rounded-full py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all {editStatus === s ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">
+								{s}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<div class="border-t border-outline-variant/10 pt-4 flex gap-3">
+					<button type="button" onclick={() => (editMode = false)}
+						class="text-label-caps flex-1 rounded-full border border-outline-variant/30 py-3.5 text-on-surface-variant uppercase tracking-widest transition-all hover:bg-surface-container-high active:scale-95">
+						Cancel
+					</button>
+					<button type="submit"
+						class="text-label-caps flex flex-1 items-center justify-center gap-2 rounded-full bg-crema-gold py-3.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95 disabled:opacity-40"
+						disabled={!editName.trim() || savingEdit}>
+						{#if savingEdit}
+							<span class="material-symbols-outlined animate-spin text-[18px]">autorenew</span>
+							Saving…
+						{:else}
+							<span class="material-symbols-outlined text-[18px]">check</span>
+							Save Changes
+						{/if}
+					</button>
+				</div>
+			</form>
+		{/if}
 	</aside>
 {/if}
 

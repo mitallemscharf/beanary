@@ -7,6 +7,11 @@
 	import { beans } from '$lib/stores/beans';
 	let { children } = $props();
 
+	function logout() {
+		showToast('Logged out — see you next time', 'logout');
+		goto('/');
+	}
+
 	let dataLoaded = $state(false);
 
 	onMount(async () => {
@@ -283,15 +288,21 @@
 			>
 				Start New Brew
 			</a>
-			<button
-				onclick={() => showToast('Support docs coming soon', 'help_outline')}
+			<a
+				href="mailto:lenny.frei@hotmail.com?subject=Beanery Support"
 				class="text-label-sm flex items-center gap-3 px-2 py-2 text-on-surface-variant transition-colors hover:text-crema-gold"
 			>
 				<span class="material-symbols-outlined text-[18px]">help_outline</span>Support
-			</button>
+			</a>
 			<a href="/history" class="text-label-sm flex items-center gap-3 px-2 py-2 text-on-surface-variant transition-colors hover:text-crema-gold">
 				<span class="material-symbols-outlined text-[18px]">history</span>Archive
 			</a>
+			<button
+				onclick={logout}
+				class="text-label-sm mt-2 flex w-full items-center gap-3 px-2 py-2 text-on-surface-variant/60 transition-colors hover:text-error"
+			>
+				<span class="material-symbols-outlined text-[18px]">logout</span>Log Out
+			</button>
 		</div>
 	</aside>
 
