@@ -4,6 +4,37 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/stores/toast';
+	import { onDestroy } from 'svelte';
+
+	// ── Extraction Timer ──
+	let timerSeconds = $state(0);
+	let timerRunning = $state(false);
+	let timerInterval: ReturnType<typeof setInterval> | null = null;
+
+	const timerDisplay = $derived(
+		String(Math.floor(timerSeconds / 60)).padStart(2, '0') + ':' + String(timerSeconds % 60).padStart(2, '0')
+	);
+
+	function startTimer() {
+		if (timerRunning) return;
+		timerRunning = true;
+		timerInterval = setInterval(() => { timerSeconds += 1; }, 1000);
+	}
+
+	function stopTimer() {
+		if (!timerRunning && timerSeconds === 0) return;
+		timerRunning = false;
+		if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+		if (timerSeconds > 0) { time = timerSeconds; }
+	}
+
+	function resetTimer() {
+		timerRunning = false;
+		if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+		timerSeconds = 0;
+	}
+
+	onDestroy(() => { if (timerInterval) clearInterval(timerInterval); });
 
 	// Bean dropdown — live from the beans store (includes any newly added beans)
 	const beanOptions = $derived($beans);
@@ -274,6 +305,59 @@
 			<!-- ── Analysis visuals (5 cols) ── -->
 			<div class="space-y-gutter lg:col-span-5" use:reveal={150}>
 
+				<!-- ── Extraction Timer ── -->
+				<div class="rounded-xl border border-primary/5 bg-surface-bright p-8 shadow-sm">
+					<p class="text-label-sm mb-6 block text-center text-on-surface-variant uppercase tracking-widest">Extraction Timer</p>
+
+					<!-- Timer display -->
+					<div class="relative mx-auto mb-6 flex h-40 w-40 items-center justify-center">
+						<!-- Outer pulse ring (only visible when running) -->
+						<div class="absolute inset-0 rounded-full border-2 border-crema-gold/30 {timerRunning ? 'timer-pulse' : ''}"></div>
+						<div class="absolute inset-3 rounded-full border border-crema-gold/15 {timerRunning ? 'timer-pulse-inner' : ''}"></div>
+						<!-- Number display -->
+						<div class="relative z-10 flex flex-col items-center">
+							<span
+								class="font-mono text-[52px] font-bold leading-none tracking-tight transition-colors duration-300 {timerRunning ? 'text-crema-gold' : timerSeconds > 0 ? 'text-primary' : 'text-on-surface-variant/30'}"
+							>{timerDisplay}</span>
+							<span class="text-label-caps mt-1.5 {timerRunning ? 'text-crema-gold' : 'text-on-surface-variant/40'}">
+								{timerRunning ? 'Running…' : timerSeconds > 0 ? `${timerSeconds}s recorded` : 'Ready'}
+							</span>
+						</div>
+					</div>
+
+					<!-- Controls -->
+					<div class="flex gap-2">
+						<button
+							type="button"
+							onclick={startTimer}
+							disabled={timerRunning}
+							class="flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed {timerRunning ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-500/10 text-green-700 hover:bg-green-500/20'}"
+						>
+							<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+							Start
+						</button>
+						<button
+							type="button"
+							onclick={stopTimer}
+							disabled={!timerRunning}
+							class="flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed bg-error/10 text-error hover:bg-error/20"
+						>
+							<span class="material-symbols-outlined text-[18px]">stop</span>
+							Stop
+						</button>
+						<button
+							type="button"
+							onclick={resetTimer}
+							class="flex items-center justify-center rounded-full px-4 py-3 text-label-caps text-on-surface-variant/50 transition-all duration-200 hover:bg-surface-container-high hover:text-on-surface active:scale-95"
+							aria-label="Reset timer"
+						>
+							<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+						</button>
+					</div>
+
+					<p class="mt-4 text-center text-label-caps text-on-surface-variant/40">Stop auto-fills the time field</p>
+				</div>
+
 				<!-- Live Brew Ratio gauge -->
 				<div class="group flex flex-col items-center rounded-xl border border-primary/5 bg-surface-bright p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
 					<p class="text-label-sm mb-7 block text-on-surface-variant uppercase tracking-widest transition-colors group-hover:text-crema-gold">Live Brew Ratio</p>
@@ -346,4 +430,14 @@
 		from { opacity: 0; }
 		to { opacity: 1; }
 	}
+	@keyframes timerPulse {
+		0%, 100% { opacity: 0.3; transform: scale(1); }
+		50%       { opacity: 0.7; transform: scale(1.04); }
+	}
+	@keyframes timerPulseInner {
+		0%, 100% { opacity: 0.2; transform: scale(1); }
+		50%       { opacity: 0.5; transform: scale(1.07); }
+	}
+	.timer-pulse       { animation: timerPulse 1.8s ease-in-out infinite; }
+	.timer-pulse-inner { animation: timerPulseInner 1.8s ease-in-out infinite 0.3s; }
 </style>
