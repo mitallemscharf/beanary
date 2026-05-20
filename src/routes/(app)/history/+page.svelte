@@ -27,8 +27,13 @@
 		return Array.from({ length: 5 }, (_, i) => i < n);
 	}
 
+	let expandedId: string | null = $state(null);
 	let openMenuId: string | null = $state(null);
 	let deletingId: string | null = $state(null);
+
+	function toggleExpand(id: string) {
+		expandedId = expandedId === id ? null : id;
+	}
 
 	// Confirm modal state
 	let confirmOpen = $state(false);
@@ -147,95 +152,123 @@
 					<div class="space-y-3">
 						{#each group as shot, i}
 							{@const isBest = shot.rating === 5}
-							<div
-								class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border border-primary/5 bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm {deletingId === shot.id ? 'opacity-40 pointer-events-none' : ''}"
-							>
-								<!-- Left: image + info -->
-								<div class="flex min-w-[260px] flex-1 items-center gap-6">
-									<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container">
-										<img
-											src={shot.img}
-											alt={shot.bean}
-											class="h-full w-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
-										/>
+							{@const isExpanded = expandedId === shot.id}
+							<div class="{deletingId === shot.id ? 'opacity-40 pointer-events-none' : ''}">
+								<!-- Main row -->
+								<div
+									class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border border-primary/5 bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm {isExpanded ? 'rounded-b-none border-b-0 bg-surface-container-low shadow-sm' : ''}"
+									onclick={() => toggleExpand(shot.id)}
+									role="button"
+									tabindex="0"
+									onkeydown={(e) => e.key === 'Enter' && toggleExpand(shot.id)}
+								>
+									<!-- Left: image + info -->
+									<div class="flex min-w-[260px] flex-1 items-center gap-6">
+										<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container">
+											<img
+												src={shot.img}
+												alt={shot.bean}
+												class="h-full w-full object-cover transition-all duration-500 {isExpanded ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'}"
+											/>
+										</div>
+										<div>
+											<div class="mb-1 flex items-center gap-2">
+												<h3 class="text-headline-md">{shot.bean}</h3>
+												{#if isBest}
+													<span class="material-symbols-outlined text-crema-gold text-[18px]" style="font-variation-settings: 'FILL' 1">emoji_events</span>
+												{/if}
+											</div>
+											<div class="flex items-center gap-2.5">
+												<span
+													class="h-2 w-2 rounded-full"
+													style="background-color: {processColors[shot.process] ?? processColors.default}"
+												></span>
+												<p class="text-label-caps text-on-surface-variant/70">{shot.process} • {shot.roast}</p>
+											</div>
+										</div>
 									</div>
-									<div>
-										<div class="mb-1 flex items-center gap-2">
-											<h3 class="text-headline-md">{shot.bean}</h3>
-											{#if isBest}
-												<span class="material-symbols-outlined text-crema-gold text-[18px]" style="font-variation-settings: 'FILL' 1">emoji_events</span>
-											{/if}
-										</div>
-										<div class="flex items-center gap-2.5">
-											<span
-												class="h-2 w-2 rounded-full"
-												style="background-color: {processColors[shot.process] ?? processColors.default}"
-											></span>
-											<p class="text-label-caps text-on-surface-variant/70">{shot.process} • {shot.roast}</p>
-										</div>
-									</div>
-								</div>
 
-								<!-- Center: data -->
-								<div class="flex items-center gap-10 text-sm">
-									{#each [
-										{ label: 'Ratio', val: `${shot.dose}g / ${shot.yield}g` },
-										{ label: 'Time', val: `${shot.time}s` },
-										{ label: 'Temp', val: `${shot.temp}°C` }
-									] as col}
-										<div class="flex flex-col items-center gap-0.5">
-											<span class="text-label-caps text-on-surface-variant/50">{col.label}</span>
-											<span class="font-mono text-sm font-medium text-primary">{col.val}</span>
-										</div>
-									{/each}
-
-									<!-- Stars -->
-									<div class="flex gap-0.5">
-										{#each stars(shot.rating) as filled}
-											<span
-												class="material-symbols-outlined text-crema-gold text-base"
-												style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300"
-											>star</span>
+									<!-- Center: data -->
+									<div class="flex items-center gap-10 text-sm">
+										{#each [
+											{ label: 'Ratio', val: `${shot.dose}g / ${shot.yield}g` },
+											{ label: 'Time', val: `${shot.time}s` },
+											{ label: 'Temp', val: `${shot.temp}°C` }
+										] as col}
+											<div class="flex flex-col items-center gap-0.5">
+												<span class="text-label-caps text-on-surface-variant/50">{col.label}</span>
+												<span class="font-mono text-sm font-medium text-primary">{col.val}</span>
+											</div>
 										{/each}
+
+										<!-- Stars -->
+										<div class="flex gap-0.5">
+											{#each stars(shot.rating) as filled}
+												<span
+													class="material-symbols-outlined text-crema-gold text-base"
+													style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300"
+												>star</span>
+											{/each}
+										</div>
+									</div>
+
+									<!-- Actions -->
+									<div class="relative flex-shrink-0 flex items-center gap-1">
+										<span class="material-symbols-outlined text-[18px] text-on-surface-variant/30 transition-transform duration-300 {isExpanded ? 'rotate-180' : ''}">expand_more</span>
+										<button
+											onclick={(e) => { e.stopPropagation(); openMenuId = openMenuId === shot.id ? null : shot.id; }}
+											class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high"
+											aria-label="More options"
+										>
+											<span class="material-symbols-outlined text-[20px]">more_vert</span>
+										</button>
+										{#if openMenuId === shot.id}
+											<div
+												class="absolute right-0 top-12 z-30 min-w-[160px] overflow-hidden rounded-xl border border-outline-variant/20 bg-surface shadow-xl"
+												style="animation: menuIn 0.15s ease-out"
+											>
+												<button
+													onclick={(e) => { e.stopPropagation(); requestDelete(shot.id, shot.bean); }}
+													class="flex w-full items-center gap-3 px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
+												>
+													<span class="material-symbols-outlined text-[17px]">delete</span>
+													<span class="text-label-sm uppercase">Delete shot</span>
+												</button>
+											</div>
+										{/if}
 									</div>
 								</div>
 
-								<!-- Actions -->
-								<div class="relative flex-shrink-0">
-									<button
-										onclick={(e) => { e.stopPropagation(); openMenuId = openMenuId === shot.id ? null : shot.id; }}
-										class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high"
-										aria-label="More options"
+								<!-- Inline expand panel -->
+								{#if isExpanded}
+									<div
+										class="rounded-b-xl border border-t-0 border-primary/5 bg-surface-container-low px-8 py-6"
+										style="animation: expandDown 0.22s cubic-bezier(0.22,1,0.36,1)"
 									>
-										<span class="material-symbols-outlined text-[20px]">more_vert</span>
-									</button>
-									{#if openMenuId === shot.id}
-										<div
-											class="absolute right-0 top-12 z-30 min-w-[160px] overflow-hidden rounded-xl border border-outline-variant/20 bg-surface shadow-xl"
-											style="animation: menuIn 0.15s ease-out"
-										>
-											<button
-												onclick={() => requestDelete(shot.id, shot.bean)}
-												class="flex w-full items-center gap-3 px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
-											>
-												<span class="material-symbols-outlined text-[17px]">delete</span>
-												<span class="text-label-sm uppercase">Delete shot</span>
-											</button>
-											<button
-												onclick={() => { openMenuId = null; showToast('Edit coming soon', 'edit'); }}
-												class="flex w-full items-center gap-3 px-4 py-3 text-left text-on-surface-variant transition-colors hover:bg-surface-container-high"
-											>
-												<span class="material-symbols-outlined text-[17px]">edit</span>
-												<span class="text-label-sm uppercase">Edit</span>
-											</button>
+										<div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+											<div>
+												<p class="text-label-caps mb-1 text-on-surface-variant/50">Grind Size</p>
+												<p class="font-mono text-sm font-medium">{shot.grind || '—'}</p>
+											</div>
+											<div>
+												<p class="text-label-caps mb-1 text-on-surface-variant/50">Dose</p>
+												<p class="font-mono text-sm font-medium">{shot.dose}g</p>
+											</div>
+											<div>
+												<p class="text-label-caps mb-1 text-on-surface-variant/50">Yield</p>
+												<p class="font-mono text-sm font-medium">{shot.yield}g</p>
+											</div>
+											<div>
+												<p class="text-label-caps mb-1 text-on-surface-variant/50">Brew Ratio</p>
+												<p class="font-mono text-sm font-medium text-crema-gold">1:{(shot.yield / shot.dose).toFixed(1)}</p>
+											</div>
 										</div>
-									{/if}
-								</div>
-
-								<!-- Notes tooltip on hover -->
-								{#if shot.notes}
-									<div class="absolute -top-10 left-6 z-20 hidden rounded-lg bg-inverse-surface px-3 py-1.5 text-[11px] text-inverse-on-surface shadow-md group-hover:block">
-										{shot.notes.slice(0, 60)}{shot.notes.length > 60 ? '…' : ''}
+										{#if shot.notes}
+											<div class="mt-5 rounded-lg border border-outline-variant/15 bg-surface-container/60 p-4">
+												<p class="text-label-caps mb-2 text-crema-gold">Tasting Notes</p>
+												<p class="text-body-md text-on-surface-variant">{shot.notes}</p>
+											</div>
+										{/if}
 									</div>
 								{/if}
 							</div>
@@ -272,5 +305,9 @@
 	@keyframes menuIn {
 		from { opacity: 0; transform: scale(0.95) translateY(-4px); }
 		to { opacity: 1; transform: scale(1) translateY(0); }
+	}
+	@keyframes expandDown {
+		from { opacity: 0; transform: translateY(-6px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 </style>

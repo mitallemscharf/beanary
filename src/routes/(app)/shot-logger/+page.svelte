@@ -21,7 +21,6 @@
 	let grind = $state('');
 	let notes = $state('');
 	let rating = $state(4);
-	let showSuccess = $state(false);
 	let saving = $state(false);
 	let validationError = $state('');
 
@@ -74,60 +73,20 @@
 				img: selectedBean?.img ?? 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&auto=format&fit=crop&q=80'
 			});
 			showToast('Shot recorded in your journal', 'check_circle');
-			showSuccess = true;
+			goto('/history');
 		} catch {
 			showToast('Failed to save shot — check your connection', 'error');
 			saving = false;
 		}
 	}
 
-	function logAnother() {
-		showSuccess = false;
-		saving = false;
-		// Reset form to defaults
-		bean = $beans[0]?.name ?? '';
-		dose = 18;
-		yieldG = 36;
-		time = 30;
-		temp = 94;
-		grind = '';
-		notes = '';
-		rating = 4;
-		validationError = '';
-	}
+
 </script>
 
 <svelte:head>
 	<title>Shot Logger | Beanery</title>
 </svelte:head>
 
-<!-- Success overlay -->
-{#if showSuccess}
-	<div
-		class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-surface/96 backdrop-blur-md"
-		style="animation: fadeIn 0.35s ease-out"
-	>
-		<div class="flex h-20 w-20 items-center justify-center rounded-full bg-crema-gold/10 mb-6 ring-1 ring-crema-gold/20">
-			<span class="material-symbols-outlined text-crema-gold text-[44px]" style="font-variation-settings: 'FILL' 1, 'wght' 300">check_circle</span>
-		</div>
-		<h2 class="text-headline-lg mb-2">Extraction Recorded</h2>
-		<p class="text-body-md text-on-surface-variant mb-10">Saved to your journal. What's next?</p>
-		<div class="flex flex-col items-center gap-3 sm:flex-row">
-			<button
-				onclick={logAnother}
-				class="text-label-caps rounded-full border border-outline-variant/40 px-8 py-3.5 uppercase tracking-widest text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface active:scale-95"
-			>
-				<span class="material-symbols-outlined mr-2 text-[16px]">add</span>Log Another Shot
-			</button>
-			<a
-				href="/history"
-				class="text-label-caps rounded-full bg-crema-gold px-8 py-3.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
-			>
-				<span class="material-symbols-outlined mr-2 text-[16px]">menu_book</span>View Journal
-			</a>
-		</div>
-	</div>
-{/if}
 
 <div class="px-container-padding pb-24 pt-10 md:px-12 md:pt-14">
 	<div class="mx-auto max-w-[1100px]">

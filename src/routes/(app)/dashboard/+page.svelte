@@ -2,6 +2,7 @@
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
 	import { reveal } from '$lib/actions/reveal';
+	import { goto } from '$app/navigation';
 
 	// ── Real counts from stores ──
 	const totalShots = $derived($shots.length);
@@ -160,6 +161,7 @@
 							style="height: {hoveredBar === i ? Math.min(bar.h + 12, 100) : bar.h}%; background: {bar.peak ? '#C5A059' : '#F0EEE9'}"
 							onmouseenter={() => (hoveredBar = i)}
 							onmouseleave={() => (hoveredBar = null)}
+							onclick={() => goto('/history')}
 							role="button"
 							tabindex={i}
 						>

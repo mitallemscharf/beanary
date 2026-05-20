@@ -193,56 +193,24 @@
 		</div>
 	</section>
 
-	<!-- ──────────── Newsletter ──────────── -->
-	<section class="flex flex-col items-center border-t border-outline-variant/10 py-24 text-center" use:reveal={0}>
-		<span class="material-symbols-outlined mb-8 cursor-pointer text-[52px] text-crema-gold transition-all duration-300 hover:-translate-y-1 hover:scale-110">local_cafe</span>
-		<h2 class="text-headline-xl mb-4 text-primary">The <em class="font-normal italic">Journal</em></h2>
-		<p class="text-body-lg mb-10 max-w-lg text-on-surface-variant">
-			Join our community of precision brewers. Receive bi-weekly extraction guides and equipment reviews curated by our head roasters.
-		</p>
-		<form class="flex w-full max-w-md gap-2" onsubmit={(e) => { e.preventDefault(); showToast('Subscribed! Welcome to the Journal.', 'local_cafe'); }}>
-			<input
-				type="email"
-				placeholder="Your email address"
-				class="text-body-md flex-1 rounded-full border-none bg-surface-container-low px-6 py-4 outline-none ring-0 transition-all duration-300 focus:ring-1 focus:ring-crema-gold hover:bg-surface-container-high"
-			/>
-			<button
-				type="submit"
-				class="text-label-caps rounded-full bg-primary px-7 py-4 text-white uppercase tracking-widest transition-all duration-500 hover:-translate-y-1 hover:bg-crema-gold hover:shadow-lg active:scale-95"
-			>
-				Subscribe
-			</button>
-		</form>
-	</section>
 </main>
 
 <!-- ──────────── Footer ──────────── -->
-<footer class="border-t border-outline-variant/10 bg-surface-container-lowest py-14">
-	<div class="mx-auto grid max-w-[1140px] grid-cols-1 gap-gutter px-margin-desktop py-4 md:grid-cols-4">
-		<div class="space-y-3">
+<footer class="border-t border-outline-variant/10 bg-surface-container-lowest py-12">
+	<div class="mx-auto flex max-w-[1140px] flex-col items-center gap-8 px-margin-desktop md:flex-row md:justify-between">
+		<div>
 			<span class="text-label-sm block text-on-surface/80 uppercase tracking-widest">Beanery</span>
-			<p class="text-label-caps text-on-surface-variant/60">© 2024 Beanery Coffee Labs.<br />Precision in every pour.</p>
+			<p class="text-label-caps mt-1 text-on-surface-variant/50">© 2026 Beanery Coffee Labs</p>
 		</div>
-		{#each [
-			{ title: 'Library', links: ['Our Story', 'Extraction Science', 'Sourcing Ethics'] },
-			{ title: 'Connect', links: ['Instagram', 'Twitter', 'Journal RSS'] },
-			{ title: 'Legal', links: ['API Docs', 'Privacy'] }
-		] as col}
-			<div class="flex flex-col gap-2">
-				<h4 class="text-label-sm mb-1 text-primary uppercase">{col.title}</h4>
-				{#each col.links as link}
-					<button onclick={() => showToast(`${link} coming soon`, 'open_in_new')} class="text-label-caps w-fit cursor-pointer text-on-surface-variant/70 decoration-crema-gold underline-offset-4 transition-all hover:translate-x-1 hover:text-crema-gold hover:underline">{link}</button>
-				{/each}
-			</div>
-		{/each}
-	</div>
-	<div class="flex justify-center pt-6">
-		<button
-			onclick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-			class="group flex items-center gap-2 rounded-full bg-surface-container-low px-5 py-2.5 text-on-surface-variant transition-all duration-300 hover:-translate-y-1 hover:text-crema-gold hover:shadow-md active:scale-95"
-		>
-			<span class="text-label-sm uppercase tracking-widest">Back to top</span>
-			<span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:-translate-y-1">expand_less</span>
-		</button>
+		<nav class="flex items-center gap-8">
+			{#each [
+				{ href: '/dashboard', label: 'Dashboard' },
+				{ href: '/shot-logger', label: 'Shot Logger' },
+				{ href: '/library', label: 'Library' },
+				{ href: '/history', label: 'History' }
+			] as link}
+				<a href={link.href} class="text-label-caps text-on-surface-variant/60 transition-all duration-200 hover:translate-x-0 hover:text-crema-gold">{link.label}</a>
+			{/each}
+		</nav>
 	</div>
 </footer>
