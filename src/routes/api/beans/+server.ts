@@ -91,13 +91,21 @@ const DEFAULT_BEANS = [
 	}
 ];
 
-export async function GET() {
+export async function GET({ locals }) {
 	try {
 		await connectDB();
-		let beans = await Bean.find().sort({ createdAt: -1 });
-		if (beans.length === 0) {
-			beans = await Bean.insertMany(DEFAULT_BEANS);
+		const user = locals.user!;
+		const isAdmin = user.role === 'admin';
+
+		// Admin sees all beans; regular users see only their own
+		const filter = isAdmin ? {} : { userId: user.id };
+		let beans = await Bean.find(filter).sort({ createdAt: -1 });
+
+		// Auto-seed default beans only for admin when library is empty
+		if (beans.length === 0 && isAdmin) {
+			beans = await Bean.insertMany(DEFAULT_BEANS.map((b) => ({ ...b, userId: user.id })));
 		}
+
 		return json(beans.map((b) => b.toJSON()));
 	} catch (err) {
 		console.error('GET /api/beans error:', err);
@@ -105,11 +113,12 @@ export async function GET() {
 	}
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
 	try {
 		await connectDB();
+		const user = locals.user!;
 		const data = await request.json();
-		const bean = new Bean(data);
+		const bean = new Bean({ ...data, userId: user.id });
 		await bean.save();
 		return json(bean.toJSON(), { status: 201 });
 	} catch (err) {
@@ -118,12 +127,22 @@ export async function POST({ request }) {
 	}
 }
 
-export async function DELETE() {
+export async function DELETE({ locals }) {
 	try {
 		await connectDB();
-		await Bean.deleteMany({});
-		const beans = await Bean.insertMany(DEFAULT_BEANS);
-		return json(beans.map((b) => b.toJSON()));
+		const user = locals.user!;
+		const isAdmin = user.role === 'admin';
+
+		if (isAdmin) {
+			// Admin reset: wipe all beans and reseed with admin's defaults
+			await Bean.deleteMany({});
+			const beans = await Bean.insertMany(DEFAULT_BEANS.map((b) => ({ ...b, userId: user.id })));
+			return json(beans.map((b) => b.toJSON()));
+		} else {
+			// User reset: delete only their own beans, return empty list
+			await Bean.deleteMany({ userId: user.id });
+			return json([]);
+		}
 	} catch (err) {
 		console.error('DELETE /api/beans error:', err);
 		throw error(500, 'Failed to reset beans');

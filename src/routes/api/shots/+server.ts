@@ -61,13 +61,21 @@ const DEFAULT_SHOTS = [
 	}
 ];
 
-export async function GET() {
+export async function GET({ locals }) {
 	try {
 		await connectDB();
-		let shots = await Shot.find().sort({ createdAt: -1 });
-		if (shots.length === 0) {
-			shots = await Shot.insertMany(DEFAULT_SHOTS);
+		const user = locals.user!;
+		const isAdmin = user.role === 'admin';
+
+		// Admin sees all shots; regular users see only their own
+		const filter = isAdmin ? {} : { userId: user.id };
+		let shots = await Shot.find(filter).sort({ createdAt: -1 });
+
+		// Auto-seed sample shots only for admin when journal is empty
+		if (shots.length === 0 && isAdmin) {
+			shots = await Shot.insertMany(DEFAULT_SHOTS.map((s) => ({ ...s, userId: user.id })));
 		}
+
 		return json(shots.map((s) => s.toJSON()));
 	} catch (err) {
 		console.error('GET /api/shots error:', err);
@@ -75,11 +83,12 @@ export async function GET() {
 	}
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
 	try {
 		await connectDB();
+		const user = locals.user!;
 		const data = await request.json();
-		const shot = new Shot(data);
+		const shot = new Shot({ ...data, userId: user.id });
 		await shot.save();
 		return json(shot.toJSON(), { status: 201 });
 	} catch (err) {
@@ -88,12 +97,22 @@ export async function POST({ request }) {
 	}
 }
 
-export async function DELETE() {
+export async function DELETE({ locals }) {
 	try {
 		await connectDB();
-		await Shot.deleteMany({});
-		const shots = await Shot.insertMany(DEFAULT_SHOTS);
-		return json(shots.map((s) => s.toJSON()));
+		const user = locals.user!;
+		const isAdmin = user.role === 'admin';
+
+		if (isAdmin) {
+			// Admin reset: wipe all shots and reseed with admin's defaults
+			await Shot.deleteMany({});
+			const shots = await Shot.insertMany(DEFAULT_SHOTS.map((s) => ({ ...s, userId: user.id })));
+			return json(shots.map((s) => s.toJSON()));
+		} else {
+			// User reset: delete only their own shots, return empty list
+			await Shot.deleteMany({ userId: user.id });
+			return json([]);
+		}
 	} catch (err) {
 		console.error('DELETE /api/shots error:', err);
 		throw error(500, 'Failed to reset shots');
