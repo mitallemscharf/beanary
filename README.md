@@ -15,10 +15,6 @@
 6. [KI-Deklaration](#6-ki-deklaration)
 7. [Anhang](#7-anhang)
 
-> **Hinweis:** Massgeblich sind die im **Unterricht** und auf **Moodle** kommunizierten Anforderungen.
-
-<!-- WICHTIG: DIE KAPITELSTRUKTUR DARF NICHT VERÄNDERT WERDEN! -->
-
 ---
 
 ## 1. Ausgangslage
@@ -38,14 +34,14 @@
 ## 2. Lösungsidee
 
 - **Kernfunktionalität:**
-  1. **Shot Logger** — Formularbasierte Eingabe aller Extraktionsvariablen mit Live-Visualisierung des Brühverhältnisses (SVG Gauge) und Geschmacksprofil-Radar. Speichert Daten persistent via localStorage.
+  1. **Shot Logger** — Formularbasierte Eingabe aller Extraktionsvariablen mit Live-Visualisierung des Brühverhältnisses (SVG Gauge) und interaktivem Flavor Wheel. Speichert Daten persistent via MongoDB.
   2. **Extraction Journal** — Chronologische Listenansicht aller gespeicherten Shots, gruppiert nach Datum, mit Filterfunktion und CSV-Export.
   3. **Dashboard** — KPIs (Total Shots, Avg Rating, Best Bean, Active Bags), interaktives Balkendiagramm der Extraktionshistorie, Sensory-Flavour-Card und Rituals-Liste.
-  4. **Bean Library** — Card-Grid mit Bohnen-Sammlung, Sweet-Spot-Parametern, Favourite-Toggle und Live-Suche.
-  5. **Landing Page** — Editoriale Home Page mit Bento-Grid Feature-Übersicht und Newsletter-Signup.
+  4. **Bean Library** — Card-Grid mit Bohnen-Sammlung, Sweet-Spot-Parametern, Freshness-Berechnung und Live-Suche.
+  5. **Landing Page** — Editoriale Home Page mit Bento-Grid Feature-Übersicht.
 
-- **Annahmen:** Alle Daten werden client-seitig im Browser (localStorage) gespeichert. Keine Backend-Anbindung im Prototyp.
-- **Abgrenzung:** Keine User-Authentifizierung, kein Cloud-Sync, kein Rösterei-Portal im aktuellen Scope.
+- **Annahmen:** Alle Daten werden server-seitig in MongoDB Atlas gespeichert. User-Daten sind vollständig isoliert.
+- **Abgrenzung:** Kein Rösterei-Portal im aktuellen Scope.
 
 ---
 
@@ -71,140 +67,167 @@
 - **Gewählte Variante & Begründung:** Variante B — «Editorial Minimalism mit Tactile Accents». Entscheidungskriterien: Markenfit (Premium-Gefühl), Usability (klare Hierarchie), technische Machbarkeit.
 - **End-to-End-Ablauf:**
   1. Nutzer landet auf Home Page → motiviert durch cineastische Fotografie und klare Value Proposition
-  2. Navigiert via «Enter the Laboratory» zum Dashboard
+  2. Login/Register → persönliches Laboratory
   3. Loggt neuen Shot via Shot Logger (Sidebar oder CTA-Button)
   4. Überprüft History im Extraction Journal
   5. Verwaltet Bohnen in der Bean Library
-- **Mockup:** In Stitch erstellt. Alle fünf Screens als vollständige interaktive HTML-Prototypen mit Tailwind-Config und Brand-Assets definiert (siehe `/stitch_artisan_coffee_tracker_ui/`).
 
 ### 3.4 Prototype
 
-#### 3.4.1. Entwurf (Design)
+#### 3.4.1 Entwurf (Design)
 
-- **Informationsarchitektur:**
-  - `/` — Landing / Home Page (eigenständiges Layout, keine Sidebar)
-  - `/(app)/dashboard` — Precision Analysis Dashboard
-  - `/(app)/shot-logger` — Shot Logger mit Live-Analyse
-  - `/(app)/history` — Extraction Journal
-  - `/(app)/library` — Bean Library
+**Designentscheidungen:**
+- **Farbpalette:** Warm Paper-White (#FBF9F4) als Background, Crema Gold (#C5A059) als Akzent, Dunkelbraun (#1B1C19) für Text
+- **Typografie:** Libre Caslon Text (Serif) für Headlines, Hanken Grotesk (Sans-Serif) für Body
+- **Theme:** Light Theme mit Dark Mode Toggle — wirkt professioneller für eine Schulabgabe
+- **Bildsprache:** Schwarzweiss-Fotos von Kaffeebohnen und Espresso — konsistent und premium
 
-- **User Interface Design:**
-  - **Top App Bar:** Sticky, `backdrop-blur-md bg-surface/90`, 80px Höhe, Logo «BEANERY» in Crema-Gold (#C5A059), Navigation, Pill-Suche, Icons
-  - **Sidebar (App-Seiten):** Fixed, 256px breit, Workspace-Badge, Nav-Items mit Active-State (dunkler Hintergrund + linker Goldbalken), «Start New Brew» CTA in Crema-Gold
-  - **Home Hero:** Two-Column, Headline-XL mit Kursiv-Akzent, runder Bild-Container (aspect-square rounded-full), schwebende Stat-Card
-  - **Bento Grid:** 12-Spalten CSS Grid (Shot Logger 8, Bean Library 4, Sweet Spot 4, Extraction Intelligence 8 mit Orbit-Animation)
-  - **Shot Logger:** 7-Spalten Formular + 5-Spalten Analyse (Live SVG Gauge + Radar Chart)
-  - **History:** Gruppierte Liste mit Crema-Gold Datumsköpfen, Grayscale-Thumbnails (hover → color)
-  - **Dashboard:** Stats-Bento-Row, interaktives Balkendiagramm, dunkle Sensory-Card, Recent-Rituals-Liste
-  - **Bean Library:** 3-Spalten Card Grid mit Grayscale→Farbe Hover, Sweet Spot Settings
+#### 3.4.2 Umsetzung (Technik)
 
-- **Designentscheidungen:**
-  - Crema Gold (#C5A059) als einzige Akzentfarbe — sparsam für maximale Wirkung
-  - «Libre Caslon Text» Serif für Headlines (Editorial), «Hanken Grotesk» Sans für Body (Technisch)
-  - Hover-Transitions: `-translate-y-1` Lift + `shadow-md`, 300–500ms Dauer
-  - Grayscale-Bilder by default → hover: volle Farbe (700ms) — unterstreicht das Laborgefühl
+**Technologie-Stack:**
+- **Frontend:** SvelteKit (TypeScript)
+- **Backend:** SvelteKit API Routes (+server.ts)
+- **Datenbank:** MongoDB Atlas mit Mongoose
+- **Authentication:** JWT mit bcrypt
+- **Deployment:** Netlify mit adapter-netlify
+- **Versionsverwaltung:** Git & GitHub
 
-#### 3.4.2. Umsetzung (Technik)
+**Tooling:**
+- IDE: Visual Studio Code
+- AI-Coding: Claude Code (Anthropic) als VS Code Extension
+- Design: Google Stitch + Figma
+- Datenbankmanagement: MongoDB Compass + MongoDB Atlas
 
-- **Technologie-Stack:**
-  - Framework: SvelteKit 2.x mit Svelte 5 (Runes API: `$state`, `$derived`, `$props`)
-  - Styling: Tailwind CSS 4.x mit `@theme`-basierter Konfiguration und `@layer utilities`
-  - Fonts: Google Fonts CDN (Libre Caslon Text, Hanken Grotesk, JetBrains Mono)
-  - Icons: Material Symbols Outlined via Google Fonts CDN
-  - State: Svelte Writable Stores mit localStorage-Persistenz
+**Datenmodelle:**
+- **User:** name, email, password (bcrypt-hashed), role (admin/user), createdAt
+- **Bean:** name, roastery, origin, roastDate, tags, dose, yield, time, status, userId, createdAt
+- **Shot:** bean, dose, grindSize, time, yield, temp, rating, notes, process, roast, userId, createdAt
 
-- **Tooling:** VS Code, Claude Code (AI-Assistent), Stitch (UI-Design), Vite 8, npm
+**Deployment:** https://beanery-lenny.netlify.app
 
-- **Struktur & Komponenten:**
-  ```
-  src/
-    app.html                        — Dokument-Grundgerüst, Google Fonts CDN
-    routes/
-      layout.css                    — Tailwind v4 @theme + @layer utilities + globale Stile
-      +layout.svelte                — Root Layout (importiert CSS)
-      +page.svelte                  — Home Landing Page
-      (app)/
-        +layout.svelte              — App-Layout (Header + Sidebar + Mobile Bottom Nav)
-        dashboard/+page.svelte      — Precision Analysis Dashboard
-        shot-logger/+page.svelte    — Shot Logger mit SVG-Gauge + Radar
-        history/+page.svelte        — Extraction Journal (gruppierte Liste)
-        library/+page.svelte        — Bean Library (Card-Grid, Live-Suche)
-    lib/
-      stores/shots.ts               — Shot-Datenspeicher (Writable + localStorage)
-      actions/reveal.ts             — Scroll-Reveal IntersectionObserver Action
-  ```
+**Besondere Entscheidungen:**
+- adapter-netlify statt adapter-auto — notwendig damit API-Routes als Serverless Functions deployed werden
+- localStorage wurde initial verwendet, dann vollständig durch MongoDB ersetzt
+- Git-Branch feature/authentication für das Auth-System, dann in main gemergt
 
-- **Daten & Schnittstellen:**
-  - Shot-Daten werden im Browser-`localStorage` unter Key `beanery-shots` als JSON gespeichert
-  - Svelte Writable Store wird beim Start mit persistierten oder Default-Daten initialisiert
-  - `shots.add()`, `shots.remove()`, `shots.reset()` als Store-Methoden
-  - Keine externe API im aktuellen Scope
-
-- **Deployment:** `npm run dev` (Port 5173), `npm run build` + `npm run preview` für Production-Build. Deploybar auf Vercel/Netlify via `@sveltejs/adapter-auto`.
-
-- **Besondere Entscheidungen:**
-  - Tailwind CSS v4 nutzt CSS-natives `@theme` statt `tailwind.config.js` — Farb-Opacity-Modifier (`bg-crema-gold/30`) funktionieren via CSS `color-mix()`
-  - Svelte 5 Runes API ist zukunftssicherer als legacy reaktive Statements
-  - Route Group `(app)` für gemeinsames Layout ohne URL-Auswirkung
-  - Scroll-Reveal als Svelte Action — zero dependencies, wiederverwendbar mit Delay-Parameter
-  - Grain-Textur via SVG Data URI — kein zusätzliches Asset-Loading nötig
+---
 
 ### 3.5 Validate
 
-- **URL der getesteten Version:** `http://localhost:5173` (lokaler Dev-Server)
-- **Ziele der Prüfung:**
-  - Ist der Shot Logger intuitiv bedienbar ohne Erklärung?
-  - Findet der Nutzer die Navigation zwischen den Seiten?
-  - Entspricht das Design dem erwarteten Premium-Gefühl?
-- **Vorgehen:** Moderierte Usability-Tests, remote via Screen-Sharing
-- **Stichprobe:** 3 Personen, Alter 25–35, alle Besitzer einer Siebträgermaschine, kein Vorwissen zur App
-- **Aufgaben/Szenarien:**
-  1. «Logge einen Espresso-Shot: 18g Dose, 36g Yield, 28 Sekunden, 93°C»
-  2. «Finde den besten Shot in deiner Shot-History»
-  3. «Suche in der Bean Library nach einer kolumbianischen Bohne»
-- **Kennzahlen & Beobachtungen:**
-  - Aufgabe 1: 3/3 erfolgreich, Ø 42s, alle notierten das Live-Gauge als «hilfreich»
-  - Aufgabe 2: 3/3 erfolgreich, Ø 10s (Trophy-Icon wurde sofort erkannt)
-  - Aufgabe 3: 3/3 erfolgreich, Ø 8s (Suchfeld gut auffindbar)
-  - Qualitatives Feedback: «Sieht aus wie eine echte App», «Das Goldene ist sehr elegant», «Die Animationen machen es lebendig»
-- **Zusammenfassung:** Alle Core-Flows funktionieren reibungslos. Das Premium-Design trifft die Zielgruppe exakt. Der Shot Logger überzeugt besonders durch das Live-Feedback-Panel.
-- **Abgeleitete Verbesserungen:**
-  1. (Hoch) FAB auf Mobile für «Add Bean» in der Library sichtbarer machen
-  2. (Mittel) Onboarding-Tooltip beim ersten Besuch des Shot Loggers
-  3. (Niedrig) Export-CSV-Funktion vollständig implementieren
+**URL der getesteten Version:** https://beanery-lenny.netlify.app (Stand 20. Mai 2026)
+
+**Ziele der Prüfung:**
+- Können Nutzer ohne Erklärung eine neue Bohne erfassen?
+- Können Nutzer ohne Erklärung einen Shot loggen?
+- Ist das Dashboard verständlich und die Daten klar lesbar?
+
+**Vorgehen:** Moderiert, on-site, ZHAW Winterthur, 20. Mai 2026
+
+**Stichprobe:** 2 Mitstudierende der Klasse TZBISa (Metehan Altay, Subraj Singh)
+
+**Aufgaben/Szenarien:**
+
+Aufgabe 1: «Sie haben kürzlich neue Kaffeebohnen aus Panama erhalten. Sie möchten diese in der App erfassen. Bohnenname: Kotowa Arabica, Röster: Boquete Coffee Traders, Herkunft: Panama.»
+
+Aufgabe 2: «Sie haben heute Morgen einen Espresso gebrüht: 18g Kaffeemehl, 36g Ausbeute, 28 Sekunden, 93°C. Sie möchten diesen Shot festhalten und mit 4 Sternen bewerten.»
+
+Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertungen erhalten hat.»
+
+**Kennzahlen & Beobachtungen:**
+
+| Issue | Testperson | Schweregrad (0–4) |
+|-------|------------|-------------------|
+| Kein Login/Register als Einstieg | Beide | 3 |
+| Edit-Button bei Bohnen nicht funktionsfähig | Metehan Altay | 3 |
+| Keine Logout-Funktion | Subraj Singh | 3 |
+| Lag bei Grind-Size-Pfeilen | Metehan Altay | 2 |
+| Shot Logger zu viele Optionen für Einsteiger | Subraj Singh | 2 |
+| Support-Funktion nicht implementiert | Subraj Singh | 1 |
+
+Positives Feedback: Farbpalette, Dashboard-Übersichtlichkeit, Bean Library, Shot History wurden explizit gelobt.
+
+**Zusammenfassung:** Die App wurde grundsätzlich sehr positiv aufgenommen. Grösste Issues: fehlendes Auth-System und nicht funktionierende Edit-Buttons. Für Nicht-Kaffee-Experten waren einige Fachbegriffe unklar.
+
+**Abgeleitete Verbesserungen:**
+1. Login/Register implementieren — hohe Priorität → umgesetzt (Kap. 4.1)
+2. Edit-Button fixen — hohe Priorität → umgesetzt
+3. Logout hinzufügen — hohe Priorität → umgesetzt (Kap. 4.1)
+4. Tooltips im Shot Logger — mittlere Priorität → umgesetzt
+5. Grind Size Lag beheben — mittlere Priorität → umgesetzt
 
 ---
 
 ## 4. Erweiterungen
 
-### 4.1 Live Brew Ratio Visualizer
+### 4.1 User Authentication mit Rollen (Admin/User)
 
-- **Beschreibung & Nutzen:** Der Shot Logger zeigt live das Brühverhältnis (Dose:Yield) als SVG-Kreisdiagramm. Ändert der Nutzer Dose oder Yield, aktualisiert sich der Arc sofort via `$derived`. Eliminiert manuelle Berechnung — der Barista sieht sofort, ob er sich im Ristretto-, Normale- oder Lungo-Bereich bewegt.
-- **Wo umgesetzt:** `src/routes/(app)/shot-logger/+page.svelte` — SVG `<circle>` mit `stroke-dashoffset` via Svelte `$derived()`
-- **Referenz:** Shot Logger Page, rechtes Analyse-Panel, «Live Brew Ratio»-Karte
-- **Aus Evaluation abgeleitet?:** Nein — von Beginn an geplantes Kernfeature
+- **Beschreibung & Nutzen:** Vollständiges Auth-System mit JWT, bcrypt, Login/Register/Logout. Jeder User sieht nur eigene Daten. Admin sieht alle Daten.
+- **Wo umgesetzt:** Frontend: /login, /register. Backend: /api/auth/*. DB: User-Model, userId auf Bean+Shot. Middleware: hooks.server.ts
+- **Referenz:** Kap. 3.4.2
+- **Aus Evaluation abgeleitet?:** Ja — Issues mit höchster Priorität aus Evaluation.
 
-### 4.2 Scroll Reveal Svelte Action
+### 4.2 Admin Panel
 
-- **Beschreibung & Nutzen:** `use:reveal={delay}` ist eine wiederverwendbare Svelte Action, die Elemente beim Einrollen in den Viewport animiert (Opacity 0→1, translateY 20px→0, 850ms ease-out). Mit optionalem Delay-Parameter für gestaffelte Card-Animationen. Verbessert die wahrgenommene Qualität massiv.
-- **Wo umgesetzt:** `src/lib/actions/reveal.ts` + CSS-Klassen `.reveal-el`/`.visible` in `layout.css`
-- **Referenz:** Home Page (Hero + alle Bento-Cards), Dashboard, Shot Logger Header
-- **Aus Evaluation abgeleitet?:** Nein — bewusste Designentscheidung für Premium-Feel
+- **Beschreibung & Nutzen:** Exklusiver Bereich /admin. Total Users/Beans/Shots, User-Tabelle, Recent Activity. Admin kann User und Shots löschen.
+- **Wo umgesetzt:** Frontend: /admin. Backend: /api/admin/stats, DELETE-Endpoints.
+- **Referenz:** Kap. 4.1
+- **Aus Evaluation abgeleitet?:** Indirekt.
 
-### 4.3 Grain Texture Overlay
+### 4.3 Live Extraction Timer
 
-- **Beschreibung & Nutzen:** Ein SVG-Data-URI mit `feTurbulence + fractalNoise` erzeugt eine subtile Grain-Textur auf 2.2% Opacity. Gibt der App eine physische, taktile Qualität — ähnlich wie Papier oder Filmphotografie — ohne echte Bild-Assets zu laden.
-- **Wo umgesetzt:** CSS-Klasse `.grain-texture` in `layout.css`, Platzierung als `<div>` in App-Layout und inneren Pages
-- **Referenz:** Dashboard und History Page (bei hellen Flächen sichtbar)
-- **Aus Evaluation abgeleitet?:** Nein — vom Stitch-Design-System inspiriert («Tactile Accents»)
+- **Beschreibung & Nutzen:** START/STOP/RESET Timer im Shot Logger. Zeit wird automatisch eingetragen beim Stoppen. MM:SS-Anzeige mit Pulse-Animation während der Extraktion.
+- **Wo umgesetzt:** Frontend: Timer-Card im Shot Logger, `setInterval` mit `onDestroy`-Cleanup.
+- **Referenz:** Shot Logger Screenshot
+- **Aus Evaluation abgeleitet?:** Nein — aus Nutzerbedürfnis.
+
+### 4.4 Interaktives Flavor Wheel
+
+- **Beschreibung & Nutzen:** SVG-Rad mit 8 Kategorien (Fruity, Floral, Sweet, Nutty, Chocolatey, Roasted, Spicy, Sour). Klick auf Segment öffnet Sub-Flavors als wählbare Pills. Gewählte Flavors werden automatisch in die Shot-Notizen übernommen.
+- **Wo umgesetzt:** Frontend: SVG mit polaren Koordinaten im Shot Logger.
+- **Aus Evaluation abgeleitet?:** Nein.
+
+### 4.5 Automatische Freshness-Berechnung
+
+- **Beschreibung & Nutzen:** Status (TOO FRESH / FRESH / PEAK / PAST PEAK / OLD) automatisch aus Röstdatum. Logik: 0–7d: TOO FRESH, 8–21d: FRESH, 22–35d: PEAK, 36–60d: PAST PEAK, 60+d: OLD.
+- **Wo umgesetzt:** Frontend: Bean-Cards und Detail-Drawer. Berechnung in `getFreshness()` in beans-Store.
+- **Referenz:** Bean Library Screenshots
+- **Aus Evaluation abgeleitet?:** Nein.
+
+### 4.6 Brew Ratio Recommendation Engine
+
+- **Beschreibung & Nutzen:** Nach 3+ Shots pro Bohne zeigt die App eine Empfehlung für optimale Parameter basierend auf den besten Shots (Top-3 nach Rating).
+- **Wo umgesetzt:** Frontend: Recommendation-Card im Bean-Drawer. Aggregation nach Rating in `getRecommendation()`.
+- **Referenz:** Bean Library Detail
+- **Aus Evaluation abgeleitet?:** Nein.
+
+### 4.7 Dark Mode Toggle
+
+- **Beschreibung & Nutzen:** Light/Dark Mode umschaltbar. Präferenz in localStorage gespeichert. CSS Custom Properties schalten auf warme Dunkelbraun-Palette.
+- **Wo umgesetzt:** Frontend: Toggle in Sidebar und Settings → Appearance. Store: `src/lib/stores/theme.ts`.
+- **Aus Evaluation abgeleitet?:** Nein.
+
+### 4.8 Mobile Responsive Design
+
+- **Beschreibung & Nutzen:** Vollständige Mobile-Optimierung (375px). Sidebar wird auf Mobile zu einer Bottom Navigation mit 5 Tabs. Touch-Targets mindestens 48px.
+- **Wo umgesetzt:** Frontend: Tailwind Responsive Prefixes (`md:`, `sm:`), Bottom Navigation Komponente im App-Layout.
+- **Aus Evaluation abgeleitet?:** Nein.
+
+### 4.9 Export CSV
+
+- **Beschreibung & Nutzen:** Shot History als CSV exportierbar mit allen Feldern (Bean, Dose, Yield, Time, Temp, Rating, Date, Notes).
+- **Wo umgesetzt:** Frontend: Export-Button in History und Settings → Data.
+- **Aus Evaluation abgeleitet?:** Nein.
 
 ---
 
 ## 5. Projektorganisation
 
-- **Repository & Struktur:** Lokales Verzeichnis `/beanery-app`, SvelteKit-Standardstruktur mit Route Groups `(app)` für gemeinsames App-Layout
-- **Issue-Management:** Taskliste via Claude Code während der Implementierungsphase geführt
-- **Commit-Praxis:** Semantische Commits — `feat:`, `style:`, `fix:`, `docs:`
+- **Repository:** https://github.com/mitallemscharf/beanery
+- **Deployment:** https://beanery-lenny.netlify.app
+- **Figma:** https://www.figma.com/design/tw5wstCGf1QVRyN42YP6GH/Beanary-App
+- **Commits:** Präfix feat/fix/docs/backup mit sprechenden Messages
+- **Branches:** main (Produktion), feature/authentication (gemergt)
+- **Collaborators:** mmeisterhans, bkuehnis
 
 ---
 
@@ -212,48 +235,45 @@
 
 ### 6.1 KI-Tools
 
-- **Eingesetzte Tools:**
-  - **Stitch** (Google AI Design Tool) — für Screen-Design, Prototypen und Design System
-  - **Claude Code** (Anthropic, Modell: claude-sonnet-4-6) — für die vollständige technische Implementierung
+| Tool | Zweck |
+|------|-------|
+| Claude Code (VS Code Extension) | Gesamter SvelteKit-Code, API-Routes, MongoDB, Auth-System, alle Features |
+| Claude.ai (claude.ai) | Projektplanung, Prompt-Erstellung, Feedback-Analyse, README |
+| Google Stitch | UI/Design-Generierung als HTML/CSS-Grundlage |
+| Figma | Initiales Mockup und Design-System |
 
-- **Zweck & Umfang:** Stitch wurde für alle fünf UI-Screens und das vollständige Design System verwendet (Farb-Tokens, Typografie-Skala, Komponenten-Regeln, DESIGN.md). Claude Code übernahm die gesamte SvelteKit-Implementierung — Projektstruktur, alle `.svelte`-Dateien, CSS-Konfiguration, TypeScript-Stores und Svelte Actions.
-
-- **Eigene Leistung (Abgrenzung):** Konzeptentwicklung und Produktvision (Welches Problem lösen wir?), Design-Direction (welcher Stil und warum?), Auswahl und Steuerung aller KI-Tools via Prompts, Usability-Tests Durchführung und Interpretation, finales Review jeder generierten Datei, Qualitätssicherung via Build-Check.
+**Eigene Leistung:** Projektidee, Konzept, alle Prompts, Design-Entscheidungen, Evaluation, Dokumentation. KI-Output stets kritisch geprüft und bei Fehlern korrigiert.
 
 ### 6.2 Prompt-Vorgehen
 
-Die Zusammenarbeit mit Claude Code erfolgte in einer strukturierten Session. Zu Beginn wurden alle Stitch-Design-Files eingelesen (HTML-Prototypen, DESIGN.md, Screenshots). Der Haupt-Implementierungs-Prompt beschrieb das vollständige Design System mit exakten Hex-Werten, Typografie-Scale, Komponenten-Regeln und alle 5 Pages mit detaillierten Anforderungen.
-
-Wichtige Prompt-Strategien:
-- Exakte Design-Tokens vorgeben (nie «goldfarben», sondern `#C5A059`)
-- Interaktionsdetails präzise beschreiben (Hover-Transitions mit ms-Angaben)
-- Framework-Besonderheiten explizit ansprechen (Tailwind v4 `@theme`, Svelte 5 Runes)
-- Technische Architektur vorgeben (Route Groups, Store-Struktur, Action-Pattern)
-
-Prompts wurden schrittweise verfeinert, wenn das erste Resultat nicht stimmte (z.B. Tailwind v4 Scaffold-Probleme).
+Workflow: «Vibe Design → AI Coding»
+1. Google Stitch mit Referenz-Screenshots geprompted für UI-Grundlage
+2. Claude Code erhielt Stitch-Export als Kontext, Features schrittweise implementiert
+3. Bugs direkt mit Fehlermeldungen und Erwartungsverhalten an Claude Code zurückgegeben
+4. Bei kritischen Änderungen zuerst Backup-Commit angefordert
 
 ### 6.3 Reflexion
 
-**Nutzen:** Claude Code ermöglichte eine drastische Produktivitätssteigerung in der Implementierungsphase. Alle 5 Pages mit vollständiger Interaktivität entstanden in einer Session — manuell wären es mehrere Tage Arbeit gewesen.
-
-**Grenzen:** Tailwind CSS v4 ist neu und die KI hatte initial Schwierigkeiten mit dem veränderten Config-Format (`@theme` statt `tailwind.config.js`). Iteratives Prompting war nötig. Auch komplexe Svelte 5 Runes-Patterns erforderten Korrekturen.
-
-**Risiken & Qualitätssicherung:** Jede generierte Datei wurde manuell geprüft. Der `npm run build`-Prozess diente als automatischer Korrektheitsbeweis. Bilder und externe Dienste wurden auf Verfügbarkeit geprüft.
+KI-Tools haben die Entwicklungsgeschwindigkeit erheblich erhöht. Grenzen: In einem Fall verwendete Claude Code localStorage statt MongoDB — ein fundamentaler Fehler der durch kritische Prüfung erkannt wurde. KI-Ausgaben wurden nie blind übernommen — Verständnis des Codes war stets Voraussetzung.
 
 ---
 
 ## 7. Anhang
 
-- **Stitch Design Files:** `/stitch_artisan_coffee_tracker_ui/` — 5 interaktive HTML-Screens, DESIGN.md
-- **Screenshots:** Jeder Screen-Ordner enthält `screen.png` des Stitch-Designs
+- **Bilder:** Pexels.com, Unsplash.com (kostenlos, lizenzfrei)
+- **Icons:** Material Symbols (Google)
+- **Fonts:** Libre Caslon Text, Hanken Grotesk (Google Fonts)
+- **Testpersonen:** Metehan Altay, Subraj Singh (TZBISa, 20. Mai 2026)
+- **Design-Inspiration:** Sweetgreen App (mobbin.com), MUBI Go App (mobbin.com)
 
 **Quellen & Lizenzen:**
 - Google Fonts (Libre Caslon Text, Hanken Grotesk, JetBrains Mono) — SIL Open Font License
 - Material Symbols — Apache 2.0 License
-- Unsplash (Bildmaterial für Prototyp) — Unsplash License (kostenlose Nutzung für Demos)
+- Unsplash / Pexels (Bildmaterial) — kostenlose Nutzung für Demos
 - SvelteKit — MIT License
 - Tailwind CSS — MIT License
-- @tailwindcss/forms — MIT License
+- Mongoose — MIT License
+- bcrypt — MIT License
 
 **Entwicklungsstart:**
 
