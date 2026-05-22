@@ -4,6 +4,31 @@
 	import { shots } from '$lib/stores/shots';
 	import { showToast } from '$lib/stores/toast';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+	import QRCode from 'qrcode';
+	import { browser } from '$app/environment';
+
+	// ── QR Code modal ──
+	let qrBean: Bean | null = $state(null);
+	let qrDataUrl = $state('');
+
+	async function openQR(bean: Bean) {
+		qrBean = bean;
+		const url = browser ? `${window.location.origin}/library?bean=${encodeURIComponent(bean.name)}` : '';
+		qrDataUrl = await QRCode.toDataURL(url, {
+			width: 320,
+			margin: 2,
+			color: { dark: '#2C1A0E', light: '#FBF9F4' }
+		});
+	}
+
+	function downloadQR() {
+		if (!qrDataUrl || !qrBean) return;
+		const a = document.createElement('a');
+		a.href = qrDataUrl;
+		a.download = `beanery-qr-${qrBean.name.toLowerCase().replace(/\s+/g,'-')}.png`;
+		a.click();
+		showToast('QR code downloaded', 'download');
+	}
 
 	function getRecommendation(beanName: string) {
 		const beanShots = $shots.filter((s) => s.bean === beanName);
@@ -206,6 +231,47 @@
 	onconfirm={confirmRemove}
 	oncancel={() => { confirmOpen = false; pendingRemove = null; }}
 />
+
+<!-- ── QR Code Modal ── -->
+{#if qrBean}
+	<button
+		class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+		onclick={() => { qrBean = null; qrDataUrl = ''; }}
+		aria-label="Close QR modal"
+		style="animation: fadeIn 0.2s ease-out"
+	></button>
+	<div
+		class="fixed left-1/2 top-1/2 z-[61] w-[340px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface shadow-2xl"
+		style="animation: modalIn 0.28s cubic-bezier(0.22,1,0.36,1)"
+	>
+		<div class="border-b border-outline-variant/10 px-6 py-4 flex items-center justify-between">
+			<div>
+				<p class="text-label-caps text-crema-gold">QR Code</p>
+				<h3 class="text-headline-md leading-tight">{qrBean.name}</h3>
+			</div>
+			<button onclick={() => { qrBean = null; qrDataUrl = ''; }} class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high active:scale-95">
+				<span class="material-symbols-outlined text-[20px]">close</span>
+			</button>
+		</div>
+		<div class="flex flex-col items-center gap-5 p-6">
+			{#if qrDataUrl}
+				<img src={qrDataUrl} alt="QR code for {qrBean.name}" class="rounded-xl" width="280" height="280" />
+			{:else}
+				<div class="flex h-[280px] w-[280px] items-center justify-center rounded-xl bg-surface-container-low">
+					<span class="material-symbols-outlined animate-spin text-crema-gold text-[36px]">autorenew</span>
+				</div>
+			{/if}
+			<p class="text-center text-label-caps text-on-surface-variant/50 px-4">Scan to open this bean's page in Beanery</p>
+			<button
+				onclick={downloadQR}
+				class="flex w-full items-center justify-center gap-2 rounded-full bg-crema-gold py-3.5 text-label-caps text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 hover:shadow-lg active:scale-95"
+			>
+				<span class="material-symbols-outlined text-[18px]">download</span>
+				Download QR Code
+			</button>
+		</div>
+	</div>
+{/if}
 
 <!-- Backdrop -->
 {#if drawerOpen}
@@ -598,17 +664,26 @@
 
 					<div class="flex flex-1 flex-col justify-between p-6">
 						<div>
-							<div class="mb-2 flex items-start justify-between">
+							<div class="mb-2 flex items-start justify-between gap-2">
 								<h3 class="text-headline-lg leading-tight transition-colors duration-200 group-hover:text-secondary">{bean.name}</h3>
-								<button onclick={(e) => { e.stopPropagation(); beans.toggleFav(bean.id); }}
-									class="flex-shrink-0 p-1 transition-all active:scale-90 hover:scale-110"
-									aria-label="{bean.favorited ? 'Remove from' : 'Add to'} favourites">
-									<span class="material-symbols-outlined text-[22px]"
-										class:text-crema-gold={bean.favorited}
-										class:text-on-surface-variant={!bean.favorited}
-										style="font-variation-settings: 'FILL' {bean.favorited ? 1 : 0}, 'wght' 300"
-									>favorite</span>
-								</button>
+								<div class="flex flex-shrink-0 items-center gap-1">
+									<!-- QR button -->
+									<button onclick={(e) => { e.stopPropagation(); openQR(bean); }}
+										class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant/40 transition-all hover:bg-surface-container-high hover:text-crema-gold active:scale-90"
+										aria-label="Show QR code">
+										<span class="material-symbols-outlined text-[18px]">qr_code</span>
+									</button>
+									<!-- Favourite button -->
+									<button onclick={(e) => { e.stopPropagation(); beans.toggleFav(bean.id); }}
+										class="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 hover:scale-110"
+										aria-label="{bean.favorited ? 'Remove from' : 'Add to'} favourites">
+										<span class="material-symbols-outlined text-[22px]"
+											class:text-crema-gold={bean.favorited}
+											class:text-on-surface-variant={!bean.favorited}
+											style="font-variation-settings: 'FILL' {bean.favorited ? 1 : 0}, 'wght' 300"
+										>favorite</span>
+									</button>
+								</div>
 							</div>
 							<p class="text-label-caps mb-4 text-on-surface-variant/70">{bean.roastery} • {bean.origin}</p>
 							<div class="mb-5 flex flex-wrap gap-1.5">
@@ -681,5 +756,9 @@
 	@keyframes fadeIn {
 		from { opacity: 0; }
 		to   { opacity: 1; }
+	}
+	@keyframes modalIn {
+		from { opacity: 0; transform: translateX(-50%) translateY(calc(-50% + 14px)) scale(0.97); }
+		to   { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1); }
 	}
 </style>
