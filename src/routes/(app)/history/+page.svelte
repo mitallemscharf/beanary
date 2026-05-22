@@ -107,6 +107,120 @@
 		];
 	}
 
+	// ── PDF Export ──
+	async function exportPDF() {
+		const { jsPDF } = await import('jspdf');
+		const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+		const PAGE_W = doc.internal.pageSize.getWidth();
+		const PAGE_H = doc.internal.pageSize.getHeight();
+		const MARGIN = 14;
+
+		const gold     = [197, 160, 89]  as [number, number, number];
+		const dark     = [27, 28, 25]    as [number, number, number];
+		const darkBg   = [44, 27, 24]    as [number, number, number];
+		const lightRow = [245, 243, 238] as [number, number, number];
+
+		// Header bar
+		doc.setFillColor(...gold);
+		doc.rect(0, 0, PAGE_W, 24, 'F');
+
+		doc.setFont('helvetica', 'bold');
+		doc.setFontSize(20);
+		doc.setTextColor(255, 255, 255);
+		doc.text('BEANERY', MARGIN, 15);
+
+		doc.setFont('helvetica', 'normal');
+		doc.setFontSize(8);
+		doc.text('Coffee Extraction Journal', MARGIN, 21);
+
+		const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+		doc.text(`Exported: ${dateStr}`, PAGE_W - MARGIN, 15, { align: 'right' });
+		doc.text(`${$shots.length} shots recorded`, PAGE_W - MARGIN, 21, { align: 'right' });
+
+		// Column definitions
+		const columns = [
+			{ label: 'DATE',   w: 28 },
+			{ label: 'BEAN',   w: 52 },
+			{ label: 'DOSE',   w: 18 },
+			{ label: 'YIELD',  w: 18 },
+			{ label: 'RATIO',  w: 20 },
+			{ label: 'TIME',   w: 18 },
+			{ label: 'TEMP',   w: 20 },
+			{ label: 'RATING', w: 20 },
+			{ label: 'NOTES',  w: 0  },
+		];
+		const fixedW = columns.slice(0, -1).reduce((s, c) => s + c.w, 0);
+		columns[columns.length - 1].w = PAGE_W - MARGIN * 2 - fixedW;
+
+		let y = 34;
+
+		function drawHeader() {
+			doc.setFillColor(...darkBg);
+			doc.rect(MARGIN, y - 5, PAGE_W - MARGIN * 2, 8, 'F');
+			doc.setFont('helvetica', 'bold');
+			doc.setFontSize(7);
+			doc.setTextColor(...gold);
+			let x = MARGIN;
+			for (const col of columns) { doc.text(col.label, x + 2, y); x += col.w; }
+			y += 8;
+		}
+
+		drawHeader();
+
+		doc.setFont('helvetica', 'normal');
+		doc.setFontSize(8);
+
+		for (let i = 0; i < $shots.length; i++) {
+			const s = $shots[i];
+			if (i % 2 === 0) {
+				doc.setFillColor(...lightRow);
+				doc.rect(MARGIN, y - 4, PAGE_W - MARGIN * 2, 7, 'F');
+			}
+			doc.setTextColor(...dark);
+			const vals = [
+				s.date,
+				s.bean.length > 28 ? s.bean.slice(0, 26) + '…' : s.bean,
+				`${s.dose}g`,
+				`${s.yield}g`,
+				`1:${(s.yield / s.dose).toFixed(1)}`,
+				`${s.time}s`,
+				`${s.temp}°C`,
+				`${s.rating}/5`,
+				(s.notes || '—').slice(0, 35),
+			];
+			let x = MARGIN;
+			for (let j = 0; j < vals.length; j++) { doc.text(vals[j], x + 2, y); x += columns[j].w; }
+			y += 7;
+			if (y > PAGE_H - 25) { doc.addPage(); y = 14; drawHeader(); }
+		}
+
+		// Summary section
+		y += 8;
+		if (y > PAGE_H - 35) { doc.addPage(); y = 20; }
+
+		const totalShots = $shots.length;
+		const avgRating  = totalShots > 0 ? ($shots.reduce((s, sh) => s + sh.rating, 0) / totalShots).toFixed(2) : '0';
+		const bestBean   = [...$shots].sort((a, b) => b.rating - a.rating)[0]?.bean || '—';
+
+		doc.setFillColor(...gold);
+		doc.rect(MARGIN, y - 4, PAGE_W - MARGIN * 2, 8, 'F');
+		doc.setFont('helvetica', 'bold');
+		doc.setFontSize(8);
+		doc.setTextColor(255, 255, 255);
+		doc.text('SUMMARY', MARGIN + 2, y);
+		y += 10;
+
+		doc.setFont('helvetica', 'normal');
+		doc.setFontSize(9);
+		doc.setTextColor(...dark);
+		doc.text(`Total shots: ${totalShots}`, MARGIN + 4, y); y += 7;
+		doc.text(`Average rating: ${avgRating} / 5`, MARGIN + 4, y); y += 7;
+		doc.text(`Best rated bean: ${bestBean}`, MARGIN + 4, y);
+
+		doc.save('beanery-shots.pdf');
+	}
+
 	const processColors: Record<string, string> = {
 		Washed: '#735c00',
 		Natural: '#c5a059',
@@ -284,6 +398,13 @@
 					>
 						<span class="material-symbols-outlined text-[18px]">file_download</span>
 						Export CSV
+					</button>
+					<button
+						onclick={exportPDF}
+						class="flex items-center gap-2 rounded-lg bg-surface-container-high px-4 py-2.5 text-body-md transition-all duration-200 hover:bg-surface-container-highest active:scale-95"
+					>
+						<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+						Export PDF
 					</button>
 				</div>
 				{#if filterOpen}
