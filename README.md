@@ -6,6 +6,7 @@
 2. [Lösungsidee](#2-lösungsidee)
 3. [Vorgehen & Artefakte](#3-vorgehen--artefakte)
     1. [Understand & Define](#31-understand--define)
+        1. [Competitive Analysis](#311-competitive-analysis)
     2. [Sketch](#32-sketch)
     3. [Decide](#33-decide)
     4. [Prototype](#34-prototype)
@@ -55,6 +56,32 @@
   - Das Brühverhältnis (Dose:Yield) ist die zentrale Qualitätskennzahl
   - Sensorische Notizen (Geschmacksprofil) sind schwer zu standardisieren
   - Ästhetik und Hochwertigkeitsgefühl sind für die Zielgruppe entscheidend
+
+### 3.1.1 Competitive Analysis
+
+Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken und Differenzierungspotenzial zu identifizieren.
+
+| App | Platform | Stärken | Schwächen |
+|-----|----------|---------|-----------|
+| Brewlog | iOS native | Einfaches Logging, Timer | Kein Web-Zugang, kein Dashboard |
+| Espresso Journal | iOS native | Detaillierte Parameter | Komplexe UI, teuer |
+| Coffee Diary | Android | Günstig, einfach | Kein Brew-Ratio-Rechner |
+| Notion/Excel | Web | Flexibel | Kein spezifisches Kaffee-UX |
+| mycoffee (GitHub) | Web (MERN) | Open Source | Kein Auth, kein Design |
+
+**Erkenntnisse:**
+- Alle nativen Apps sind auf iOS/Android beschränkt — keine plattformübergreifende Web-App
+- Keine App bietet automatische Freshness-Berechnung
+- Kein Tool kombiniert Shot-Logging mit Brew-Ratio-Empfehlungen
+- Design-Qualität der bestehenden Apps ist durchschnittlich
+
+**Differenzierung Beanery:**
+- Web-App — funktioniert auf allen Geräten ohne Installation
+- Premium Design (Google Stitch + eigenes Design-System)
+- Automatische Freshness-Berechnung aus Röstdatum
+- Dialing-In Empfehlungen basierend auf eigenen Shot-Daten
+- User-spezifische Datenisolation mit Auth-System
+- PWA — trotzdem auf Homescreen installierbar
 
 ### 3.2 Sketch
 
