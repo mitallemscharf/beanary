@@ -13,7 +13,6 @@
 			: $shots
 	);
 
-	// Group shots by date
 	const grouped = $derived(() => {
 		const groups: Record<string, typeof $shots> = {};
 		for (const shot of filteredShots) {
@@ -35,7 +34,7 @@
 		expandedId = expandedId === id ? null : id;
 	}
 
-	// Confirm modal state
+	// ── Confirm delete ──
 	let confirmOpen = $state(false);
 	let pendingDelete: { id: string; bean: string } | null = $state(null);
 
@@ -59,6 +58,53 @@
 			deletingId = null;
 			pendingDelete = null;
 		}
+	}
+
+	// ── Compare mode ──
+	let compareMode = $state(false);
+	let selectedIds = $state<string[]>([]);
+	let showCompareModal = $state(false);
+
+	const compareShots = $derived(
+		selectedIds.map((id) => $shots.find((s) => s.id === id)).filter(Boolean) as typeof $shots
+	);
+
+	function toggleSelect(id: string) {
+		if (selectedIds.includes(id)) {
+			selectedIds = selectedIds.filter((x) => x !== id);
+		} else if (selectedIds.length < 2) {
+			selectedIds = [...selectedIds, id];
+		} else {
+			showToast('Select only 2 shots to compare', 'info');
+		}
+	}
+
+	function openCompare() {
+		if (selectedIds.length === 2) showCompareModal = true;
+	}
+
+	function exitCompare() {
+		compareMode = false;
+		selectedIds = [];
+		showCompareModal = false;
+	}
+
+	function differs(a: unknown, b: unknown) {
+		return String(a) !== String(b);
+	}
+
+	type Shot = (typeof $shots)[0];
+	function compareRows(a: Shot, b: Shot) {
+		return [
+			{ label: 'Dose',        va: `${a.dose}g`,  vb: `${b.dose}g`,  diff: differs(a.dose, b.dose) },
+			{ label: 'Yield',       va: `${a.yield}g`, vb: `${b.yield}g`, diff: differs(a.yield, b.yield) },
+			{ label: 'Brew Ratio',  va: `1:${(a.yield/a.dose).toFixed(1)}`, vb: `1:${(b.yield/b.dose).toFixed(1)}`, diff: differs((a.yield/a.dose).toFixed(1),(b.yield/b.dose).toFixed(1)) },
+			{ label: 'Grind Size',  va: a.grind||'—',  vb: b.grind||'—',  diff: differs(a.grind, b.grind) },
+			{ label: 'Time',        va: `${a.time}s`,  vb: `${b.time}s`,  diff: differs(a.time, b.time) },
+			{ label: 'Temperature', va: `${a.temp}°C`, vb: `${b.temp}°C`, diff: differs(a.temp, b.temp) },
+			{ label: 'Rating',      va: a.rating,      vb: b.rating,      diff: differs(a.rating, b.rating), isRating: true },
+			{ label: 'Tasting Notes', va: a.notes||'—', vb: b.notes||'—', diff: differs(a.notes, b.notes), isNotes: true },
+		];
 	}
 
 	const processColors: Record<string, string> = {
@@ -85,6 +131,116 @@
 	oncancel={() => { confirmOpen = false; pendingDelete = null; }}
 />
 
+<!-- ── Compare Modal ── -->
+{#if showCompareModal && compareShots.length === 2}
+	{@const [a, b] = compareShots}
+	{@const aWins = a.rating > b.rating}
+	{@const bWins = b.rating > a.rating}
+	{@const tied = a.rating === b.rating}
+
+	<!-- Backdrop -->
+	<button
+		class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+		onclick={() => (showCompareModal = false)}
+		aria-label="Close comparison"
+		style="animation: fadeIn 0.2s ease-out"
+	></button>
+
+	<!-- Modal -->
+	<div
+		class="fixed inset-x-4 top-1/2 z-50 max-h-[90vh] max-w-4xl -translate-y-1/2 overflow-y-auto rounded-2xl border border-outline-variant/20 bg-surface shadow-2xl md:inset-x-auto md:left-1/2 md:-translate-x-1/2"
+		style="animation: modalIn 0.28s cubic-bezier(0.22,1,0.36,1)"
+	>
+		<!-- Header -->
+		<div class="sticky top-0 z-10 flex items-center justify-between border-b border-outline-variant/10 bg-surface px-6 py-5">
+			<div class="flex items-center gap-3">
+				<span class="material-symbols-outlined text-crema-gold text-[22px]">compare_arrows</span>
+				<div>
+					<h2 class="text-headline-md">Shot Comparison</h2>
+					<p class="text-label-caps mt-0.5 text-on-surface-variant/60">Differences highlighted in gold</p>
+				</div>
+			</div>
+			<button
+				onclick={() => (showCompareModal = false)}
+				class="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-all hover:bg-surface-container-high active:scale-95"
+				aria-label="Close"
+			>
+				<span class="material-symbols-outlined text-[20px]">close</span>
+			</button>
+		</div>
+
+		<!-- Winner banner -->
+		{#if !tied}
+			<div class="border-b border-crema-gold/20 bg-crema-gold/5 px-6 py-3 flex items-center gap-2">
+				<span class="material-symbols-outlined text-crema-gold text-[18px]" style="font-variation-settings:'FILL' 1">emoji_events</span>
+				<p class="text-label-caps text-crema-gold">
+					{aWins ? a.bean : b.bean} wins — rated {aWins ? a.rating : b.rating}/5
+				</p>
+			</div>
+		{:else}
+			<div class="border-b border-outline-variant/10 bg-surface-container-low px-6 py-3 flex items-center gap-2">
+				<span class="material-symbols-outlined text-on-surface-variant text-[18px]">balance</span>
+				<p class="text-label-caps text-on-surface-variant/60">Tie — both rated {a.rating}/5</p>
+			</div>
+		{/if}
+
+		<!-- Comparison table -->
+		<div class="p-6">
+			<!-- Shot headers -->
+			<div class="mb-6 grid grid-cols-3 gap-4">
+				<div class="text-label-caps text-on-surface-variant/40 pt-2">Field</div>
+				{#each [a, b] as shot, idx}
+					<div class="relative rounded-xl border {(idx === 0 && aWins) || (idx === 1 && bWins) ? 'border-crema-gold/40 bg-crema-gold/5' : 'border-primary/5 bg-surface-container-low'} p-4">
+						<div class="flex items-center gap-3 mb-2">
+							<img src={shot.img} alt={shot.bean} class="h-10 w-10 rounded-lg object-cover" />
+							<div class="min-w-0">
+								<p class="text-label-sm font-semibold truncate">{shot.bean}</p>
+								<p class="text-label-caps text-on-surface-variant/50">{shot.date}</p>
+							</div>
+						</div>
+						{#if (idx === 0 && aWins) || (idx === 1 && bWins)}
+							<span class="absolute right-3 top-3 material-symbols-outlined text-crema-gold text-[18px]" style="font-variation-settings:'FILL' 1">emoji_events</span>
+						{/if}
+					</div>
+				{/each}
+			</div>
+
+			<!-- Rows -->
+			<!-- Rows -->
+			<div class="space-y-2">
+				{#each compareRows(a, b) as row}
+					<div class="grid grid-cols-3 gap-4 rounded-lg px-2 py-2.5 transition-colors {row.diff ? 'bg-crema-gold/5' : ''}">
+						<div class="flex items-center">
+							<span class="text-label-caps text-on-surface-variant/50">{row.label}</span>
+							{#if row.diff}
+								<span class="ml-2 h-1.5 w-1.5 rounded-full bg-crema-gold"></span>
+							{/if}
+						</div>
+						{#each [row.va, row.vb] as val}
+							<div>
+								{#if row.isRating}
+									<div class="flex gap-0.5">
+										{#each Array.from({length:5},(_,i)=>i<Number(val)) as filled}
+											<span class="material-symbols-outlined text-[16px] {row.diff ? 'text-crema-gold' : 'text-crema-gold'}"
+												style="font-variation-settings:'FILL' {filled?1:0},'wght' 300">star</span>
+										{/each}
+									</div>
+								{:else if row.isNotes}
+									<p class="font-mono text-[12px] leading-relaxed {row.diff ? 'text-crema-gold' : 'text-on-surface-variant'}">{val}</p>
+								{:else}
+									<span class="font-mono text-sm font-semibold {row.diff ? 'text-crema-gold' : 'text-primary'}">{val}</span>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/each}
+			</div>
+
+			<p class="mt-4 text-center text-label-caps text-on-surface-variant/30">● Gold = values differ between shots</p>
+		</div>
+	</div>
+{/if}
+
 <div class="grain-texture" aria-hidden="true"></div>
 
 <div class="px-container-padding pb-24 pt-10 md:px-12 md:pt-14">
@@ -99,6 +255,14 @@
 			</div>
 			<div class="flex flex-col items-start gap-2 md:items-end">
 				<div class="flex flex-wrap gap-3">
+					<!-- Compare mode toggle -->
+					<button
+						onclick={() => { compareMode = !compareMode; if (!compareMode) { selectedIds = []; showCompareModal = false; } }}
+						class="flex items-center gap-2 rounded-lg px-4 py-2.5 text-body-md transition-all duration-200 active:scale-95 {compareMode ? 'bg-crema-gold text-white shadow-sm' : 'bg-surface-container-high hover:bg-surface-container-highest'}"
+					>
+						<span class="material-symbols-outlined text-[18px]">compare_arrows</span>
+						Compare
+					</button>
 					<button
 						onclick={() => { filterOpen = !filterOpen; if (!filterOpen) filterQuery = ''; }}
 						class="flex items-center gap-2 rounded-lg px-4 py-2.5 text-body-md transition-all duration-200 active:scale-95 {filterOpen ? 'bg-crema-gold/15 text-crema-gold ring-1 ring-crema-gold/30' : 'bg-surface-container-high hover:bg-surface-container-highest'}"
@@ -142,6 +306,37 @@
 			</div>
 		</header>
 
+		<!-- Compare mode banner -->
+		{#if compareMode}
+			<div class="mb-8 flex items-center justify-between rounded-xl border border-crema-gold/30 bg-crema-gold/5 px-6 py-4" style="animation: fadeDown 0.2s ease-out">
+				<div class="flex items-center gap-3">
+					<span class="material-symbols-outlined text-crema-gold text-[20px]">touch_app</span>
+					<p class="text-body-md text-on-surface">
+						{#if selectedIds.length === 0}
+							Select 2 shots to compare
+						{:else if selectedIds.length === 1}
+							<span class="text-crema-gold font-semibold">1 selected</span> — select 1 more
+						{:else}
+							<span class="text-crema-gold font-semibold">2 shots selected</span> — ready to compare
+						{/if}
+					</p>
+				</div>
+				<div class="flex items-center gap-3">
+					{#if selectedIds.length === 2}
+						<button
+							onclick={openCompare}
+							class="text-label-caps rounded-full bg-crema-gold px-5 py-2.5 text-white uppercase tracking-widest shadow-sm transition-all hover:brightness-110 active:scale-95"
+						>
+							Compare Now
+						</button>
+					{/if}
+					<button onclick={exitCompare} class="flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high active:scale-95">
+						<span class="material-symbols-outlined text-[18px]">close</span>
+					</button>
+				</div>
+			</div>
+		{/if}
+
 		<!-- Grouped sections -->
 		<div class="space-y-14">
 			{#each grouped() as [date, group]}
@@ -150,20 +345,34 @@
 						{date}
 					</h2>
 					<div class="space-y-3">
-						{#each group as shot, i}
+						{#each group as shot}
 							{@const isBest = shot.rating === 5}
 							{@const isExpanded = expandedId === shot.id}
+							{@const isSelected = selectedIds.includes(shot.id)}
 							<div class="{deletingId === shot.id ? 'opacity-40 pointer-events-none' : ''}">
 								<!-- Main row -->
 								<div
-									class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border border-primary/5 bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm {isExpanded ? 'rounded-b-none border-b-0 bg-surface-container-low shadow-sm' : ''}"
-									onclick={() => toggleExpand(shot.id)}
+									class="group relative flex cursor-pointer flex-wrap items-center justify-between gap-6 rounded-xl border bg-surface-bright p-6 transition-all duration-300 hover:bg-surface-container-low hover:shadow-sm
+										{isSelected ? 'border-crema-gold/50 bg-crema-gold/5 shadow-sm' : 'border-primary/5'}
+										{isExpanded && !compareMode ? 'rounded-b-none border-b-0 bg-surface-container-low shadow-sm' : ''}"
+									onclick={() => compareMode ? toggleSelect(shot.id) : toggleExpand(shot.id)}
 									role="button"
 									tabindex="0"
-									onkeydown={(e) => e.key === 'Enter' && toggleExpand(shot.id)}
+									onkeydown={(e) => e.key === 'Enter' && (compareMode ? toggleSelect(shot.id) : toggleExpand(shot.id))}
 								>
+									<!-- Compare checkbox -->
+									{#if compareMode}
+										<div class="flex-shrink-0">
+											<div class="flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all {isSelected ? 'border-crema-gold bg-crema-gold' : 'border-outline-variant/40 bg-transparent'}">
+												{#if isSelected}
+													<span class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings:'FILL' 1">check</span>
+												{/if}
+											</div>
+										</div>
+									{/if}
+
 									<!-- Left: image + info -->
-									<div class="flex min-w-[260px] flex-1 items-center gap-6">
+									<div class="flex min-w-[200px] flex-1 items-center gap-6">
 										<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container">
 											<img
 												src={shot.img}
@@ -179,10 +388,7 @@
 												{/if}
 											</div>
 											<div class="flex items-center gap-2.5">
-												<span
-													class="h-2 w-2 rounded-full"
-													style="background-color: {processColors[shot.process] ?? processColors.default}"
-												></span>
+												<span class="h-2 w-2 rounded-full" style="background-color: {processColors[shot.process] ?? processColors.default}"></span>
 												<p class="text-label-caps text-on-surface-variant/70">{shot.process} • {shot.roast}</p>
 											</div>
 										</div>
@@ -200,47 +406,44 @@
 												<span class="font-mono text-sm font-medium text-primary">{col.val}</span>
 											</div>
 										{/each}
-
-										<!-- Stars -->
 										<div class="flex gap-0.5">
 											{#each stars(shot.rating) as filled}
-												<span
-													class="material-symbols-outlined text-crema-gold text-base"
-													style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300"
-												>star</span>
+												<span class="material-symbols-outlined text-crema-gold text-base" style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300">star</span>
 											{/each}
 										</div>
 									</div>
 
-									<!-- Actions -->
-									<div class="relative flex-shrink-0 flex items-center gap-1">
-										<span class="material-symbols-outlined text-[18px] text-on-surface-variant/30 transition-transform duration-300 {isExpanded ? 'rotate-180' : ''}">expand_more</span>
-										<button
-											onclick={(e) => { e.stopPropagation(); openMenuId = openMenuId === shot.id ? null : shot.id; }}
-											class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high"
-											aria-label="More options"
-										>
-											<span class="material-symbols-outlined text-[20px]">more_vert</span>
-										</button>
-										{#if openMenuId === shot.id}
-											<div
-												class="absolute right-0 top-12 z-30 min-w-[160px] overflow-hidden rounded-xl border border-outline-variant/20 bg-surface shadow-xl"
-												style="animation: menuIn 0.15s ease-out"
+									<!-- Actions (hidden in compare mode) -->
+									{#if !compareMode}
+										<div class="relative flex-shrink-0 flex items-center gap-1">
+											<span class="material-symbols-outlined text-[18px] text-on-surface-variant/30 transition-transform duration-300 {isExpanded ? 'rotate-180' : ''}">expand_more</span>
+											<button
+												onclick={(e) => { e.stopPropagation(); openMenuId = openMenuId === shot.id ? null : shot.id; }}
+												class="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high"
+												aria-label="More options"
 											>
-												<button
-													onclick={(e) => { e.stopPropagation(); requestDelete(shot.id, shot.bean); }}
-													class="flex w-full items-center gap-3 px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
+												<span class="material-symbols-outlined text-[20px]">more_vert</span>
+											</button>
+											{#if openMenuId === shot.id}
+												<div
+													class="absolute right-0 top-12 z-30 min-w-[160px] overflow-hidden rounded-xl border border-outline-variant/20 bg-surface shadow-xl"
+													style="animation: menuIn 0.15s ease-out"
 												>
-													<span class="material-symbols-outlined text-[17px]">delete</span>
-													<span class="text-label-sm uppercase">Delete shot</span>
-												</button>
-											</div>
-										{/if}
-									</div>
+													<button
+														onclick={(e) => { e.stopPropagation(); requestDelete(shot.id, shot.bean); }}
+														class="flex w-full items-center gap-3 px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
+													>
+														<span class="material-symbols-outlined text-[17px]">delete</span>
+														<span class="text-label-sm uppercase">Delete shot</span>
+													</button>
+												</div>
+											{/if}
+										</div>
+									{/if}
 								</div>
 
 								<!-- Inline expand panel -->
-								{#if isExpanded}
+								{#if isExpanded && !compareMode}
 									<div
 										class="rounded-b-xl border border-t-0 border-primary/5 bg-surface-container-low px-4 py-5 sm:px-8 sm:py-6"
 										style="animation: expandDown 0.22s cubic-bezier(0.22,1,0.36,1)"
@@ -298,6 +501,10 @@
 </div>
 
 <style>
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
 	@keyframes fadeDown {
 		from { opacity: 0; transform: translateY(-6px); }
 		to { opacity: 1; transform: translateY(0); }
@@ -309,5 +516,9 @@
 	@keyframes expandDown {
 		from { opacity: 0; transform: translateY(-6px); }
 		to { opacity: 1; transform: translateY(0); }
+	}
+	@keyframes modalIn {
+		from { opacity: 0; transform: translateX(-50%) translateY(calc(-50% + 16px)) scale(0.97); }
+		to   { opacity: 1; transform: translateX(-50%) translateY(-50%) scale(1); }
 	}
 </style>
