@@ -6,6 +6,11 @@ export interface SessionUser {
 	name: string;
 	email: string;
 	role: 'admin' | 'user';
+	skillLevel: 'beginner' | 'home_barista' | 'expert';
+	machineType: string;
+	onboardingCompleted: boolean;
+	xp: number;
+	level: string;
 }
 
 function getSecret(): string {
@@ -24,8 +29,4 @@ export function verifyToken(token: string): SessionUser | null {
 	} catch {
 		return null;
 	}
-}
-
-export function cookieOptions(maxAge = 60 * 60 * 24 * 7) {
-	return `HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge}`;
 }

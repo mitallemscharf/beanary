@@ -3,10 +3,22 @@ import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
 	{
-		name: { type: String, required: true, trim: true },
-		email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+		name:     { type: String, required: true, trim: true },
+		email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
 		password: { type: String, required: true },
-		role: { type: String, enum: ['admin', 'user'], default: 'user' }
+		role:     { type: String, enum: ['admin', 'user'], default: 'user' },
+		// Profile
+		skillLevel:   { type: String, enum: ['beginner', 'home_barista', 'expert'], default: 'home_barista' },
+		machineType:  { type: String, default: 'espresso_semi' },
+		goals:        [{ type: String }],
+		// Gamification
+		xp:            { type: Number, default: 0 },
+		level:         { type: String, default: 'novice' },
+		badges:        [{ type: String }],
+		lastLoginDate: { type: String, default: '' },
+		// UX
+		onboardingCompleted:    { type: Boolean, default: false },
+		isPublicOnLeaderboard:  { type: Boolean, default: true }
 	},
 	{ timestamps: true }
 );
@@ -16,7 +28,7 @@ userSchema.set('toJSON', {
 		ret.id = ret._id.toString();
 		delete ret._id;
 		delete ret.__v;
-		delete ret.password; // never expose password hash
+		delete ret.password;
 	}
 });
 
@@ -35,6 +47,14 @@ export interface IUser {
 	name: string;
 	email: string;
 	role: 'admin' | 'user';
+	skillLevel: 'beginner' | 'home_barista' | 'expert';
+	machineType: string;
+	goals: string[];
+	xp: number;
+	level: string;
+	badges: string[];
+	onboardingCompleted: boolean;
+	isPublicOnLeaderboard: boolean;
 }
 
 export const User = mongoose.models.User ?? mongoose.model('User', userSchema);
