@@ -64,16 +64,17 @@ function createBeansStore() {
 			}
 		},
 
-		async add(beanData: Omit<Bean, 'id'>): Promise<Bean> {
+		async add(beanData: Omit<Bean, 'id'>): Promise<{ bean: Bean; xpAwarded: number; newBadges: string[] }> {
 			const res = await fetch('/api/beans', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(beanData)
 			});
 			if (!res.ok) throw new Error('Failed to save bean');
-			const saved: Bean = await res.json();
+			const result = await res.json();
+			const saved: Bean = result.bean ?? result;
 			update((list) => [saved, ...list]);
-			return saved;
+			return { bean: saved, xpAwarded: result.xpAwarded ?? 0, newBadges: result.newBadges ?? [] };
 		},
 
 		async remove(id: string) {

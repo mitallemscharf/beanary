@@ -1,6 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import { connectDB } from '$lib/server/db';
 import { Shot } from '$lib/server/models/Shot';
+import { User } from '$lib/server/models/User';
+import { awardXP, XP, BADGES } from '$lib/server/gamification';
 
 const DEFAULT_SHOTS = [
 	{
@@ -90,7 +92,26 @@ export async function POST({ request, locals }) {
 		const data = await request.json();
 		const shot = new Shot({ ...data, userId: user.id });
 		await shot.save();
-		return json(shot.toJSON(), { status: 201 });
+
+		// Award XP
+		let xpAmount = XP.LOG_SHOT;
+		if (data.rating)              xpAmount += XP.RATE_SHOT;
+		if (data.notes?.trim())       xpAmount += XP.ADD_NOTES;
+
+		// Check time for badges
+		const hour = new Date().getHours();
+		const { newBadges, leveledUp, newLevel } = await awardXP(user.id, xpAmount, (u) => {
+			const earned: string[] = [];
+			const count = (u.xp ?? 0) / XP.LOG_SHOT; // rough shot count from XP
+			if (!u.badges.includes('first_drop'))      earned.push('first_drop');
+			if (count >= 10 && !u.badges.includes('getting_started')) earned.push('getting_started');
+			if (data.time < 25 && !u.badges.includes('speed_runner')) earned.push('speed_runner');
+			if (hour < 7  && !u.badges.includes('early_bird'))        earned.push('early_bird');
+			if (hour >= 22 && !u.badges.includes('night_owl'))        earned.push('night_owl');
+			return earned;
+		});
+
+		return json({ shot: shot.toJSON(), xpAwarded: xpAmount, newBadges, leveledUp, newLevel }, { status: 201 });
 	} catch (err) {
 		console.error('POST /api/shots error:', err);
 		throw error(500, 'Failed to save shot');

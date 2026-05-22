@@ -183,7 +183,7 @@
 			.map((t) => t.trim())
 			.filter(Boolean);
 		try {
-			await beans.add({
+			const result = await beans.add({
 				name: newName,
 				roastery: newRoastery || 'Unknown Roastery',
 				origin: newOrigin || 'Unknown Origin',
@@ -196,7 +196,7 @@
 				img: coffeeImgs[Math.floor(Math.random() * coffeeImgs.length)],
 				favorited: false
 			});
-			showToast('Bean added to library', 'check_circle');
+			showToast(`Bean added! +${result.xpAwarded} XP`, 'check_circle');
 			newName = '';
 			newRoastery = '';
 			newOrigin = '';

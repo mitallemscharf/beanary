@@ -30,16 +30,24 @@ function createShotsStore() {
 			}
 		},
 
-		async add(shotData: Omit<Shot, 'id'>): Promise<Shot> {
+		async add(shotData: Omit<Shot, 'id'>): Promise<{ shot: Shot; xpAwarded: number; newBadges: string[]; leveledUp: boolean; newLevel: string }> {
 			const res = await fetch('/api/shots', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(shotData)
 			});
 			if (!res.ok) throw new Error('Failed to save shot');
-			const saved: Shot = await res.json();
+			const result = await res.json();
+			// Handle both old format (bare shot) and new format ({ shot, xpAwarded, ... })
+			const saved: Shot = result.shot ?? result;
 			update((shots) => [saved, ...shots]);
-			return saved;
+			return {
+				shot: saved,
+				xpAwarded: result.xpAwarded ?? 0,
+				newBadges: result.newBadges ?? [],
+				leveledUp: result.leveledUp ?? false,
+				newLevel: result.newLevel ?? ''
+			};
 		},
 
 		async remove(id: string) {

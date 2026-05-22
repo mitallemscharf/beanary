@@ -154,7 +154,7 @@
 		try {
 			const selectedBean = $beans.find((b) => b.name === bean);
 			const finalNotes = [notes.trim(), selectedFlavors.length > 0 ? `Flavors: ${selectedFlavors.join(', ')}` : ''].filter(Boolean).join(' · ');
-			await shots.add({
+			const result = await shots.add({
 				bean,
 				dose,
 				yield: yieldG,
@@ -168,7 +168,13 @@
 				roast: 'Light Roast',
 				img: selectedBean?.img ?? 'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=200&h=200&auto=format&fit=crop&q=80'
 			});
-			showToast('Shot recorded in your journal', 'check_circle');
+			showToast(`Shot recorded! +${result.xpAwarded} XP`, 'check_circle');
+			if (result.newBadges.length > 0) {
+				setTimeout(() => showToast(`New badge: ${result.newBadges[0].replace(/_/g, ' ')} 🏆`, 'emoji_events'), 1200);
+			}
+			if (result.leveledUp) {
+				setTimeout(() => showToast(`Level up! You are now ${result.newLevel.replace(/_/g, ' ')} 🎉`, 'workspace_premium'), 2400);
+			}
 			goto('/history');
 		} catch {
 			showToast('Failed to save shot — check your connection', 'error');

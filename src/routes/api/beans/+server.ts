@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { connectDB } from '$lib/server/db';
 import { Bean } from '$lib/server/models/Bean';
+import { awardXP, XP } from '$lib/server/gamification';
 
 const DEFAULT_BEANS = [
 	// ── Panama — Boquete Coffee Traders ──
@@ -120,7 +121,15 @@ export async function POST({ request, locals }) {
 		const data = await request.json();
 		const bean = new Bean({ ...data, userId: user.id });
 		await bean.save();
-		return json(bean.toJSON(), { status: 201 });
+
+		// Award XP + bean collector badge
+		const { newBadges, leveledUp, newLevel } = await awardXP(user.id, XP.ADD_BEAN, (u) => {
+			const beanCount = u.xp / XP.ADD_BEAN; // rough count
+			if (beanCount >= 10 && !u.badges.includes('bean_collector')) return ['bean_collector'];
+			return [];
+		});
+
+		return json({ bean: bean.toJSON(), xpAwarded: XP.ADD_BEAN, newBadges, leveledUp, newLevel }, { status: 201 });
 	} catch (err) {
 		console.error('POST /api/beans error:', err);
 		throw error(500, 'Failed to save bean');
