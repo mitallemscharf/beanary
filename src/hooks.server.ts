@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
 
 // Routes that do NOT require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/api/auth/login', '/api/auth/register', '/api/auth/seed'];
+const PUBLIC_ROUTES = ['/login', '/register', '/api/auth/login', '/api/auth/register', '/api/auth/seed'];
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('session');
@@ -13,6 +13,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const pathname = event.url.pathname;
 	const isPublic = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith('/api/auth/'));
+
+	// Root always redirects: logged in → dashboard, guest → login
+	if (pathname === '/') {
+		throw redirect(302, user ? '/dashboard' : '/login');
+	}
 
 	// Protect all non-public routes
 	if (!user && !isPublic) {
