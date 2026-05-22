@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/stores/toast';
 	import { onDestroy } from 'svelte';
+	import type { PageData } from './$types';
 
 	// ── Extraction Timer ──
 	let timerSeconds = $state(0);
@@ -81,6 +82,19 @@
 			: [...selectedFlavors, f];
 	}
 
+	// ── Adaptive UI ──
+	let { data }: { data: PageData } = $props();
+	const skillLevel = $derived(data.user?.skillLevel ?? 'home_barista');
+	const machineType = $derived(data.user?.machineType ?? 'espresso_semi');
+	const isBeginner = $derived(skillLevel === 'beginner');
+	const isExpert   = $derived(skillLevel === 'expert');
+	const isEspresso = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
+	const isPourOver = $derived(machineType === 'pour_over');
+	const isImmersion = $derived(machineType === 'french_press' || machineType === 'aeropress');
+
+	// Beginners start with advanced fields hidden; others see all
+	let showAdvanced = $state(!isBeginner);
+
 	// Bean dropdown — live from the beans store (includes any newly added beans)
 	const beanOptions = $derived($beans);
 
@@ -99,6 +113,11 @@
 	let rating = $state(4);
 	let saving = $state(false);
 	let validationError = $state('');
+
+	// Expert-only extra fields
+	let pressure = $state(9);
+	let bloomTime = $state(30);
+	let steepTime = $state(240);
 
 	const ratio = $derived(dose > 0 ? (yieldG / dose).toFixed(1) : '0.0');
 	const ratioNum = $derived(dose > 0 ? yieldG / dose : 0);
@@ -183,15 +202,22 @@
 			<div class="rounded-xl border border-primary/5 bg-surface-container-low p-5 shadow-sm md:p-8 lg:col-span-7" use:reveal={0}>
 				<form class="space-y-stack-lg" onsubmit={(e) => e.preventDefault()}>
 
+					<!-- Beginner skill badge -->
+					{#if isBeginner}
+						<div class="flex items-center gap-2 rounded-lg bg-crema-gold/10 border border-crema-gold/20 px-4 py-2.5">
+							<span class="material-symbols-outlined text-crema-gold text-[18px]">school</span>
+							<p class="text-label-sm text-crema-gold">Beginner mode — simplified view. <a href="/glossar" class="underline">Glossar</a></p>
+						</div>
+					{/if}
+
 					<!-- Bean select -->
 					<div>
-						<label for="bean-select" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Single Origin / Blend</label>
-						<p class="text-label-caps mb-2 text-on-surface-variant/40">The coffee you're extracting — select from your library</p>
-						<select
-							id="bean-select"
-							bind:value={bean}
-							class="text-body-md w-full cursor-pointer rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-						>
+						<div class="mb-1 flex items-center gap-2">
+							<label for="bean-select" class="text-label-sm text-on-surface-variant uppercase">Single Origin / Blend</label>
+						</div>
+						{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">Which coffee are you using?</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">The coffee you're extracting — select from your library</p>{/if}
+						<select id="bean-select" bind:value={bean}
+							class="text-body-md w-full cursor-pointer rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50">
 							{#each beanOptions as b (b.id)}
 								<option value={b.name}>{b.name} · {b.origin}</option>
 							{/each}
@@ -201,101 +227,129 @@
 						</select>
 					</div>
 
+					<!-- Core fields: Dose, Yield, Time -->
 					<div class="grid grid-cols-1 gap-stack-lg md:grid-cols-2">
 						<!-- Dose -->
 						<div>
-							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="dose">Dose (g)</label>
-							<p class="text-label-caps mb-2 text-on-surface-variant/40">Grams of ground coffee in the portafilter — typically 14–20g</p>
-							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
-								<button type="button" onclick={() => dose = Math.max(1, Math.round((dose - 0.1) * 10) / 10)}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
-								<input id="dose" type="number" step="0.1" bind:value={dose}
-									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-								<button type="button" onclick={() => dose = Math.round((dose + 0.1) * 10) / 10}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+							<div class="mb-1 flex items-center gap-2">
+								<label class="text-label-sm text-on-surface-variant uppercase" for="dose">Dose (g)</label>
+								{#if isBeginner}<span class="text-label-caps text-crema-gold/70">Ground coffee weight</span>{/if}
 							</div>
-						</div>
-
-						<!-- Grind -->
-						<div>
-							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind Size</label>
-							<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer = slower flow, coarser = faster</p>
-							<div class="relative">
-								<input
-									id="grind"
-									type="text"
-									bind:value={grind}
-									placeholder="e.g. 2.4 or 14 clicks"
-									class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 pr-12 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-								/>
-								<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50 transition-colors hover:text-crema-gold" style="cursor:pointer">tune</span>
+							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">How many grams of coffee you're using (usually 18g)</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Grams in portafilter — typically 14–20g</p>{/if}
+							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
+								<button type="button" onclick={() => dose = Math.max(1, Math.round((dose - 0.1) * 10) / 10)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="dose" type="number" step="0.1" bind:value={dose} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => dose = Math.round((dose + 0.1) * 10) / 10} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
 							</div>
 						</div>
 
 						<!-- Yield -->
 						<div>
-							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="yield">Yield (g)</label>
-							<p class="text-label-caps mb-2 text-on-surface-variant/40">Total weight of espresso in your cup — the liquid output</p>
+							<div class="mb-1 flex items-center gap-2">
+								<label class="text-label-sm text-on-surface-variant uppercase" for="yield">{isPourOver ? 'Pour Weight (g)' : 'Yield (g)'}</label>
+								{#if isBeginner}<span class="text-label-caps text-crema-gold/70">Liquid espresso weight</span>{/if}
+							</div>
+							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">The espresso in your cup — usually 36g for a double</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Total liquid output in grams</p>{/if}
 							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
-								<button type="button" onclick={() => yieldG = Math.max(1, Math.round((yieldG - 0.5) * 10) / 10)}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
-								<input id="yield" type="number" step="0.1" bind:value={yieldG}
-									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-								<button type="button" onclick={() => yieldG = Math.round((yieldG + 0.5) * 10) / 10}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+								<button type="button" onclick={() => yieldG = Math.max(1, Math.round((yieldG - 0.5) * 10) / 10)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="yield" type="number" step="0.1" bind:value={yieldG} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => yieldG = Math.round((yieldG + 0.5) * 10) / 10} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
 							</div>
 						</div>
 
 						<!-- Time -->
 						<div>
-							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Time (s)</label>
-							<p class="text-label-caps mb-2 text-on-surface-variant/40">Extraction duration in seconds — aim for 25–35s for espresso</p>
+							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">{isPourOver || isImmersion ? 'Total Time (s)' : 'Extraction Time (s)'}</label>
+							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">How long did the shot take? (aim for 25–35 seconds)</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Duration in seconds — espresso: 25–35s</p>{/if}
 							<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/50">
-								<button type="button" onclick={() => time = Math.max(1, time - 1)}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
-								<input id="time" type="number" bind:value={time}
-									class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-								<button type="button" onclick={() => time = time + 1}
-									class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
+								<button type="button" onclick={() => time = Math.max(1, time - 1)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">−</button>
+								<input id="time" type="number" bind:value={time} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<button type="button" onclick={() => time = time + 1} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold hover:bg-surface-container-low active:bg-surface-container-high transition-colors">+</button>
 							</div>
 						</div>
+
+						<!-- Expert: Bloom / Steep time -->
+						{#if isPourOver && (showAdvanced || isExpert)}
+							<div>
+								<label for="bloom" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Bloom Time (s)</label>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Pre-infusion time to degas CO₂</p>
+								<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60">
+									<button type="button" onclick={() => bloomTime = Math.max(0, bloomTime - 5)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">−</button>
+									<input id="bloom" type="number" bind:value={bloomTime} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+									<button type="button" onclick={() => bloomTime = bloomTime + 5} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">+</button>
+								</div>
+							</div>
+						{/if}
+
+						{#if isImmersion && (showAdvanced || isExpert)}
+							<div>
+								<label for="steep" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Steep Time (s)</label>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">How long the coffee steeps before pressing</p>
+								<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60">
+									<button type="button" onclick={() => steepTime = Math.max(0, steepTime - 10)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">−</button>
+									<input id="steep" type="number" bind:value={steepTime} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+									<button type="button" onclick={() => steepTime = steepTime + 10} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">+</button>
+								</div>
+							</div>
+						{/if}
+
+						<!-- Expert: Pressure (espresso only) -->
+						{#if isEspresso && isExpert}
+							<div>
+								<label for="pressure" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Pressure (bar)</label>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Extraction pressure — standard: 9 bar</p>
+								<div class="flex overflow-hidden rounded-lg border border-outline-variant/30 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60">
+									<button type="button" onclick={() => pressure = Math.max(1, pressure - 1)} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">−</button>
+									<input id="pressure" type="number" bind:value={pressure} class="text-body-md flex-1 bg-transparent p-3.5 text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+									<button type="button" onclick={() => pressure = pressure + 1} class="flex-shrink-0 px-3.5 text-on-surface-variant/60 text-lg hover:text-crema-gold transition-colors">+</button>
+								</div>
+							</div>
+						{/if}
 					</div>
 
-					<!-- Temperature slider -->
-					<div>
-						<label for="temp-range" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Water Temperature</label>
-						<p class="text-label-caps mb-3 text-on-surface-variant/40">Brew water temp — lighter roasts prefer 93–96°C, darker roasts 88–92°C</p>
-						<div class="flex items-center gap-5">
-							<input
-								id="temp-range"
-								type="range"
-								min="85"
-								max="100"
-								bind:value={temp}
-								class="range-gold flex-1"
-							/>
-							<div class="w-16 text-right">
-								<span class="text-headline-md text-crema-gold">{temp}°C</span>
+					<!-- Advanced fields toggle for beginners -->
+					{#if isBeginner}
+						<button type="button" onclick={() => (showAdvanced = !showAdvanced)}
+							class="flex items-center gap-2 text-label-sm text-crema-gold transition-all hover:brightness-110 active:scale-95">
+							<span class="material-symbols-outlined text-[18px]">{showAdvanced ? 'expand_less' : 'expand_more'}</span>
+							{showAdvanced ? 'Hide' : 'Show'} advanced fields (grind, temperature, notes)
+						</button>
+					{/if}
+
+					{#if showAdvanced || !isBeginner}
+						<!-- Grind size -->
+						<div>
+							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind Size</label>
+							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer grinds = slower extraction</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer = slower flow, coarser = faster</p>{/if}
+							<div class="relative">
+								<input id="grind" type="text" bind:value={grind} placeholder="e.g. 2.4 or 14 clicks"
+									class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 pr-12 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
+								<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50">tune</span>
 							</div>
 						</div>
-						<div class="mt-2 flex justify-between">
-							<span class="text-label-caps text-on-surface-variant/40">85°C Cool</span>
-							<span class="text-label-caps text-on-surface-variant/40">100°C Hot</span>
-						</div>
-					</div>
 
-					<!-- Sensory notes -->
-					<div class="border-t border-outline-variant/10 pt-6">
-						<label for="notes" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Sensory Notes</label>
-						<p class="text-label-caps mb-2 text-on-surface-variant/40">Your impressions — aroma, acidity, sweetness, mouthfeel, finish</p>
-						<textarea
-							id="notes"
-							bind:value={notes}
-							rows={3}
-							placeholder="Describe the mouthfeel, acidity, and aromatic finish..."
-							class="text-body-md w-full resize-none rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"
-						></textarea>
-					</div>
+						<!-- Temperature slider -->
+						<div>
+							<label for="temp-range" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Water Temperature</label>
+							{#if isBeginner}<p class="text-label-caps mb-3 text-on-surface-variant/40">Water heat — 93°C is a good default for most coffees</p>{:else}<p class="text-label-caps mb-3 text-on-surface-variant/40">Light roasts: 93–96°C · Dark roasts: 88–92°C</p>{/if}
+							<div class="flex items-center gap-5">
+								<input id="temp-range" type="range" min="85" max="100" bind:value={temp} class="range-gold flex-1" />
+								<span class="text-headline-md w-16 text-right text-crema-gold">{temp}°C</span>
+							</div>
+							<div class="mt-2 flex justify-between">
+								<span class="text-label-caps text-on-surface-variant/40">85°C Cool</span>
+								<span class="text-label-caps text-on-surface-variant/40">100°C Hot</span>
+							</div>
+						</div>
+
+						<!-- Sensory notes -->
+						<div class="border-t border-outline-variant/10 pt-6">
+							<label for="notes" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Sensory Notes</label>
+							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">How does it taste? Write anything you notice.</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Aroma, acidity, sweetness, mouthfeel, finish</p>{/if}
+							<textarea id="notes" bind:value={notes} rows={3} placeholder="Describe the mouthfeel, acidity, and aromatic finish..."
+								class="text-body-md w-full resize-none rounded-lg border border-outline-variant/30 bg-surface-bright p-4 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50"></textarea>
+						</div>
+					{/if}
 
 					<!-- Star Rating -->
 					<div class="border-t border-outline-variant/10 pt-6">

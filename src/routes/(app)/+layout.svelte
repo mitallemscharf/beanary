@@ -6,6 +6,7 @@
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
 	import { darkMode } from '$lib/stores/theme';
+	import OnboardingTour from '$lib/components/OnboardingTour.svelte';
 	import type { PageData } from './$types';
 
 	let { children, data }: { children: import('svelte').Snippet; data: PageData } = $props();
@@ -18,6 +19,7 @@
 	}
 
 	let dataLoaded = $state(false);
+	let showOnboarding = $state(false);
 
 	onMount(async () => {
 		try {
@@ -27,14 +29,29 @@
 		} finally {
 			dataLoaded = true;
 		}
+
+		// Show onboarding tour for beginners who haven't completed it
+		if (user?.skillLevel === 'beginner' && !user?.onboardingCompleted) {
+			showOnboarding = true;
+		}
 	});
 
+	async function completeOnboarding() {
+		showOnboarding = false;
+		await fetch('/api/users/profile', {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ onboardingCompleted: true })
+		});
+	}
+
 	const navItems = [
-		{ href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-		{ href: '/shot-logger', icon: 'coffee', label: 'Shot Logger' },
-		{ href: '/history', icon: 'menu_book', label: 'Journal' },
-		{ href: '/library', icon: 'local_library', label: 'Library' },
-		{ href: '/settings', icon: 'settings', label: 'Settings' }
+		{ href: '/dashboard',   icon: 'dashboard',     label: 'Dashboard' },
+		{ href: '/shot-logger', icon: 'coffee',        label: 'Shot Logger' },
+		{ href: '/history',     icon: 'menu_book',     label: 'Journal' },
+		{ href: '/library',     icon: 'local_library', label: 'Library' },
+		{ href: '/profile',     icon: 'workspace_premium', label: 'Profile' },
+		{ href: '/settings',    icon: 'settings',      label: 'Settings' }
 	];
 
 	function isActive(href: string) {
@@ -90,6 +107,11 @@
 	const hasResults = $derived(shotResults.length > 0 || beanResults.length > 0);
 	const isFiltering = $derived(searchQuery.trim().length >= 1);
 </script>
+
+<!-- Onboarding Tour -->
+{#if showOnboarding}
+	<OnboardingTour onComplete={completeOnboarding} />
+{/if}
 
 <!-- Grain texture overlay -->
 <div class="grain-texture" aria-hidden="true"></div>
@@ -291,7 +313,27 @@
 				</a>
 			{/each}
 
-			{#if user?.role === 'admin'}
+				<div class="my-2 border-t border-outline-variant/10"></div>
+			<a href="/leaderboard"
+				class="group flex items-center gap-4 rounded-r-lg px-4 py-3 transition-all duration-200 {isActive('/leaderboard') ? 'border-l-4 border-crema-gold bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}">
+				<span class="material-symbols-outlined text-[20px] transition-transform duration-200 {isActive('/leaderboard') ? '' : 'group-hover:scale-110'}"
+					style={isActive('/leaderboard') ? "font-variation-settings:'FILL' 1,'wght' 400" : ''}>leaderboard</span>
+				<span class="text-body-md">Leaderboard</span>
+			</a>
+			<a href="/guides"
+				class="group flex items-center gap-4 rounded-r-lg px-4 py-3 transition-all duration-200 {isActive('/guides') ? 'border-l-4 border-crema-gold bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}">
+				<span class="material-symbols-outlined text-[20px] transition-transform duration-200 {isActive('/guides') ? '' : 'group-hover:scale-110'}"
+					style={isActive('/guides') ? "font-variation-settings:'FILL' 1,'wght' 400" : ''}>menu_book</span>
+				<span class="text-body-md">Brewing Guides</span>
+			</a>
+			<a href="/glossar"
+				class="group flex items-center gap-4 rounded-r-lg px-4 py-3 transition-all duration-200 {isActive('/glossar') ? 'border-l-4 border-crema-gold bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}">
+				<span class="material-symbols-outlined text-[20px] transition-transform duration-200 {isActive('/glossar') ? '' : 'group-hover:scale-110'}"
+					style={isActive('/glossar') ? "font-variation-settings:'FILL' 1,'wght' 400" : ''}>dictionary</span>
+				<span class="text-body-md">Glossar</span>
+			</a>
+
+		{#if user?.role === 'admin'}
 				<div class="my-2 border-t border-outline-variant/10"></div>
 				<a
 					href="/admin"

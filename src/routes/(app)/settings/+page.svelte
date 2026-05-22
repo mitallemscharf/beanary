@@ -5,7 +5,11 @@
 	import { showToast } from '$lib/stores/toast';
 	import { darkMode } from '$lib/stores/theme';
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+	const user = $derived(data.user);
 
 	async function logout() {
 		await fetch('/api/auth/logout', { method: 'POST' });
@@ -26,6 +30,46 @@
 	function savePrefs() {
 		if (browser) localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 		showToast('Preferences saved', 'check_circle');
+	}
+
+	// ── Skill & Machine settings ──
+	let skillLevel = $state(user?.skillLevel ?? 'home_barista');
+	let machineType = $state(user?.machineType ?? 'espresso_semi');
+	let savingProfile = $state(false);
+
+	const SKILLS = [
+		{ id: 'beginner',    emoji: '🌱', label: 'Beginner' },
+		{ id: 'home_barista',emoji: '☕', label: 'Home Barista' },
+		{ id: 'expert',      emoji: '🏆', label: 'Expert' }
+	];
+	const MACHINES = [
+		{ id: 'espresso_semi', label: 'Espresso (Semi-Auto)' },
+		{ id: 'espresso_auto', label: 'Espresso (Auto/Smart)' },
+		{ id: 'pour_over',     label: 'Pour Over' },
+		{ id: 'aeropress',     label: 'AeroPress' },
+		{ id: 'french_press',  label: 'French Press' },
+		{ id: 'moka_pot',      label: 'Moka Pot' },
+		{ id: 'cold_brew',     label: 'Cold Brew' },
+		{ id: 'other',         label: 'Multiple / Other' }
+	];
+
+	async function saveProfile() {
+		savingProfile = true;
+		try {
+			const res = await fetch('/api/users/profile', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ skillLevel, machineType })
+			});
+			if (res.ok) {
+				showToast('Profile updated', 'check_circle');
+				await invalidateAll();
+			} else {
+				showToast('Failed to save — try again', 'error');
+			}
+		} finally {
+			savingProfile = false;
+		}
 	}
 
 	function exportCSV() {
@@ -62,10 +106,11 @@
 	}
 
 	const sections = [
-		{ label: 'Profile', icon: 'account_circle' },
+		{ label: 'Profile',    icon: 'account_circle' },
+		{ label: 'Experience', icon: 'school' },
 		{ label: 'Extraction', icon: 'science' },
 		{ label: 'Appearance', icon: 'palette' },
-		{ label: 'Data', icon: 'database' }
+		{ label: 'Data',       icon: 'database' }
 	];
 	let activeSection = $state('Profile');
 </script>
@@ -143,6 +188,47 @@
 								>
 									<span class="material-symbols-outlined text-[18px]">logout</span>
 									<span class="text-label-sm uppercase tracking-widest">Log Out</span>
+								</button>
+							</div>
+						</div>
+					</div>
+
+				{:else if activeSection === 'Experience'}
+					<div class="rounded-xl border border-primary/5 bg-surface-container-low p-8">
+						<h2 class="text-headline-md mb-2">Experience & Machine</h2>
+						<p class="text-body-md mb-8 text-on-surface-variant">Personalises your Shot Logger fields and onboarding experience.</p>
+						<div class="space-y-8">
+							<!-- Skill Level -->
+							<div>
+								<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Experience Level</p>
+								<div class="flex flex-wrap gap-3">
+									{#each SKILLS as s}
+										<button type="button" onclick={() => (skillLevel = s.id)}
+											class="flex items-center gap-2 rounded-full border-2 px-5 py-2.5 transition-all duration-200 active:scale-95
+												{skillLevel === s.id ? 'border-crema-gold bg-crema-gold/10 text-primary font-semibold' : 'border-outline-variant/30 text-on-surface-variant hover:border-crema-gold/40'}">
+											<span>{s.emoji}</span>
+											<span class="text-body-md">{s.label}</span>
+										</button>
+									{/each}
+								</div>
+							</div>
+							<!-- Machine Type -->
+							<div>
+								<p class="text-label-sm mb-3 text-on-surface-variant uppercase">Machine Type</p>
+								<div class="grid grid-cols-2 gap-2 max-w-md">
+									{#each MACHINES as m}
+										<button type="button" onclick={() => (machineType = m.id)}
+											class="rounded-xl border-2 px-4 py-3 text-left text-body-md transition-all duration-200 active:scale-[0.98]
+												{machineType === m.id ? 'border-crema-gold bg-crema-gold/10 font-semibold text-primary' : 'border-outline-variant/20 text-on-surface-variant hover:border-crema-gold/30'}">
+											{m.label}
+										</button>
+									{/each}
+								</div>
+							</div>
+							<div class="border-t border-outline-variant/10 pt-6">
+								<button onclick={saveProfile} disabled={savingProfile}
+									class="text-label-caps rounded-full bg-crema-gold px-8 py-3.5 text-white uppercase tracking-widest transition-all hover:brightness-110 hover:shadow-lg active:scale-95 disabled:opacity-60">
+									{savingProfile ? 'Saving…' : 'Save Changes'}
 								</button>
 							</div>
 						</div>
