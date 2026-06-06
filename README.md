@@ -6,7 +6,7 @@
 2. [Lösungsidee](#2-lösungsidee)
 3. [Vorgehen & Artefakte](#3-vorgehen--artefakte)
     1. [Understand & Define](#31-understand--define)
-        1. [Competitive Analysis](#311-competitive-analysis)
+        1. [Wettbewerbsanalyse](#311-wettbewerbsanalyse)
     2. [Sketch](#32-sketch)
     3. [Decide](#33-decide)
     4. [Prototype](#34-prototype)
@@ -57,7 +57,7 @@
   - Sensorische Notizen (Geschmacksprofil) sind schwer zu standardisieren
   - Ästhetik und Hochwertigkeitsgefühl sind für die Zielgruppe entscheidend
 
-#### 3.1.1 Competitive Analysis
+#### 3.1.1 Wettbewerbsanalyse
 
 Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken und Differenzierungspotenzial zu identifizieren.
 
@@ -181,7 +181,7 @@ flowchart TD
     I --> J[Bewertung 1-5 Sterne]
     J --> K[Flavor Tags auswählen]
     K --> L[Notizen eingeben optional]
-    L --> M[Record Shot to Journal]
+    L --> M[Shot speichern]
     M --> N{Validierung OK?}
     N -- Nein --> O[Fehlermeldung anzeigen]
     O --> F
@@ -189,7 +189,7 @@ flowchart TD
     P --> Q[XP vergeben]
     Q --> R{Badge verdient?}
     R -- Ja --> S[Badge Toast anzeigen]
-    R -- Nein --> T[Success Toast anzeigen]
+    R -- Nein --> T[Erfolgsmeldung anzeigen]
     S --> T
     T --> U[Weiterleitung zu Shot History]
 ```
@@ -208,7 +208,7 @@ flowchart TD
 
 **Screenshots — Alle Hauptseiten**
 
-![Landing Page](screenshots/01-landing.png)
+![Startseite](screenshots/01-landing.png)
 *Landing Page — Hero-Sektion «The Art of Extraction» mit CTA-Button und Feature-Übersicht*
 
 ![Login](screenshots/02-login.png)
@@ -223,7 +223,7 @@ flowchart TD
 ![Dashboard](screenshots/05-dashboard.png)
 *Dashboard «Morning Ritual» — Metrikkarten, Rating History Chart und Recent Rituals*
 
-![Bean Library](screenshots/06-bean-library.png)
+![Bohnen-Bibliothek](screenshots/06-bean-library.png)
 *Bean Library — Karten-Layout mit automatischen FRESH/PEAK/PAST PEAK Freshness-Badges*
 
 ![Bohne hinzufügen](screenshots/07-bean-add.png)
@@ -232,7 +232,7 @@ flowchart TD
 ![Bohnen-Detail](screenshots/08-bean-detail.png)
 *Bohnen-Detailansicht — Sweet Spot Empfehlung basierend auf den besten Shots*
 
-![Shot Logger](screenshots/09-shot-logger.png)
+![Shot-Logger](screenshots/09-shot-logger.png)
 *Shot Logger — Parameter erfassen mit Live Brew-Ratio Berechnung (RISTRETTO/NORMALE/LUNGO)*
 
 ![Extraction Timer](screenshots/10-shot-timer.png)
@@ -259,7 +259,7 @@ flowchart TD
 ![Einstellungen](screenshots/17-settings.png)
 *Einstellungen — Profil, Passwort ändern, Maschinen-Typ und Extraktions-Defaults*
 
-![Admin Panel](screenshots/18-admin.png)
+![Admin-Panel](screenshots/18-admin.png)
 *Admin Panel — Vollständige Benutzerübersicht mit Total Users, Beans und Shots*
 
 ![Mobile](screenshots/19-mobile.png)
