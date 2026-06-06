@@ -528,8 +528,9 @@
 											</div>
 										{/each}
 										<div class="flex gap-0.5">
-											{#each stars(shot.rating) as filled}
-												<span class="material-symbols-outlined text-crema-gold text-base" style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300">star</span>
+											{#each Array.from({length: 5}, (_, i) => i) as i}
+												<span class="material-symbols-outlined text-base {i < shot.rating ? 'text-crema-gold' : 'text-outline-variant/40'}"
+													style="font-variation-settings: 'FILL' {i < shot.rating ? 1 : 0}, 'wght' 300">star</span>
 											{/each}
 										</div>
 									</div>

@@ -17,12 +17,20 @@
 		goto('/login');
 	}
 
-	// Profile prefs stored in localStorage
+	// Profile prefs stored in localStorage — default to session user, never hardcoded values
 	const PREFS_KEY = 'beanery-prefs';
 	function loadPrefs() {
-		if (!browser) return { name: 'Lenny', email: 'lenny@beanery.com', defaultDose: 18, defaultTemp: 94 };
-		const raw = localStorage.getItem(PREFS_KEY);
-		return raw ? JSON.parse(raw) : { name: 'Lenny', email: 'lenny@beanery.com', defaultDose: 18, defaultTemp: 94 };
+		const defaults = { name: data.user?.name ?? '', email: data.user?.email ?? '', defaultDose: 18, defaultTemp: 94 };
+		if (!browser) return defaults;
+		try {
+			const raw = localStorage.getItem(PREFS_KEY);
+			// Only restore dose/temp from localStorage; always use live session name+email
+			if (raw) {
+				const saved = JSON.parse(raw);
+				return { ...defaults, defaultDose: saved.defaultDose ?? 18, defaultTemp: saved.defaultTemp ?? 94 };
+			}
+		} catch { /* ignore */ }
+		return defaults;
 	}
 
 	let prefs = $state(loadPrefs());

@@ -233,9 +233,9 @@
 								{goals.includes(g.id) ? 'border-crema-gold bg-crema-gold/5' : 'border-outline-variant/20 bg-surface-bright hover:border-crema-gold/40'}">
 							<span class="text-2xl">{g.emoji}</span>
 							<p class="text-body-md font-medium flex-1">{g.label}</p>
-							<div class="flex-shrink-0 h-5 w-5 rounded border-2 transition-colors {goals.includes(g.id) ? 'border-crema-gold bg-crema-gold' : 'border-outline-variant/40'}">
+							<div class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded border-2 transition-colors {goals.includes(g.id) ? 'border-crema-gold bg-crema-gold' : 'border-outline-variant/40'}">
 								{#if goals.includes(g.id)}
-									<span class="material-symbols-outlined text-white text-[14px] flex items-center justify-center h-full w-full" style="font-variation-settings:'FILL' 1">check</span>
+									<span class="material-symbols-outlined text-white select-none leading-none" style="font-size:13px;font-variation-settings:'FILL' 1">check</span>
 								{/if}
 							</div>
 						</button>

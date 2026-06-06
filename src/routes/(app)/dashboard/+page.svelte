@@ -3,7 +3,20 @@
 	import { beans } from '$lib/stores/beans';
 	import { reveal } from '$lib/actions/reveal';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import BeanImage from '$lib/components/BeanImage.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+	const user = $derived(data.user);
+	const firstName = $derived(user?.name?.split(' ')[0] ?? 'there');
+
+	// Time-based greeting — evaluated once at page load in browser
+	const hour = browser ? new Date().getHours() : 8;
+	const greetFirst   = hour >= 5 && hour < 12 ? 'Morning'   : hour >= 12 && hour < 17 ? 'Afternoon' : hour >= 17 && hour < 21 ? 'Evening'   : 'Late Night';
+	const greetSecond  = hour >= 5 && hour < 12 ? 'Ritual'    : hour >= 12 && hour < 17 ? 'Brew'      : hour >= 17 && hour < 21 ? 'Extraction': 'Cup';
+	const greetPrefix  = hour >= 5 && hour < 12 ? 'Good morning'   : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 21 ? 'Good evening' : 'Brewing late';
+	const greetSuffix  = hour >= 17 && hour < 21 ? "Let's review your day." : hour < 5 || hour >= 21 ? "Here's your overview." : "Here's your extraction overview.";
 
 	// ── Real counts from stores ──
 	const totalShots = $derived($shots.length);
@@ -91,9 +104,9 @@
 		<!-- Page header -->
 		<section class="mb-14" use:reveal={0}>
 			<p class="text-label-caps mb-2 text-crema-gold">Precision Analysis</p>
-			<h1 class="text-headline-xl mb-3">Morning <em class="font-normal italic">Ritual</em></h1>
+			<h1 class="text-headline-xl mb-3">{greetFirst} <em class="font-normal italic">{greetSecond}</em></h1>
 			<p class="text-body-lg max-w-2xl text-on-surface-variant">
-				Welcome back, Lenny. Here's your extraction overview.
+				{greetPrefix}, {firstName}. {greetSuffix}
 			</p>
 		</section>
 
