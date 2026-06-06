@@ -516,6 +516,7 @@
 								onclick={() => activeCategory = activeCategory === seg.id ? null : seg.id}
 								class="cursor-pointer transition-all duration-200 hover:opacity-100"
 								role="button"
+								tabindex="0"
 								aria-label={seg.label}
 							/>
 							<text

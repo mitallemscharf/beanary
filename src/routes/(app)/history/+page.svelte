@@ -414,7 +414,6 @@
 							type="text"
 							placeholder="Filter by bean name..."
 							bind:value={filterQuery}
-							autofocus
 							class="text-body-md w-56 rounded-full border border-crema-gold/30 bg-surface-container-low py-2 pl-9 pr-4 outline-none ring-0 transition-all duration-200 focus:ring-1 focus:ring-crema-gold/60"
 						/>
 						{#if filterQuery}

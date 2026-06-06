@@ -3,6 +3,7 @@ import { connectDB } from '$lib/server/db';
 import { Shot } from '$lib/server/models/Shot';
 import { User } from '$lib/server/models/User';
 import { awardXP, XP, BADGES } from '$lib/server/gamification';
+import { signToken } from '$lib/server/auth';
 
 const DEFAULT_SHOTS = [
 	{
@@ -85,7 +86,7 @@ export async function GET({ locals }) {
 	}
 }
 
-export async function POST({ request, locals }) {
+export async function POST({ request, locals, cookies }) {
 	try {
 		await connectDB();
 		const user = locals.user!;
@@ -110,6 +111,18 @@ export async function POST({ request, locals }) {
 			if (hour >= 22 && !u.badges.includes('night_owl'))        earned.push('night_owl');
 			return earned;
 		});
+
+		// Refresh JWT so sidebar shows updated XP without requiring re-login
+		const updatedUser = await User.findById(user.id).select('xp level');
+		if (updatedUser) {
+			const token = signToken({
+				id: user.id, name: user.name, email: user.email, role: user.role,
+				skillLevel: user.skillLevel, machineType: user.machineType,
+				onboardingCompleted: user.onboardingCompleted,
+				xp: updatedUser.xp ?? 0, level: updatedUser.level ?? 'novice'
+			});
+			cookies.set('session', token, { path: '/', httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
+		}
 
 		return json({ shot: shot.toJSON(), xpAwarded: xpAmount, newBadges, leveledUp, newLevel }, { status: 201 });
 	} catch (err) {

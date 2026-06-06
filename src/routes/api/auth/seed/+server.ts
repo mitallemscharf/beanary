@@ -9,16 +9,19 @@ export async function POST() {
 	try {
 		await connectDB();
 
-		// Create admin if not exists
+		// Create admin if not exists, always ensure onboardingCompleted: true
 		let admin = await User.findOne({ email: 'lenny@beanery.app' });
 		if (!admin) {
 			admin = new User({
 				name: 'Lenny Frei',
 				email: 'lenny@beanery.app',
 				password: 'Beanery2026',
-				role: 'admin'
+				role: 'admin',
+				onboardingCompleted: true
 			});
 			await admin.save();
+		} else if (!admin.onboardingCompleted) {
+			await User.updateOne({ email: 'lenny@beanery.app' }, { $set: { onboardingCompleted: true } });
 		}
 
 		// Create test user if not exists
