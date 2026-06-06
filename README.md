@@ -209,48 +209,42 @@ flowchart TD
 **Screenshots — Alle Hauptseiten**
 
 ![Landing Page](screenshots/01-landing.png)
-*Landing Page: Hero-Sektion mit CTA und Feature-Übersicht im Bento-Grid*
+*Landing Page: Hero-Sektion mit CTA und Feature-Übersicht im Bento-Grid (nicht eingeloggt)*
 
 ![Login](screenshots/02-login.png)
-*Login-Seite: Reduziertes Formular mit Forgot-Password-Link und Markenidentität*
+*Login-Seite: Reduziertes Formular mit «Forgot password?»-Link und Markenidentität*
 
-![Registrierung Schritt 1](screenshots/03-register-1.png)
-*Registrierung Schritt 1: Name, E-Mail und Passwort*
+![Registrierung](screenshots/03-register.png)
+*Registrierungsassistent: Mehrstufiges Onboarding mit Name, E-Mail und Passwort*
 
-![Registrierung Schritt 2](screenshots/04-register-2.png)
-*Registrierung Schritt 2: Skill Level auswählen (Beginner / Home Barista / Expert)*
-
-![Registrierung Schritt 3](screenshots/05-register-3.png)
-*Registrierung Schritt 3: Maschinentyp auswählen*
-
-![Registrierung Schritt 4](screenshots/06-register-4.png)
-*Registrierung Schritt 4: Persönliche Ziele definieren*
-
-![Dashboard](screenshots/07-dashboard.png)
+![Dashboard](screenshots/04-dashboard.png)
 *Dashboard «Morning Ritual»: Metrikkarten, Rating History Chart und Recent Rituals*
 
-![Shot Logger](screenshots/08-shot-logger.png)
+![Shot Logger](screenshots/05-shot-logger.png)
 *Shot Logger: Extraktionsparameter-Formular mit Live Brew Ratio Gauge und Flavor Wheel*
 
-![Bean Library](screenshots/09-library.png)
+![Bean Library](screenshots/06-library.png)
 *Bean Library: Kartenraster der Bohnensammlung mit Freshness-Status und Sweet-Spot-Werten*
 
-![Shot History](screenshots/10-history.png)
+![Shot History](screenshots/07-history.png)
 *Shot History: Chronologisches Extraction Journal mit Filter, PDF-Export und Vergleichsmodus*
 
-![Profil](screenshots/11-profile.png)
+![Profil](screenshots/08-profile.png)
 *Profil: XP-Level, Fortschrittsbalken und Badges-Übersicht*
 
-![Leaderboard](screenshots/12-leaderboard.png)
+![Leaderboard](screenshots/09-leaderboard.png)
 *Leaderboard: Community-Rangliste nach Erfahrungspunkten mit Podium-Ansicht*
 
-![Brewing Guides](screenshots/13-guides.png)
+![Brewing Guides](screenshots/10-guides.png)
 *Brewing Guides: Schritt-für-Schritt Anleitungen für alle Brühmethoden*
 
-![Glossar](screenshots/14-glossar.png)
+![Glossar](screenshots/11-glossar.png)
 *Glossar: 27 durchsuchbare Kaffee-Fachbegriffe mit Definitionen*
 
-![Admin Panel](screenshots/15-admin.png)
+![Settings](screenshots/12-settings.png)
+*Settings: Profil, Passwort, Extraction Defaults, Benachrichtigungen und Account-Verwaltung*
+
+![Admin Panel](screenshots/13-admin.png)
 *Admin Panel: Benutzerübersicht, Shot-Aktivitäten und Datenverwaltung (nur für Admins)*
 
 ---
