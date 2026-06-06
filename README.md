@@ -149,9 +149,32 @@ Akzeptanzkriterien:
 
 ### 3.2 Sketch
 
-- **Variantenüberblick:** Drei Konzeptrichtungen: (A) wissenschaftlich/nüchtern, (B) editorial/minimalistisch, (C) community-orientiert. Variante B traf die Zielgruppe am besten.
-- **Skizzen:** Wireframes für alle fünf Screens (Home, Shot Logger, History, Dashboard, Library) in Stitch.
-- **Unterschiede:** Variante A war zu funktional ohne emotionalen Appeal; Variante C zu komplex für den Prototyp-Scope.
+**Methode: Crazy 8s**
+
+Im Rahmen der Sketch-Phase wurde die Crazy-8s-Methode angewendet, um 8 verschiedene Varianten des zentralen Features «Shot Logger» in kurzer Zeit zu skizzieren.
+
+**Variantenüberblick:**
+
+| Nr. | Variante | Beschreibung |
+|-----|----------|--------------|
+| 1 | Einfaches Formular | Alle Felder untereinander, klassische Eingabe |
+| 2 | Slider-basiert | Parameter per Schieberegler einstellen |
+| 3 | Schnell-Eingabe | Nur 3 Pflichtfelder, Rest ausklappbar |
+| 4 | Timer-First | Timer starten, dann Parameter eingeben |
+| 5 | Bohne zuerst (Auto-Fill) | Bohne wählen, Formular füllt sich mit letzten Werten |
+| 6 | Karten-Ansicht (Swipe) | Jeder Parameter auf eigener Karte |
+| 7 | Bewertung zuerst | Shot bewerten, dann Details optional |
+| 8 | Vergleichs-Modus | Letzter Shot angezeigt, nur Änderungen eingeben |
+
+**Skizzen:** [crazy8s.pdf](crazy8s.pdf)
+
+**Peer Dot-Voting:** In der Kleinklasse TZBISa vom 20. Mai 2026 wurden die Varianten mit Mitstudierenden besprochen. Favoriten: Variante 4 (Timer-First) und Variante 5 (Bohne zuerst/Auto-Fill).
+
+**Wesentliche Unterschiede zwischen den Varianten:**
+- Variante 1-3: Fokus auf schnelle Dateneingabe
+- Variante 4-5: Fokus auf natürlichen Workflow (erst brauen, dann dokumentieren)
+- Variante 6-7: Fokus auf minimale Eingabe
+- Variante 8: Fokus auf iterative Verbesserung
 
 ### 3.3 Decide
 
