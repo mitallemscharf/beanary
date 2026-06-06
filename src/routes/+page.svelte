@@ -20,8 +20,8 @@
 				Beanery
 			</a>
 			<nav class="hidden items-center gap-7 md:flex">
-				<a href="/guides" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Guides</a>
-				<a href="/glossar" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Glossar</a>
+				<a href="/login" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Guides</a>
+				<a href="/login" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Glossar</a>
 			</nav>
 		</div>
 		<div class="flex items-center gap-3">
