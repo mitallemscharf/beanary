@@ -101,6 +101,13 @@
 				</div>
 			</div>
 
+			<!-- Forgot password -->
+			<div class="flex justify-end -mt-1">
+				<a href="/forgot-password" class="text-label-sm text-on-surface-variant/60 transition-colors hover:text-crema-gold">
+					Forgot password?
+				</a>
+			</div>
+
 			<!-- Error -->
 			{#if error}
 				<div class="flex items-center gap-2.5 rounded-lg border border-error/20 bg-error/5 px-4 py-3">

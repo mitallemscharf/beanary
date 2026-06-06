@@ -29,7 +29,10 @@ const userSchema = new mongoose.Schema(
 		defaultDose:  { type: Number, default: 18 },
 		defaultYield: { type: Number, default: 36 },
 		defaultTemp:  { type: Number, default: 94 },
-		defaultGrind: { type: Number, default: 15 }
+		defaultGrind: { type: Number, default: 15 },
+		// Password reset
+		resetToken:  { type: String },
+		resetExpiry: { type: Date }
 	},
 	{ timestamps: true }
 );
@@ -71,6 +74,8 @@ export interface IUser {
 	defaultYield?: number;
 	defaultTemp?: number;
 	defaultGrind?: number;
+	resetToken?: string;
+	resetExpiry?: Date;
 }
 
 export const User = mongoose.models.User ?? mongoose.model('User', userSchema);
