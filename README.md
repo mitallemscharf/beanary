@@ -83,6 +83,70 @@ Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken
 - User-spezifische Datenisolation mit Auth-System
 - PWA — trotzdem auf Homescreen installierbar
 
+#### 3.1.2 User Stories
+
+Die folgenden User Stories wurden nach dem INVEST-Prinzip (Independent, Negotiable, Valuable, Estimable, Small, Testable) formuliert.
+
+---
+
+**US-01: Shot erfassen**
+Als Home-Barista möchte ich einen Espresso-Shot mit allen Parametern erfassen, damit ich meinen Sweet Spot reproduzieren kann.
+
+Akzeptanzkriterien:
+- [ ] Bohne aus Library auswählbar
+- [ ] Dose, Yield, Zeit, Temperatur, Mahlgrad erfassbar
+- [ ] Brew Ratio wird live berechnet
+- [ ] Shot wird in MongoDB gespeichert
+- [ ] Shot erscheint sofort in History
+
+---
+
+**US-02: Bohne verwalten**
+Als Home-Barista möchte ich meine Kaffeebohnen erfassen und verwalten, damit ich den Überblick über meine Sammlung behalte.
+
+Akzeptanzkriterien:
+- [ ] Bohne mit Name, Röster, Herkunft, Röstdatum erfassbar
+- [ ] Freshness wird automatisch berechnet
+- [ ] Bohne in Shot Logger verfügbar nach Erstellung
+- [ ] Bohne editierbar und löschbar
+
+---
+
+**US-03: Fortschritt verfolgen**
+Als Home-Barista möchte ich meine Shot-Statistiken auf dem Dashboard sehen, damit ich meinen Fortschritt über Zeit verfolgen kann.
+
+Akzeptanzkriterien:
+- [ ] Total Shots angezeigt
+- [ ] Durchschnittsbewertung berechnet
+- [ ] Rating History Chart sichtbar
+- [ ] Beste Bohne identifiziert
+
+---
+
+**US-04: Anfänger-Unterstützung**
+Als Kaffee-Einsteiger möchte ich beim Dialing-In Unterstützung erhalten, damit ich die Fachbegriffe verstehe und mich nicht überfordert fühle.
+
+Akzeptanzkriterien:
+- [ ] Skill Level wählbar bei Registration
+- [ ] Beginner sieht vereinfachten Shot Logger
+- [ ] Tooltips erklären Fachbegriffe
+- [ ] Brewing Guides verfügbar
+- [ ] Glossar mit 27 Begriffen durchsuchbar
+
+---
+
+**US-05: Account & Datensicherheit**
+Als Nutzer möchte ich einen eigenen Account haben, damit nur ich meine Daten sehe und verwalten kann.
+
+Akzeptanzkriterien:
+- [ ] Registrierung mit Email + Passwort möglich
+- [ ] Login/Logout funktioniert
+- [ ] Jeder User sieht nur eigene Beans und Shots
+- [ ] Passwort ist gehasht (bcrypt)
+- [ ] Admin sieht alle Daten
+
+---
+
 ### 3.2 Sketch
 
 - **Variantenüberblick:** Drei Konzeptrichtungen: (A) wissenschaftlich/nüchtern, (B) editorial/minimalistisch, (C) community-orientiert. Variante B traf die Zielgruppe am besten.
@@ -99,6 +163,37 @@ Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken
   4. Überprüft History im Extraction Journal
   5. Verwaltet Bohnen in der Bean Library
 
+#### 3.3.1 User Flow Diagramm
+
+Der folgende Flowchart zeigt den vollständigen Ablauf des Shot Loggers — vom Öffnen der Seite bis zur Weiterleitung zur Shot History.
+
+```mermaid
+flowchart TD
+    A[User öffnet Shot Logger] --> B{Bohnen vorhanden?}
+    B -- Nein --> C[Zur Bean Library]
+    C --> D[Neue Bohne erfassen]
+    D --> A
+    B -- Ja --> E[Bohne auswählen]
+    E --> F[Parameter eingeben\nDose, Yield, Zeit, Temp]
+    F --> G[Extraction Timer starten]
+    G --> H[Shot ziehen]
+    H --> I[Timer stoppen\nZeit wird automatisch eingetragen]
+    I --> J[Bewertung 1-5 Sterne]
+    J --> K[Flavor Tags auswählen]
+    K --> L[Notizen eingeben optional]
+    L --> M[Record Shot to Journal]
+    M --> N{Validierung OK?}
+    N -- Nein --> O[Fehlermeldung anzeigen]
+    O --> F
+    N -- Ja --> P[Shot in MongoDB speichern]
+    P --> Q[XP vergeben]
+    Q --> R{Badge verdient?}
+    R -- Ja --> S[Badge Toast anzeigen]
+    R -- Nein --> T[Success Toast anzeigen]
+    S --> T
+    T --> U[Weiterleitung zu Shot History]
+```
+
 ### 3.4 Prototype
 
 #### 3.4.1 Entwurf (Design)
@@ -108,6 +203,57 @@ Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken
 - **Typografie:** Libre Caslon Text (Serif) für Headlines, Hanken Grotesk (Sans-Serif) für Body
 - **Theme:** Light Theme mit Dark Mode Toggle — wirkt professioneller für eine Schulabgabe
 - **Bildsprache:** Schwarzweiss-Fotos von Kaffeebohnen und Espresso — konsistent und premium
+
+---
+
+**Screenshots — Alle Hauptseiten**
+
+![Landing Page](screenshots/01-landing.png)
+*Landing Page: Hero-Sektion mit CTA und Feature-Übersicht im Bento-Grid*
+
+![Login](screenshots/02-login.png)
+*Login-Seite: Reduziertes Formular mit Forgot-Password-Link und Markenidentität*
+
+![Registrierung Schritt 1](screenshots/03-register-1.png)
+*Registrierung Schritt 1: Name, E-Mail und Passwort*
+
+![Registrierung Schritt 2](screenshots/04-register-2.png)
+*Registrierung Schritt 2: Skill Level auswählen (Beginner / Home Barista / Expert)*
+
+![Registrierung Schritt 3](screenshots/05-register-3.png)
+*Registrierung Schritt 3: Maschinentyp auswählen*
+
+![Registrierung Schritt 4](screenshots/06-register-4.png)
+*Registrierung Schritt 4: Persönliche Ziele definieren*
+
+![Dashboard](screenshots/07-dashboard.png)
+*Dashboard «Morning Ritual»: Metrikkarten, Rating History Chart und Recent Rituals*
+
+![Shot Logger](screenshots/08-shot-logger.png)
+*Shot Logger: Extraktionsparameter-Formular mit Live Brew Ratio Gauge und Flavor Wheel*
+
+![Bean Library](screenshots/09-library.png)
+*Bean Library: Kartenraster der Bohnensammlung mit Freshness-Status und Sweet-Spot-Werten*
+
+![Shot History](screenshots/10-history.png)
+*Shot History: Chronologisches Extraction Journal mit Filter, PDF-Export und Vergleichsmodus*
+
+![Profil](screenshots/11-profile.png)
+*Profil: XP-Level, Fortschrittsbalken und Badges-Übersicht*
+
+![Leaderboard](screenshots/12-leaderboard.png)
+*Leaderboard: Community-Rangliste nach Erfahrungspunkten mit Podium-Ansicht*
+
+![Brewing Guides](screenshots/13-guides.png)
+*Brewing Guides: Schritt-für-Schritt Anleitungen für alle Brühmethoden*
+
+![Glossar](screenshots/14-glossar.png)
+*Glossar: 27 durchsuchbare Kaffee-Fachbegriffe mit Definitionen*
+
+![Admin Panel](screenshots/15-admin.png)
+*Admin Panel: Benutzerübersicht, Shot-Aktivitäten und Datenverwaltung (nur für Admins)*
+
+---
 
 #### 3.4.2 Umsetzung (Technik)
 
@@ -126,9 +272,9 @@ Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken
 - Datenbankmanagement: MongoDB Compass + MongoDB Atlas
 
 **Datenmodelle:**
-- **User:** name, email, password (bcrypt-hashed), role (admin/user), createdAt
-- **Bean:** name, roastery, origin, roastDate, tags, dose, yield, time, status, userId, createdAt
-- **Shot:** bean, dose, grindSize, time, yield, temp, rating, notes, process, roast, userId, createdAt
+- **User:** name, email, password (bcrypt-hashed), role (admin/user), skillLevel, machineType, goals, xp, level, badges, notifications, defaultDose/Yield/Temp/Grind, createdAt
+- **Bean:** name, roastery, origin, roastLevel (Light/Medium/Medium-Dark/Dark), roastDate, tags, dose, yield, time, status, userId, createdAt
+- **Shot:** beanId (ref Bean), bean, dose, grindSize, time, yield, brewRatio, temp, rating, flavorTags, notes, process, roast, userId, createdAt
 
 **Deployment:** https://beanery-lenny.netlify.app
 
