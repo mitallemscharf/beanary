@@ -57,7 +57,7 @@
   - Sensorische Notizen (Geschmacksprofil) sind schwer zu standardisieren
   - Ästhetik und Hochwertigkeitsgefühl sind für die Zielgruppe entscheidend
 
-### 3.1.1 Competitive Analysis
+#### 3.1.1 Competitive Analysis
 
 Im Rahmen der Understand-Phase wurden bestehende Lösungen analysiert um Lücken und Differenzierungspotenzial zu identifizieren.
 
@@ -196,7 +196,7 @@ flowchart TD
 
 ### 3.4 Prototype
 
-#### 3.4.1 Entwurf (Design)
+#### 3.4.1. Entwurf (Design)
 
 **Designentscheidungen:**
 - **Farbpalette:** Warm Paper-White (#FBF9F4) als Background, Crema Gold (#C5A059) als Akzent, Dunkelbraun (#1B1C19) für Text
@@ -209,47 +209,65 @@ flowchart TD
 **Screenshots — Alle Hauptseiten**
 
 ![Landing Page](screenshots/01-landing.png)
-*Landing Page: Hero-Sektion mit CTA und Feature-Übersicht im Bento-Grid (nicht eingeloggt)*
+*Landing Page — Hero-Sektion «The Art of Extraction» mit CTA-Button und Feature-Übersicht*
 
 ![Login](screenshots/02-login.png)
-*Login-Seite: Reduziertes Formular mit «Forgot password?»-Link und Markenidentität*
+*Login-Seite — Anmeldung mit E-Mail und Passwort*
 
-![Registrierung](screenshots/03-register.png)
-*Registrierungsassistent: Mehrstufiges Onboarding mit Name, E-Mail und Passwort*
+![Registrierung](screenshots/03-register-1.png)
+*Registrierung Schritt 1 — Account-Daten erfassen*
 
-![Dashboard](screenshots/04-dashboard.png)
-*Dashboard «Morning Ritual»: Metrikkarten, Rating History Chart und Recent Rituals*
+![Skill Level](screenshots/04-register-2.png)
+*Registrierung Schritt 2 — Skill Level Auswahl (Beginner / Home Barista / Expert)*
 
-![Shot Logger](screenshots/05-shot-logger.png)
-*Shot Logger: Extraktionsparameter-Formular mit Live Brew Ratio Gauge und Flavor Wheel*
+![Dashboard](screenshots/05-dashboard.png)
+*Dashboard «Morning Ritual» — Metrikkarten, Rating History Chart und Recent Rituals*
 
-![Bean Library](screenshots/06-library.png)
-*Bean Library: Kartenraster der Bohnensammlung mit Freshness-Status und Sweet-Spot-Werten*
+![Bean Library](screenshots/06-bean-library.png)
+*Bean Library — Karten-Layout mit automatischen FRESH/PEAK/PAST PEAK Freshness-Badges*
 
-![Shot History](screenshots/07-history.png)
-*Shot History: Chronologisches Extraction Journal mit Filter, PDF-Export und Vergleichsmodus*
+![Bohne hinzufügen](screenshots/07-bean-add.png)
+*Neue Bohne erfassen — Slide-in Formular mit allen Bohnen-Parametern*
 
-![Profil](screenshots/08-profile.png)
-*Profil: XP-Level, Fortschrittsbalken und Badges-Übersicht*
+![Bohnen-Detail](screenshots/08-bean-detail.png)
+*Bohnen-Detailansicht — Sweet Spot Empfehlung basierend auf den besten Shots*
 
-![Leaderboard](screenshots/09-leaderboard.png)
-*Leaderboard: Community-Rangliste nach Erfahrungspunkten mit Podium-Ansicht*
+![Shot Logger](screenshots/09-shot-logger.png)
+*Shot Logger — Parameter erfassen mit Live Brew-Ratio Berechnung (RISTRETTO/NORMALE/LUNGO)*
 
-![Brewing Guides](screenshots/10-guides.png)
-*Brewing Guides: Schritt-für-Schritt Anleitungen für alle Brühmethoden*
+![Extraction Timer](screenshots/10-shot-timer.png)
+*Shot Logger — Live Extraction Timer während des Kaffeebezugs*
 
-![Glossar](screenshots/11-glossar.png)
-*Glossar: 27 durchsuchbare Kaffee-Fachbegriffe mit Definitionen*
+![Shot History](screenshots/11-shot-history.png)
+*Shot History — Chronologische Liste mit Filter, Export CSV und Export PDF*
 
-![Settings](screenshots/12-settings.png)
-*Settings: Profil, Passwort, Extraction Defaults, Benachrichtigungen und Account-Verwaltung*
+![Shot Detail](screenshots/12-shot-expanded.png)
+*Shot History Detail — Ausgeklappte Ansicht mit allen gespeicherten Parametern*
 
-![Admin Panel](screenshots/13-admin.png)
-*Admin Panel: Benutzerübersicht, Shot-Aktivitäten und Datenverwaltung (nur für Admins)*
+![Profil](screenshots/13-profile.png)
+*Profil-Seite — XP-Fortschrittsbalken, Level-Anzeige und verdiente Achievement-Badges*
+
+![Leaderboard](screenshots/14-leaderboard.png)
+*Leaderboard — Rangliste der aktivsten Nutzer nach XP*
+
+![Brewing Guides](screenshots/15-guides.png)
+*Brewing Guides — Schritt-für-Schritt Anleitungen für 6 verschiedene Brew-Methoden*
+
+![Glossar](screenshots/16-glossar.png)
+*Glossar — 27 durchsuchbare Kaffee-Fachbegriffe mit Definitionen und Tipps*
+
+![Einstellungen](screenshots/17-settings.png)
+*Einstellungen — Profil, Passwort ändern, Maschinen-Typ und Extraktions-Defaults*
+
+![Admin Panel](screenshots/18-admin.png)
+*Admin Panel — Vollständige Benutzerübersicht mit Total Users, Beans und Shots*
+
+![Mobile](screenshots/19-mobile.png)
+*Mobile Ansicht — Vollständig responsives Design des Shot Loggers auf Smartphone-Viewport (390px)*
 
 ---
 
-#### 3.4.2 Umsetzung (Technik)
+#### 3.4.2. Umsetzung (Technik)
 
 **Technologie-Stack:**
 - **Frontend:** SvelteKit (TypeScript)
