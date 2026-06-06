@@ -116,11 +116,11 @@
 		if (bean === '' && $beans.length > 0) bean = $beans[0].name;
 	});
 
-	let dose = $state(18);
-	let yieldG = $state(36);
-	let time = $state(30);
-	let temp = $state(94);
-	let grind = $state(15);
+	let dose  = $state(data.user?.defaultDose  ?? 18);
+	let yieldG = $state(data.user?.defaultYield ?? 36);
+	let time  = $state(30);
+	let temp  = $state(data.user?.defaultTemp  ?? 94);
+	let grind = $state(data.user?.defaultGrind ?? 15);
 	let notes = $state('');
 	let rating = $state(4);
 	let saving = $state(false);

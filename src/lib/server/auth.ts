@@ -11,6 +11,11 @@ export interface SessionUser {
 	onboardingCompleted: boolean;
 	xp: number;
 	level: string;
+	defaultDose?: number;
+	defaultYield?: number;
+	defaultTemp?: number;
+	defaultGrind?: number;
+	notifications?: { dailyReminder: boolean; weeklySummary: boolean; beanFreshnessAlerts: boolean };
 }
 
 function getSecret(): string {

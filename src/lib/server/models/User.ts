@@ -18,7 +18,18 @@ const userSchema = new mongoose.Schema(
 		lastLoginDate: { type: String, default: '' },
 		// UX
 		onboardingCompleted:    { type: Boolean, default: false },
-		isPublicOnLeaderboard:  { type: Boolean, default: true }
+		isPublicOnLeaderboard:  { type: Boolean, default: true },
+		// Notifications
+		notifications: {
+			dailyReminder:       { type: Boolean, default: false },
+			weeklySummary:       { type: Boolean, default: false },
+			beanFreshnessAlerts: { type: Boolean, default: false }
+		},
+		// Extraction defaults
+		defaultDose:  { type: Number, default: 18 },
+		defaultYield: { type: Number, default: 36 },
+		defaultTemp:  { type: Number, default: 94 },
+		defaultGrind: { type: Number, default: 15 }
 	},
 	{ timestamps: true }
 );
@@ -55,6 +66,11 @@ export interface IUser {
 	badges: string[];
 	onboardingCompleted: boolean;
 	isPublicOnLeaderboard: boolean;
+	notifications?: { dailyReminder: boolean; weeklySummary: boolean; beanFreshnessAlerts: boolean };
+	defaultDose?: number;
+	defaultYield?: number;
+	defaultTemp?: number;
+	defaultGrind?: number;
 }
 
 export const User = mongoose.models.User ?? mongoose.model('User', userSchema);

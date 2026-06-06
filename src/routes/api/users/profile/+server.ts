@@ -11,7 +11,7 @@ export async function PATCH({ request, locals, cookies }) {
 		const updates = await request.json();
 
 		// Allowed fields only
-		const allowed = ['skillLevel', 'machineType', 'goals', 'onboardingCompleted', 'isPublicOnLeaderboard'];
+		const allowed = ['name', 'skillLevel', 'machineType', 'goals', 'onboardingCompleted', 'isPublicOnLeaderboard', 'notifications', 'defaultDose', 'defaultYield', 'defaultTemp', 'defaultGrind'];
 		const patch: Record<string, unknown> = {};
 		for (const key of allowed) {
 			if (key in updates) patch[key] = updates[key];
@@ -30,7 +30,12 @@ export async function PATCH({ request, locals, cookies }) {
 			machineType: user.machineType,
 			onboardingCompleted: user.onboardingCompleted,
 			xp: user.xp ?? 0,
-			level: user.level ?? 'novice'
+			level: user.level ?? 'novice',
+			defaultDose: user.defaultDose ?? 18,
+			defaultYield: user.defaultYield ?? 36,
+			defaultTemp: user.defaultTemp ?? 94,
+			defaultGrind: user.defaultGrind ?? 15,
+			notifications: user.notifications ?? { dailyReminder: false, weeklySummary: false, beanFreshnessAlerts: false }
 		};
 		const token = signToken(session);
 		cookies.set('session', token, { path: '/', httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
