@@ -71,7 +71,7 @@
 				<img
 					src="https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?w=700&h=700&auto=compress&cs=tinysrgb&fit=crop"
 					alt="Espresso extraction"
-					class="h-full w-full scale-105 object-cover grayscale-[25%] transition-all duration-[1200ms] hover:scale-100 hover:grayscale-0"
+					class="h-full w-full scale-105 object-cover transition-all duration-[1200ms] hover:scale-100"
 				/>
 			</div>
 			<div class="absolute -bottom-2 left-2 sm:-bottom-5 sm:-left-5 border border-outline-variant/20 bg-surface-container-lowest/90 p-4 sm:p-5 shadow-md backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
@@ -139,7 +139,7 @@
 					<img
 						src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&h=180&auto=format&fit=crop&q=80"
 						alt="Coffee bean collection"
-						class="h-40 w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+						class="h-40 w-full object-cover transition-all duration-500 group-hover:scale-105"
 					/>
 				</div>
 			</a>

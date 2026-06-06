@@ -3,6 +3,7 @@
 	import { reveal } from '$lib/actions/reveal';
 	import { showToast } from '$lib/stores/toast';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+	import BeanImage from '$lib/components/BeanImage.svelte';
 
 	let filterOpen = $state(false);
 	let filterQuery = $state('');
@@ -306,7 +307,7 @@
 				{#each [a, b] as shot, idx}
 					<div class="relative rounded-xl border {(idx === 0 && aWins) || (idx === 1 && bWins) ? 'border-crema-gold/40 bg-crema-gold/5' : 'border-primary/5 bg-surface-container-low'} p-4">
 						<div class="flex items-center gap-3 mb-2">
-							<img src={shot.img} alt={shot.bean} class="h-10 w-10 rounded-lg object-cover" />
+							<BeanImage src={shot.img} alt={shot.bean} class="h-10 w-10 rounded-lg object-cover" />
 							<div class="min-w-0">
 								<p class="text-label-sm font-semibold truncate">{shot.bean}</p>
 								<p class="text-label-caps text-on-surface-variant/50">{shot.date}</p>
@@ -494,10 +495,10 @@
 									<!-- Left: image + info -->
 									<div class="flex min-w-[200px] flex-1 items-center gap-6">
 										<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container">
-											<img
+											<BeanImage
 												src={shot.img}
 												alt={shot.bean}
-												class="h-full w-full object-cover transition-all duration-500 {isExpanded ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'}"
+												class="h-full w-full object-cover transition-all duration-500 {isExpanded ? 'scale-105' : 'group-hover:scale-105'}"
 											/>
 										</div>
 										<div>

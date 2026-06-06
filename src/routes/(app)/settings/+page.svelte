@@ -316,34 +316,6 @@
 									></span>
 								</button>
 							</div>
-
-							<!-- Theme preview -->
-							<div class="grid grid-cols-2 gap-3">
-								<button
-									onclick={() => darkMode.set(false)}
-									class="group relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all {!$darkMode ? 'border-crema-gold' : 'border-outline-variant/20 hover:border-outline-variant/50'}"
-								>
-									<div class="mb-3 h-16 rounded-lg bg-[#fbf9f4] border border-[#e4e2dd]"></div>
-									<div class="flex items-center justify-between">
-										<span class="text-label-sm uppercase tracking-widest text-on-surface">Light</span>
-										{#if !$darkMode}
-											<span class="material-symbols-outlined text-[16px] text-crema-gold">check_circle</span>
-										{/if}
-									</div>
-								</button>
-								<button
-									onclick={() => darkMode.set(true)}
-									class="group relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all {$darkMode ? 'border-crema-gold' : 'border-outline-variant/20 hover:border-outline-variant/50'}"
-								>
-									<div class="mb-3 h-16 rounded-lg bg-[#1a0c08] border border-[#3e1f18]"></div>
-									<div class="flex items-center justify-between">
-										<span class="text-label-sm uppercase tracking-widest text-on-surface">Dark</span>
-										{#if $darkMode}
-											<span class="material-symbols-outlined text-[16px] text-crema-gold">check_circle</span>
-										{/if}
-									</div>
-								</button>
-							</div>
 						</div>
 					</div>
 

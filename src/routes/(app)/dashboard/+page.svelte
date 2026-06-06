@@ -3,6 +3,7 @@
 	import { beans } from '$lib/stores/beans';
 	import { reveal } from '$lib/actions/reveal';
 	import { goto } from '$app/navigation';
+	import BeanImage from '$lib/components/BeanImage.svelte';
 
 	// ── Real counts from stores ──
 	const totalShots = $derived($shots.length);
@@ -192,7 +193,7 @@
 				<img
 					src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&h=500&auto=format&fit=crop&q=80"
 					alt="Coffee bloom macro"
-					class="absolute inset-0 h-full w-full object-cover opacity-20 grayscale transition-all duration-500 group-hover:opacity-35 group-hover:grayscale-0 group-hover:scale-105"
+					class="absolute inset-0 h-full w-full object-cover opacity-20 transition-all duration-500 group-hover:opacity-30 group-hover:scale-105"
 				/>
 				<div class="relative z-10 flex h-full flex-col p-8">
 					<span class="material-symbols-outlined mb-5 text-[32px] text-crema-gold transition-transform duration-500 group-hover:rotate-12">coffee_maker</span>
@@ -248,10 +249,10 @@
 							class="group flex items-center gap-6 rounded-xl border border-primary/5 bg-surface p-5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-surface-container-low hover:shadow-md"
 						>
 							<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container-high">
-								<img
+								<BeanImage
 									src={ritual.img}
 									alt={ritual.name}
-									class="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-110 group-hover:grayscale-0"
+									class="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
 								/>
 							</div>
 							<div class="flex-1">

@@ -4,6 +4,7 @@
 	import { shots } from '$lib/stores/shots';
 	import { showToast } from '$lib/stores/toast';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+	import BeanImage from '$lib/components/BeanImage.svelte';
 	import QRCode from 'qrcode';
 	import { browser } from '$app/environment';
 
@@ -654,8 +655,8 @@
 					use:reveal={0}
 				>
 					<div class="relative h-[240px] w-full flex-shrink-0 overflow-hidden">
-						<img src={bean.img} alt={bean.name}
-							class="h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" />
+						<BeanImage src={bean.img} alt={bean.name}
+							class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105" />
 						<div class="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-bean-floral/75 px-3 py-1 backdrop-blur-sm">
 							<span class="material-symbols-outlined text-[12px]" style="color:{freshness.color};font-variation-settings:'FILL' 1">{freshness.icon}</span>
 							<span class="text-label-caps text-white">{freshness.label}</span>
