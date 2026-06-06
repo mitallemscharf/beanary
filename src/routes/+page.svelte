@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
-	import { showToast } from '$lib/stores/toast';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 </script>
 
 <svelte:head>
@@ -18,26 +20,29 @@
 				Beanery
 			</a>
 			<nav class="hidden items-center gap-7 md:flex">
-				<a href="/dashboard" class="text-label-sm border-b-2 border-crema-gold pb-0.5 text-crema-gold">Lab</a>
-				<a href="/history" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Journal</a>
-				<button onclick={() => showToast('Roasteries directory coming soon', 'store')} class="text-label-sm text-on-surface-variant/50 transition-colors hover:text-on-surface-variant cursor-not-allowed">Roasteries</button>
+				<a href="/guides" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Guides</a>
+				<a href="/glossar" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold">Glossar</a>
 			</nav>
 		</div>
 		<div class="flex items-center gap-3">
-			<div class="relative hidden md:block">
-				<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
-				<input
-					type="text"
-					placeholder="Explore extractions..."
-					class="text-body-md w-60 rounded-full border-none bg-surface-container py-2.5 pl-10 pr-5 text-[13px] outline-none ring-0 transition-all duration-300 focus:ring-1 focus:ring-crema-gold/60 hover:bg-surface-container-high"
-				/>
-			</div>
-			<button onclick={() => showToast('No new notifications', 'notifications')} class="rounded-full p-2.5 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-crema-gold active:scale-95">
-				<span class="material-symbols-outlined text-[22px]">notifications</span>
-			</button>
-			<a href="/dashboard" class="rounded-full p-2.5 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-crema-gold active:scale-95">
-				<span class="material-symbols-outlined text-[22px]">account_circle</span>
-			</a>
+			{#if data.user}
+				<a
+					href="/dashboard"
+					class="text-label-caps inline-block rounded-full bg-primary px-6 py-2.5 text-white uppercase tracking-widest shadow-sm transition-all duration-500 hover:-translate-y-0.5 hover:bg-crema-gold hover:shadow-lg active:scale-95"
+				>
+					Go to App
+				</a>
+			{:else}
+				<a href="/login" class="text-label-sm text-on-surface-variant transition-colors hover:text-crema-gold hidden md:block">
+					Log In
+				</a>
+				<a
+					href="/register"
+					class="text-label-caps inline-block rounded-full bg-primary px-6 py-2.5 text-white uppercase tracking-widest shadow-sm transition-all duration-500 hover:-translate-y-0.5 hover:bg-crema-gold hover:shadow-lg active:scale-95"
+				>
+					Get Started
+				</a>
+			{/if}
 		</div>
 	</div>
 </header>
@@ -56,13 +61,28 @@
 				Elevate your daily brew through the precision of coffee science. Track every gram, second,
 				and degree to find your perfect cup.
 			</p>
-			<div class="pt-2">
-				<a
-					href="/dashboard"
-					class="text-label-caps inline-block rounded-full bg-primary px-10 py-4 text-white uppercase tracking-widest shadow-sm transition-all duration-500 hover:-translate-y-1 hover:bg-crema-gold hover:shadow-lg active:scale-95"
-				>
-					Enter the Laboratory
-				</a>
+			<div class="flex flex-col gap-3 pt-2 sm:flex-row">
+				{#if data.user}
+					<a
+						href="/dashboard"
+						class="text-label-caps inline-block rounded-full bg-primary px-10 py-4 text-white uppercase tracking-widest shadow-sm transition-all duration-500 hover:-translate-y-1 hover:bg-crema-gold hover:shadow-lg active:scale-95"
+					>
+						Go to App
+					</a>
+				{:else}
+					<a
+						href="/login"
+						class="text-label-caps inline-block rounded-full bg-primary px-10 py-4 text-white uppercase tracking-widest shadow-sm transition-all duration-500 hover:-translate-y-1 hover:bg-crema-gold hover:shadow-lg active:scale-95"
+					>
+						Enter the Laboratory
+					</a>
+					<a
+						href="/register"
+						class="text-label-caps inline-block rounded-full border border-primary/20 px-10 py-4 text-primary uppercase tracking-widest transition-all duration-500 hover:-translate-y-1 hover:border-crema-gold hover:text-crema-gold hover:shadow-lg active:scale-95"
+					>
+						Get Started Free
+					</a>
+				{/if}
 			</div>
 		</div>
 
