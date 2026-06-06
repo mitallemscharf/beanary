@@ -160,27 +160,72 @@ Aufgabe 2: «Sie haben heute Morgen einen Espresso gebrüht: 18g Kaffeemehl, 36g
 
 Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertungen erhalten hat.»
 
-**Kennzahlen & Beobachtungen:**
+---
 
-| Issue | Testperson | Schweregrad (0–4) |
-|-------|------------|-------------------|
-| Kein Login/Register als Einstieg | Beide | 3 |
-| Edit-Button bei Bohnen nicht funktionsfähig | Metehan Altay | 3 |
-| Keine Logout-Funktion | Subraj Singh | 3 |
-| Lag bei Grind-Size-Pfeilen | Metehan Altay | 2 |
-| Shot Logger zu viele Optionen für Einsteiger | Subraj Singh | 2 |
-| Support-Funktion nicht implementiert | Subraj Singh | 1 |
+#### Feedback Grid
 
-Positives Feedback: Farbpalette, Dashboard-Übersichtlichkeit, Bean Library, Shot History wurden explizit gelobt.
+**Feedback Grid — Metehan Altay**
 
-**Zusammenfassung:** Die App wurde grundsätzlich sehr positiv aufgenommen. Grösste Issues: fehlendes Auth-System und nicht funktionierende Edit-Buttons. Für Nicht-Kaffee-Experten waren einige Fachbegriffe unklar.
+| ✅ Was hat gut funktioniert? | ❌ Was hat nicht funktioniert? |
+|---|---|
+| Farbpalette sehr ansprechend | Edit-Button bei Bohnen nicht klickbar |
+| Navigation zwischen Seiten klar | Grind Size Pfeile laggen |
+| Bean Library übersichtlich | Kein Login/Register Fenster |
+| Shot History gut strukturiert | Keine Logout Funktion |
 
-**Abgeleitete Verbesserungen:**
-1. Login/Register implementieren — hohe Priorität → umgesetzt (Kap. 4.1)
-2. Edit-Button fixen — hohe Priorität → umgesetzt
-3. Logout hinzufügen — hohe Priorität → umgesetzt (Kap. 4.1)
-4. Tooltips im Shot Logger — mittlere Priorität → umgesetzt
-5. Grind Size Lag beheben — mittlere Priorität → umgesetzt
+| 💡 Neue Ideen | ❓ Was war unklar? |
+|---|---|
+| Login/Register als Einstieg | Bedeutung von "Precision 98%" |
+| Onboarding für Anfänger | Unterschied Journal vs History |
+
+**Feedback Grid — Subraj Singh**
+
+| ✅ Was hat gut funktioniert? | ❌ Was hat nicht funktioniert? |
+|---|---|
+| Farbpalette passt sehr gut | Support Funktion nicht vorhanden |
+| Dashboard übersichtlich | Keine Logout Funktion |
+| Shot History klar gestaltet | Kein Login/Register Fenster |
+| Bean Library Auswahl gross | |
+| Einstellungsseite einfach | |
+
+| 💡 Neue Ideen | ❓ Was war unklar? |
+|---|---|
+| Anmeldefenster vor App-Zugriff | Zu viele Optionen im Shot Logger |
+| Abmeldefunktion hinzufügen | Fachbegriffe (Dose, Yield, TDS) |
+
+---
+
+#### Visuelle Issue Map
+
+| Arbeitsschritt | Fragestellung | Metehan Altay | Subraj Singh |
+|---|---|---|---|
+| **Login/Einstieg** | Ist der Einstieg klar? | ❌ Kein Login-Fenster (Schweregrad 3) | ❌ Kein Login-Fenster (Schweregrad 3) |
+| **Shot Logger** | Sind alle Felder verständlich? | ⚠️ Grind Size Lag (Schweregrad 2) | ⚠️ Zu komplex für Einsteiger (Schweregrad 2) |
+| **Bean Library** | Kann man Bohnen bearbeiten? | ❌ Edit-Button defekt (Schweregrad 3) | ✅ Kein Problem |
+| **Navigation** | Ist die Navigation klar? | ✅ Kein Problem | ⚠️ Support-Link tot (Schweregrad 1) |
+| **Account** | Gibt es Logout? | ❌ Kein Logout (Schweregrad 3) | ❌ Kein Logout (Schweregrad 3) |
+
+**Schweregrad-Legende:**
+- 0 = Kein Problem
+- 1 = Kosmetisch
+- 2 = Kleines Problem
+- 3 = Grosses Problem — hohe Priorität
+- 4 = Katastrophe
+
+---
+
+#### Umgesetzte Verbesserungen
+
+| Issue | Schweregrad | Status | Umsetzung |
+|---|---|---|---|
+| Kein Login/Register | 3 | ✅ Behoben | Vollständiges Auth-System mit JWT |
+| Kein Logout | 3 | ✅ Behoben | Logout Button in Sidebar |
+| Edit-Button defekt | 3 | ✅ Behoben | Slide-in Drawer mit vorausgefülltem Formular |
+| Grind Size Lag | 2 | ✅ Behoben | Performance-Optimierung |
+| Shot Logger zu komplex | 2 | ✅ Behoben | Adaptives UI für Beginner |
+| Support-Link tot | 1 | ✅ Behoben | Support-Seite implementiert |
+
+**Zusammenfassung:** Die App wurde grundsätzlich sehr positiv aufgenommen. Grösste Issues: fehlendes Auth-System und nicht funktionierende Edit-Buttons. Für Nicht-Kaffee-Experten waren einige Fachbegriffe unklar. Alle Issues mit Schweregrad ≥ 1 wurden umgesetzt.
 
 ---
 
