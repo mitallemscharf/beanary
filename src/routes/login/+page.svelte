@@ -26,7 +26,7 @@
 				return;
 			}
 
-			goto('/');
+			goto('/dashboard');
 		} catch {
 			error = 'Connection error — please try again.';
 		} finally {
