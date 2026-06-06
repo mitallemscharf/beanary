@@ -179,6 +179,7 @@ Im Rahmen der Sketch-Phase wurde die Crazy-8s-Methode angewendet, um 8 verschied
 ### 3.3 Decide
 
 - **Gewählte Variante & Begründung:** Variante B — «Editorial Minimalism mit Tactile Accents». Entscheidungskriterien: Markenfit (Premium-Gefühl), Usability (klare Hierarchie), technische Machbarkeit.
+- **Mockup:** https://www.figma.com/design/tw5wstCGf1QVRyN42YP6GH/Beanary-App
 - **End-to-End-Ablauf:**
   1. Nutzer landet auf Home Page → motiviert durch cineastische Fotografie und klare Value Proposition
   2. Login/Register → persönliches Laboratory
@@ -220,6 +221,27 @@ flowchart TD
 ### 3.4 Prototype
 
 #### 3.4.1. Entwurf (Design)
+
+**Informationsarchitektur:**
+
+```
+/ (Landing Page — öffentlich)
+├── /login
+├── /register
+├── /guides          (öffentlich)
+├── /glossar         (öffentlich)
+└── /(app)           (geschützt — Login erforderlich)
+    ├── /dashboard
+    ├── /shot-logger
+    ├── /history
+    ├── /library
+    ├── /profile
+    ├── /leaderboard
+    ├── /settings
+    └── /admin       (nur Admin)
+```
+
+Navigation: Desktop — fixe Sidebar mit Logo, Hauptnavigation, Nutzer-Bereich. Mobile — ausgeblendete Sidebar, Bottom Navigation Bar mit 5 Tabs.
 
 **Designentscheidungen:**
 - **Farbpalette:** Warm Paper-White (#FBF9F4) als Background, Crema Gold (#C5A059) als Akzent, Dunkelbraun (#1B1C19) für Text
@@ -312,6 +334,43 @@ flowchart TD
 - **Shot:** beanId (ref Bean), bean, dose, grindSize, time, yield, brewRatio, temp, rating, flavorTags, notes, process, roast, userId, createdAt
 
 **Deployment:** https://beanery-lenny.netlify.app
+
+**Struktur & Komponenten:**
+
+```
+src/
+├── routes/
+│   ├── +page.svelte              # Landing Page
+│   ├── login/                    # Auth-Seiten
+│   ├── register/
+│   ├── guides/ & glossar/        # Öffentliche Inhalte
+│   ├── (app)/                    # Geschützte App-Seiten
+│   │   ├── +layout.svelte        # Sidebar + Bottom Nav
+│   │   ├── dashboard/
+│   │   ├── shot-logger/
+│   │   ├── history/
+│   │   ├── library/
+│   │   ├── profile/
+│   │   ├── leaderboard/
+│   │   ├── settings/
+│   │   └── admin/
+│   └── api/                      # Serverless API Routes
+│       ├── auth/                 # Login / Register / Logout
+│       ├── beans/                # CRUD Bohnen
+│       ├── shots/                # CRUD Shots
+│       ├── users/                # Profil / Passwort
+│       ├── leaderboard/
+│       └── admin/                # Admin Stats
+├── lib/
+│   ├── server/
+│   │   ├── auth.ts               # JWT sign/verify
+│   │   ├── db.ts                 # MongoDB connect
+│   │   ├── gamification.ts       # XP + Badges
+│   │   └── models/               # User, Bean, Shot (Mongoose)
+│   ├── stores/                   # Svelte Runes Stores
+│   └── actions/                  # reveal.ts (scroll animation)
+└── hooks.server.ts               # Auth Guard + Routing
+```
 
 **Besondere Entscheidungen:**
 - adapter-netlify statt adapter-auto — notwendig damit API-Routes als Serverless Functions deployed werden
@@ -437,6 +496,7 @@ Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertung
 
 - **Beschreibung & Nutzen:** SVG-Rad mit 8 Kategorien (Fruity, Floral, Sweet, Nutty, Chocolatey, Roasted, Spicy, Sour). Klick auf Segment öffnet Sub-Flavors als wählbare Pills. Gewählte Flavors werden automatisch in die Shot-Notizen übernommen.
 - **Wo umgesetzt:** Frontend: SVG mit polaren Koordinaten im Shot Logger.
+- **Referenz:** Screenshot 09-shot-logger.png
 - **Aus Evaluation abgeleitet?:** Nein.
 
 ### 4.5 Automatische Freshness-Berechnung
@@ -457,18 +517,21 @@ Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertung
 
 - **Beschreibung & Nutzen:** Light/Dark Mode umschaltbar. Präferenz in localStorage gespeichert. CSS Custom Properties schalten auf warme Dunkelbraun-Palette.
 - **Wo umgesetzt:** Frontend: Toggle in Sidebar und Settings → Appearance. Store: `src/lib/stores/theme.ts`.
+- **Referenz:** Screenshot 17-settings.png
 - **Aus Evaluation abgeleitet?:** Nein.
 
 ### 4.8 Mobile Responsive Design
 
 - **Beschreibung & Nutzen:** Vollständige Mobile-Optimierung (375px). Sidebar wird auf Mobile zu einer Bottom Navigation mit 5 Tabs. Touch-Targets mindestens 48px.
 - **Wo umgesetzt:** Frontend: Tailwind Responsive Prefixes (`md:`, `sm:`), Bottom Navigation Komponente im App-Layout.
+- **Referenz:** Screenshot 19-mobile.png
 - **Aus Evaluation abgeleitet?:** Nein.
 
 ### 4.9 Export CSV
 
 - **Beschreibung & Nutzen:** Shot History als CSV exportierbar mit allen Feldern (Bean, Dose, Yield, Time, Temp, Rating, Date, Notes).
 - **Wo umgesetzt:** Frontend: Export-Button in History und Settings → Data.
+- **Referenz:** Screenshot 11-shot-history.png, Screenshot 17-settings.png
 - **Aus Evaluation abgeleitet?:** Nein.
 
 ---
@@ -477,10 +540,12 @@ Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertung
 
 - **Repository:** https://github.com/mitallemscharf/beanery
 - **Deployment:** https://beanery-lenny.netlify.app
-- **Figma:** https://www.figma.com/design/tw5wstCGf1QVRyN42YP6GH/Beanary-App
+- **Figma:** https://www.figma.com/design/tw5wstCGf1QVRyN42YP6GH/Beanery-App
 - **Commits:** Präfix feat/fix/docs/backup mit sprechenden Messages
 - **Branches:** main (Produktion), feature/authentication (gemergt)
 - **Collaborators:** mmeisterhans, bkuehnis
+- **GitHub Issues:** 13 Issues erstellt (#1–#13), kategorisiert mit Labels (feat, fix, docs)
+- **Milestones:** v1.0 — Minimum Requirements, v2.0 — Extensions & Bonus Features
 
 ---
 
