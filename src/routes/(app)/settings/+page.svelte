@@ -232,13 +232,13 @@
 	}
 
 	const sections = [
-		{ label: 'Profile',       icon: 'account_circle' },
-		{ label: 'Account',       icon: 'manage_accounts' },
-		{ label: 'Experience',    icon: 'school' },
-		{ label: 'Extraction',    icon: 'science' },
-		{ label: 'Notifications', icon: 'notifications' },
-		{ label: 'Appearance',    icon: 'palette' },
-		{ label: 'Data',          icon: 'database' }
+		{ label: 'Profile',        icon: 'account_circle' },
+		{ label: 'Experience',     icon: 'school' },
+		{ label: 'Extraction',     icon: 'science' },
+		{ label: 'Notifications',  icon: 'notifications' },
+		{ label: 'Appearance',     icon: 'palette' },
+		{ label: 'Data',           icon: 'database' },
+		{ label: 'Delete Account', icon: 'delete_forever' }
 	];
 	let activeSection = $state('Profile');
 </script>
@@ -310,7 +310,7 @@
 
 								<!-- Email — read-only -->
 								<div>
-									<p class="text-label-sm mb-2 block text-on-surface-variant uppercase">Email — cannot be changed</p>
+									<p class="text-label-sm mb-2 block text-on-surface-variant uppercase">Email</p>
 									<div class="flex max-w-md items-center gap-3 rounded-lg border border-outline-variant/20 bg-surface-container p-4 opacity-60">
 										<span class="material-symbols-outlined text-[18px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0, 'wght' 300">lock</span>
 										<span class="text-body-md text-on-surface-variant">{user?.email ?? ''}</span>
@@ -380,7 +380,7 @@
 					</div>
 
 				<!-- ── Account ── -->
-				{:else if activeSection === 'Account'}
+				{:else if activeSection === 'Delete Account'}
 					<div class="rounded-xl border border-error/20 bg-surface-container-low p-8">
 						<div class="mb-6 flex items-center gap-3">
 							<span class="material-symbols-outlined text-[24px] text-error">warning</span>
@@ -458,9 +458,9 @@
 						<div class="space-y-8">
 							<!-- Dose -->
 							<div>
-								<label for="pref-dose" class="text-label-sm mb-3 flex items-center justify-between text-on-surface-variant uppercase">
+								<label for="pref-dose" class="text-label-sm mb-3 flex items-center gap-3 text-on-surface-variant uppercase">
 									<span>Default Dose</span>
-									<span class="text-headline-md text-crema-gold">{defaultDose}g</span>
+									<span class="rounded-full bg-crema-gold/10 px-2.5 py-0.5 font-mono text-[12px] font-semibold normal-case tracking-normal text-crema-gold">{defaultDose}g</span>
 								</label>
 								<input
 									id="pref-dose"
@@ -479,9 +479,9 @@
 
 							<!-- Yield -->
 							<div>
-								<label for="pref-yield" class="text-label-sm mb-3 flex items-center justify-between text-on-surface-variant uppercase">
+								<label for="pref-yield" class="text-label-sm mb-3 flex items-center gap-3 text-on-surface-variant uppercase">
 									<span>Default Yield</span>
-									<span class="text-headline-md text-crema-gold">{defaultYield}g</span>
+									<span class="rounded-full bg-crema-gold/10 px-2.5 py-0.5 font-mono text-[12px] font-semibold normal-case tracking-normal text-crema-gold">{defaultYield}g</span>
 								</label>
 								<input
 									id="pref-yield"
@@ -500,9 +500,9 @@
 
 							<!-- Grind -->
 							<div>
-								<label for="pref-grind" class="text-label-sm mb-3 flex items-center justify-between text-on-surface-variant uppercase">
+								<label for="pref-grind" class="text-label-sm mb-3 flex items-center gap-3 text-on-surface-variant uppercase">
 									<span>Default Grind Size</span>
-									<span class="text-headline-md text-crema-gold">{defaultGrind} clicks</span>
+									<span class="rounded-full bg-crema-gold/10 px-2.5 py-0.5 font-mono text-[12px] font-semibold normal-case tracking-normal text-crema-gold">{defaultGrind} clicks</span>
 								</label>
 								<input
 									id="pref-grind"
@@ -521,9 +521,9 @@
 
 							<!-- Temperature -->
 							<div>
-								<label for="pref-temp" class="text-label-sm mb-3 flex items-center justify-between text-on-surface-variant uppercase">
+								<label for="pref-temp" class="text-label-sm mb-3 flex items-center gap-3 text-on-surface-variant uppercase">
 									<span>Default Water Temperature</span>
-									<span class="text-headline-md text-crema-gold">{defaultTemp}°C</span>
+									<span class="rounded-full bg-crema-gold/10 px-2.5 py-0.5 font-mono text-[12px] font-semibold normal-case tracking-normal text-crema-gold">{defaultTemp}°C</span>
 								</label>
 								<input
 									id="pref-temp"

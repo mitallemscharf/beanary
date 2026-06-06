@@ -284,7 +284,7 @@
 								<div class="flex gap-0.5">
 									{#each stars(ritual.rating) as filled}
 										<span
-											class="material-symbols-outlined text-crema-gold text-[16px]"
+											class="material-symbols-outlined text-[16px] {filled ? 'text-crema-gold' : 'text-outline-variant/40'}"
 											style="font-variation-settings: 'FILL' {filled ? 1 : 0}, 'wght' 300"
 										>star</span>
 									{/each}
