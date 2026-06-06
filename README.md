@@ -511,29 +511,56 @@ KI-Tools haben die Entwicklungsgeschwindigkeit erheblich erhöht. Grenzen: In ei
 
 ---
 
-## 7. Anhang
+## 7. Anhang [Optional]
 
-- **Bilder:** Pexels.com, Unsplash.com (kostenlos, lizenzfrei)
-- **Icons:** Material Symbols (Google)
-- **Fonts:** Libre Caslon Text, Hanken Grotesk (Google Fonts)
-- **Testpersonen:** Metehan Altay, Subraj Singh (TZBISa, 20. Mai 2026)
-- **Design-Inspiration:** Sweetgreen App (mobbin.com), MUBI Go App (mobbin.com)
+### Quellen & Ressourcen
 
-**Quellen & Lizenzen:**
-- Google Fonts (Libre Caslon Text, Hanken Grotesk, JetBrains Mono) — SIL Open Font License
-- Material Symbols — Apache 2.0 License
-- Unsplash / Pexels (Bildmaterial) — kostenlose Nutzung für Demos
-- SvelteKit — MIT License
-- Tailwind CSS — MIT License
-- Mongoose — MIT License
-- bcrypt — MIT License
+**Bilder & Medien:**
+| Quelle | Lizenz | Verwendung |
+|--------|--------|------------|
+| Pexels.com | Kostenlos, lizenzfrei (Pexels Lizenz) | Kaffeebilder auf Landing Page und Bean Cards |
+| Unsplash.com | Kostenlos, lizenzfrei (Unsplash Lizenz) | Bohnenbilder in der Bean Library |
 
-**Entwicklungsstart:**
+**Schriften:**
+| Font | Quelle | Lizenz |
+|------|--------|--------|
+| Libre Caslon Text | Google Fonts | SIL Open Font License |
+| Hanken Grotesk | Google Fonts | SIL Open Font License |
 
-```bash
-cd beanery-app
-npm install
-npm run dev
-```
+**Icons:**
+| Icon Set | Quelle | Lizenz |
+|----------|--------|--------|
+| Material Symbols | Google Fonts | Apache License 2.0 |
 
-App läuft auf `http://localhost:5173`
+**Libraries & Tools:**
+| Tool/Library | Verwendung | Lizenz |
+|-------------|------------|--------|
+| SvelteKit | Frontend Framework | MIT |
+| MongoDB / Mongoose | Datenbank | Apache 2.0 / MIT |
+| bcrypt | Passwort-Hashing | MIT |
+| jsonwebtoken | JWT Authentication | MIT |
+| Playwright | Automatische Screenshots | Apache 2.0 |
+
+**KI-Tools (siehe auch Kapitel 6):**
+| Tool | Verwendung |
+|------|------------|
+| Claude Code (Anthropic) | Gesamte App-Entwicklung |
+| Claude.ai (Anthropic) | Planung, Prompts, README |
+| Google Stitch | UI/Design-Generierung |
+
+**Design-Inspiration:**
+| Quelle | URL |
+|--------|-----|
+| Sweetgreen App | mobbin.com/apps/sweetgreen-ios |
+| MUBI Go App | mobbin.com/apps/mubi-go-ios |
+
+**Testpersonen Evaluation:**
+- Metehan Altay — Mitstudierender TZBISa, ZHAW
+- Subraj Singh — Mitstudierender TZBISa, ZHAW
+- Datum: 20. Mai 2026, ZHAW Winterthur
+
+**Links:**
+- GitHub Repository: https://github.com/mitallemscharf/beanery
+- Netlify Deployment: https://beanery-lenny.netlify.app
+- Figma Mockup: https://www.figma.com/design/tw5wstCGf1QVRyN42YP6GH/Beanery-App
+- Crazy 8s Skizzen: [crazy8s.pdf](crazy8s.pdf)
