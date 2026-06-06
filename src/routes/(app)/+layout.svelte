@@ -311,14 +311,15 @@
 				<span class="material-symbols-outlined text-[22px]">notifications</span>
 			</button>
 
-			<!-- Settings — desktop only -->
-			<button
-				onclick={() => goto('/settings')}
-				class="hidden rounded-full p-2.5 transition-all duration-200 hover:bg-surface-container-high active:scale-95 md:flex {$page.url.pathname === '/settings' ? 'text-crema-gold' : 'text-on-surface-variant hover:text-crema-gold'}"
-				aria-label="Account settings"
+			<!-- Profile — desktop only -->
+			<a
+				href="/profile"
+				class="hidden rounded-full p-2.5 transition-all duration-200 hover:bg-surface-container-high active:scale-95 md:flex {$page.url.pathname === '/profile' ? 'text-crema-gold' : 'text-on-surface-variant hover:text-crema-gold'}"
+				aria-label="My profile"
+				data-sveltekit-reload
 			>
 				<span class="material-symbols-outlined text-[22px]">account_circle</span>
-			</button>
+			</a>
 
 			<!-- Hamburger — mobile only -->
 			<button
