@@ -88,11 +88,13 @@
 	const machineType = $derived(data.user?.machineType ?? 'espresso_semi');
 	const isBeginner = $derived(skillLevel === 'beginner');
 	const isExpert   = $derived(skillLevel === 'expert');
-	const isEspresso  = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
-	const isPourOver  = $derived(machineType === 'pour_over');
-	const isAeropress = $derived(machineType === 'aeropress');
-	const isMokaPot   = $derived(machineType === 'moka_pot');
-	const isImmersion = $derived(machineType === 'french_press' || machineType === 'aeropress');
+	const isEspresso   = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
+	const isPourOver   = $derived(machineType === 'pour_over');
+	const isAeropress  = $derived(machineType === 'aeropress');
+	const isMokaPot    = $derived(machineType === 'moka_pot');
+	const isFrenchPress = $derived(machineType === 'french_press');
+	const isColdBrew   = $derived(machineType === 'cold_brew');
+	const isImmersion  = $derived(machineType === 'french_press' || machineType === 'aeropress');
 
 	const MACHINE_NAMES: Record<string, string> = {
 		espresso_semi: 'Espresso (Semi-Auto)', espresso_auto: 'Espresso (Auto/Smart)',
@@ -117,16 +119,19 @@
 	let yieldG = $state(36);
 	let time = $state(30);
 	let temp = $state(94);
-	let grind = $state('');
+	let grind = $state(15);
 	let notes = $state('');
 	let rating = $state(4);
 	let saving = $state(false);
 	let validationError = $state('');
 
-	// Expert-only extra fields
+	// Extra fields (machine-specific)
 	let pressure = $state(9);
 	let bloomTime = $state(30);
+	let bloomWater = $state(60);
 	let steepTime = $state(240);
+	let pressureStyle = $state<'standard' | 'inverted'>('standard');
+	let heatLevel = $state<'low' | 'medium' | 'high'>('medium');
 
 	const ratio = $derived(dose > 0 ? (yieldG / dose).toFixed(1) : '0.0');
 	const ratioNum = $derived(dose > 0 ? yieldG / dose : 0);
@@ -263,9 +268,10 @@
 							</div>
 						</div>
 
-						<!-- Yield -->
+						<!-- Yield (hidden for Moka Pot) -->
+						{#if !isMokaPot}
 						<div>
-							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="yield">{isPourOver ? 'Pour (g)' : isMokaPot ? 'Output (g)' : 'Yield (g)'}</label>
+							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="yield">{isAeropress ? 'Water (g)' : isPourOver ? 'Pour (g)' : 'Yield (g)'}</label>
 							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 								<input id="yield" type="number" step="0.1" bind:value={yieldG} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
 								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">g</span>
@@ -275,32 +281,39 @@
 								</div>
 							</div>
 						</div>
+						{/if}
 
 						<!-- Time -->
 						<div>
-							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">{isImmersion ? 'Steep (s)' : isPourOver ? 'Total (s)' : 'Time (s)'}</label>
+							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">{isColdBrew ? 'Steep (h)' : isFrenchPress ? 'Steep (min)' : isAeropress ? 'Steep (s)' : isPourOver ? 'Total (s)' : 'Time (s)'}</label>
 							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
-								<input id="time" type="number" bind:value={time} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">s</span>
+								<input id="time" type="number" min={isColdBrew ? 8 : 1} max={isColdBrew ? 24 : undefined} bind:value={time} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">{isColdBrew ? 'h' : isFrenchPress ? 'min' : 's'}</span>
 								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
-									<button type="button" onclick={() => time = time + 1} aria-label="Increase time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
-									<button type="button" onclick={() => time = Math.max(1, time - 1)} aria-label="Decrease time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
+									<button type="button" onclick={() => time = isColdBrew ? Math.min(24, time + 1) : time + 1} aria-label="Increase time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
+									<button type="button" onclick={() => time = isColdBrew ? Math.max(8, time - 1) : Math.max(1, time - 1)} aria-label="Decrease time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
 								</div>
 							</div>
 						</div>
 
-						<!-- Grind Size — always visible, same style -->
+						<!-- Grind Size -->
 						<div>
 							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind</label>
 							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
-								<input id="grind" type="text" bind:value={grind} placeholder="e.g. 2.4"
-									class="text-body-md w-full bg-transparent py-4 pl-5 pr-10 outline-none" />
-								<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant/20">tune</span>
+								<input id="grind" type="number" min="1" max="40" step="0.5" bind:value={grind}
+									class="text-body-md w-full bg-transparent py-4 pl-5 pr-[5rem] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-[9px] font-semibold uppercase tracking-wide text-on-surface-variant/30">clicks</span>
+								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
+									<button type="button" onclick={() => grind = Math.min(40, Math.round((grind + 0.5) * 2) / 2)} aria-label="Increase grind size" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
+									<button type="button" onclick={() => grind = Math.max(1, Math.round((grind - 0.5) * 2) / 2)} aria-label="Decrease grind size" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
+								</div>
 							</div>
 						</div>
 					</div>
 
 					<!-- Machine-specific extra fields -->
+
+					<!-- Pour Over: Bloom Time + Bloom Water -->
 					{#if isPourOver}
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<div>
@@ -315,14 +328,27 @@
 									</div>
 								</div>
 							</div>
+							<div>
+								<label for="bloom-water" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Bloom Water (g)</label>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">~2× dose weight to saturate grounds</p>
+								<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+									<input id="bloom-water" type="number" step="5" bind:value={bloomWater} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">g</span>
+									<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
+										<button type="button" onclick={() => bloomWater = bloomWater + 5} aria-label="Increase bloom water" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
+										<button type="button" onclick={() => bloomWater = Math.max(10, bloomWater - 5)} aria-label="Decrease bloom water" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
+									</div>
+								</div>
+							</div>
 						</div>
 					{/if}
 
-					{#if isAeropress || (isEspresso && (showAdvanced || isExpert))}
+					<!-- Espresso: Pressure (advanced/expert only) -->
+					{#if isEspresso && (showAdvanced || isExpert)}
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<div>
 								<label for="pressure" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Pressure (bar)</label>
-								<p class="text-label-caps mb-2 text-on-surface-variant/40">{isAeropress ? 'Pressing pressure' : 'Extraction pressure — standard 9 bar'}</p>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Extraction pressure — standard 9 bar</p>
 								<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 									<input id="pressure" type="number" bind:value={pressure} class="text-body-md w-full bg-transparent py-4 pl-5 pr-16 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
 									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">bar</span>
@@ -331,6 +357,54 @@
 										<button type="button" onclick={() => pressure = Math.max(1, pressure - 1)} aria-label="Decrease pressure" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
 									</div>
 								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- AeroPress: Pressure + Standard/Inverted toggle -->
+					{#if isAeropress}
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<div>
+								<label for="aero-pressure" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Pressure (bar)</label>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Pressing force (0.5–2 bar typical)</p>
+								<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+									<input id="aero-pressure" type="number" bind:value={pressure} class="text-body-md w-full bg-transparent py-4 pl-5 pr-16 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">bar</span>
+									<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
+										<button type="button" onclick={() => pressure = pressure + 1} aria-label="Increase pressure" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
+										<button type="button" onclick={() => pressure = Math.max(1, pressure - 1)} aria-label="Decrease pressure" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
+									</div>
+								</div>
+							</div>
+							<div>
+								<p class="text-label-sm mb-1 block text-on-surface-variant uppercase">Brew Style</p>
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Standard or inverted method</p>
+								<div class="flex gap-2">
+									<button type="button" onclick={() => pressureStyle = 'standard'}
+										class="flex-1 rounded-xl border py-3 text-label-sm uppercase transition-all {pressureStyle === 'standard' ? 'border-crema-gold/60 bg-crema-gold/10 text-crema-gold' : 'border-outline-variant/20 text-on-surface-variant/50 hover:border-crema-gold/30'}">
+										Standard
+									</button>
+									<button type="button" onclick={() => pressureStyle = 'inverted'}
+										class="flex-1 rounded-xl border py-3 text-label-sm uppercase transition-all {pressureStyle === 'inverted' ? 'border-crema-gold/60 bg-crema-gold/10 text-crema-gold' : 'border-outline-variant/20 text-on-surface-variant/50 hover:border-crema-gold/30'}">
+										Inverted
+									</button>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Moka Pot: Heat Level toggle -->
+					{#if isMokaPot}
+						<div>
+							<p class="text-label-sm mb-1 block text-on-surface-variant uppercase">Heat Level</p>
+							<p class="text-label-caps mb-2 text-on-surface-variant/40">Stove heat intensity</p>
+							<div class="flex gap-2">
+								{#each (['low', 'medium', 'high'] as const) as level}
+									<button type="button" onclick={() => heatLevel = level}
+										class="flex-1 rounded-xl border py-3 text-label-sm uppercase transition-all {heatLevel === level ? 'border-crema-gold/60 bg-crema-gold/10 text-crema-gold' : 'border-outline-variant/20 text-on-surface-variant/50 hover:border-crema-gold/30'}">
+										{level.charAt(0).toUpperCase() + level.slice(1)}
+									</button>
+								{/each}
 							</div>
 						</div>
 					{/if}
