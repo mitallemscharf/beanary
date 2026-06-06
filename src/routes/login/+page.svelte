@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-
 	let email = $state('');
 	let password = $state('');
 	let loading = $state(false);
@@ -26,7 +24,7 @@
 				return;
 			}
 
-			goto('/dashboard');
+			location.href = '/dashboard';
 		} catch {
 			error = 'Connection error — please try again.';
 		} finally {

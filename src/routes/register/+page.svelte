@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-
 	// Steps: 0=credentials, 1=skill, 2=machine, 3=goals
 	let step = $state(0);
 
@@ -89,7 +87,7 @@
 				error = data.message ?? 'Registration failed. Please try again.';
 				return;
 			}
-			goto('/dashboard');
+			location.href = '/dashboard';
 		} catch {
 			error = 'Connection error — please try again.';
 		} finally {
