@@ -141,14 +141,14 @@
 			<!-- ── Stat cards ── -->
 			<div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3" use:reveal={0}>
 
-				<!-- Total Users — dark card -->
-				<div class="relative overflow-hidden rounded-xl bg-primary-container p-7">
+				<!-- Total Users -->
+				<div class="relative overflow-hidden rounded-xl border border-crema-gold/20 bg-crema-gold/10 p-7">
 					<div class="absolute right-5 top-5 opacity-10">
-						<span class="material-symbols-outlined text-[64px] text-white" style="font-variation-settings: 'FILL' 1">group</span>
+						<span class="material-symbols-outlined text-[64px] text-crema-gold" style="font-variation-settings: 'FILL' 1">group</span>
 					</div>
-					<p class="text-label-caps mb-1 text-on-primary-container/60">Registered Users</p>
+					<p class="text-label-caps mb-1 text-on-surface-variant/60">Registered Users</p>
 					<p class="font-display text-[48px] font-bold leading-none text-crema-gold">{stats.totalUsers}</p>
-					<p class="text-label-sm mt-2 text-on-primary-container/50">Active accounts</p>
+					<p class="text-label-sm mt-2 text-on-surface-variant/50">Active accounts</p>
 				</div>
 
 				<!-- Total Beans -->

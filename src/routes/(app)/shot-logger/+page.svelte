@@ -88,9 +88,18 @@
 	const machineType = $derived(data.user?.machineType ?? 'espresso_semi');
 	const isBeginner = $derived(skillLevel === 'beginner');
 	const isExpert   = $derived(skillLevel === 'expert');
-	const isEspresso = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
-	const isPourOver = $derived(machineType === 'pour_over');
+	const isEspresso  = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
+	const isPourOver  = $derived(machineType === 'pour_over');
+	const isAeropress = $derived(machineType === 'aeropress');
+	const isMokaPot   = $derived(machineType === 'moka_pot');
 	const isImmersion = $derived(machineType === 'french_press' || machineType === 'aeropress');
+
+	const MACHINE_NAMES: Record<string, string> = {
+		espresso_semi: 'Espresso (Semi-Auto)', espresso_auto: 'Espresso (Auto/Smart)',
+		pour_over: 'Pour Over', aeropress: 'AeroPress', french_press: 'French Press',
+		moka_pot: 'Moka Pot', cold_brew: 'Cold Brew', other: 'Multiple / Other'
+	};
+	const machineName = $derived(MACHINE_NAMES[machineType] ?? machineType);
 
 	// Beginners start with advanced fields hidden; others see all
 	let showAdvanced = $state(!isBeginner);
@@ -208,13 +217,19 @@
 			<div class="rounded-xl border border-primary/5 bg-surface-container-low p-5 shadow-sm md:p-8 lg:col-span-7" use:reveal={0}>
 				<form class="space-y-stack-lg" onsubmit={(e) => e.preventDefault()}>
 
-					<!-- Beginner skill badge -->
-					{#if isBeginner}
-						<div class="flex items-center gap-2 rounded-lg bg-crema-gold/10 border border-crema-gold/20 px-4 py-2.5">
-							<span class="material-symbols-outlined text-crema-gold text-[18px]">school</span>
-							<p class="text-label-sm text-crema-gold">Beginner mode — simplified view. <a href="/glossar" class="underline">Glossar</a></p>
+					<!-- Skill + machine badges -->
+					<div class="flex flex-wrap items-center gap-2">
+						{#if isBeginner}
+							<div class="flex items-center gap-2 rounded-lg bg-crema-gold/10 border border-crema-gold/20 px-3 py-2">
+								<span class="material-symbols-outlined text-crema-gold text-[16px]">school</span>
+								<p class="text-label-caps text-crema-gold">Beginner mode — <a href="/glossar" class="underline">Glossar</a></p>
+							</div>
+						{/if}
+						<div class="flex items-center gap-2 rounded-lg border border-outline-variant/20 bg-surface-container px-3 py-2">
+							<span class="material-symbols-outlined text-[16px] text-on-surface-variant/40">settings</span>
+							<p class="text-label-caps text-on-surface-variant/50">Optimised for: <span class="text-crema-gold">{machineName}</span></p>
 						</div>
-					{/if}
+					</div>
 
 					<!-- Bean select -->
 					<div>
@@ -233,16 +248,12 @@
 						</select>
 					</div>
 
-					<!-- Core fields: Dose, Yield, Time -->
-					<div class="grid grid-cols-1 gap-stack-lg md:grid-cols-2">
+					<!-- Core fields: Dose · Yield · Time · Grind — always visible, 4-col -->
+					<div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
 						<!-- Dose -->
 						<div>
-							<div class="mb-1 flex items-center gap-2">
-								<label class="text-label-sm text-on-surface-variant uppercase" for="dose">Dose (g)</label>
-								{#if isBeginner}<span class="text-label-caps text-crema-gold/70">Ground coffee weight</span>{/if}
-							</div>
-							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">How many grams of coffee you're using (usually 18g)</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Grams in portafilter — typically 14–20g</p>{/if}
-							<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="dose">{isMokaPot ? 'Coffee (g)' : 'Dose (g)'}</label>
+							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 								<input id="dose" type="number" step="0.1" bind:value={dose} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
 								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">g</span>
 								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
@@ -254,12 +265,8 @@
 
 						<!-- Yield -->
 						<div>
-							<div class="mb-1 flex items-center gap-2">
-								<label class="text-label-sm text-on-surface-variant uppercase" for="yield">{isPourOver ? 'Pour Weight (g)' : 'Yield (g)'}</label>
-								{#if isBeginner}<span class="text-label-caps text-crema-gold/70">Liquid espresso weight</span>{/if}
-							</div>
-							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">The espresso in your cup — usually 36g for a double</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Total liquid output in grams</p>{/if}
-							<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="yield">{isPourOver ? 'Pour (g)' : isMokaPot ? 'Output (g)' : 'Yield (g)'}</label>
+							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 								<input id="yield" type="number" step="0.1" bind:value={yieldG} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
 								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">g</span>
 								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
@@ -271,9 +278,8 @@
 
 						<!-- Time -->
 						<div>
-							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">{isPourOver || isImmersion ? 'Total Time (s)' : 'Extraction Time (s)'}</label>
-							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">How long did the shot take? (aim for 25–35 seconds)</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Duration in seconds — espresso: 25–35s</p>{/if}
-							<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+							<label for="time" class="text-label-sm mb-1 block text-on-surface-variant uppercase">{isImmersion ? 'Steep (s)' : isPourOver ? 'Total (s)' : 'Time (s)'}</label>
+							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 								<input id="time" type="number" bind:value={time} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
 								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">s</span>
 								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
@@ -283,43 +289,41 @@
 							</div>
 						</div>
 
-						<!-- Expert: Bloom / Steep time -->
-						{#if isPourOver && (showAdvanced || isExpert)}
+						<!-- Grind Size — always visible, same style -->
+						<div>
+							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind</label>
+							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+								<input id="grind" type="text" bind:value={grind} placeholder="e.g. 2.4"
+									class="text-body-md w-full bg-transparent py-4 pl-5 pr-10 outline-none" />
+								<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant/20">tune</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Machine-specific extra fields -->
+					{#if isPourOver}
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<div>
 								<label for="bloom" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Bloom Time (s)</label>
-								<p class="text-label-caps mb-2 text-on-surface-variant/40">Pre-infusion time to degas CO₂</p>
-								<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">Pre-infusion — let CO₂ escape (30–45s)</p>
+								<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 									<input id="bloom" type="number" bind:value={bloomTime} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
 									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">s</span>
 									<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
-										<button type="button" onclick={() => bloomTime = bloomTime + 5} aria-label="Increase bloom time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
-										<button type="button" onclick={() => bloomTime = Math.max(0, bloomTime - 5)} aria-label="Decrease bloom time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
+										<button type="button" onclick={() => bloomTime = bloomTime + 5} aria-label="Increase bloom" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
+										<button type="button" onclick={() => bloomTime = Math.max(0, bloomTime - 5)} aria-label="Decrease bloom" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
 									</div>
 								</div>
 							</div>
-						{/if}
+						</div>
+					{/if}
 
-						{#if isImmersion && (showAdvanced || isExpert)}
-							<div>
-								<label for="steep" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Steep Time (s)</label>
-								<p class="text-label-caps mb-2 text-on-surface-variant/40">How long the coffee steeps before pressing</p>
-								<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
-									<input id="steep" type="number" bind:value={steepTime} class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
-									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">s</span>
-									<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
-										<button type="button" onclick={() => steepTime = steepTime + 10} aria-label="Increase steep time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
-										<button type="button" onclick={() => steepTime = Math.max(0, steepTime - 10)} aria-label="Decrease steep time" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
-									</div>
-								</div>
-							</div>
-						{/if}
-
-						<!-- Expert: Pressure (espresso only) -->
-						{#if isEspresso && isExpert}
+					{#if isAeropress || (isEspresso && (showAdvanced || isExpert))}
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<div>
 								<label for="pressure" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Pressure (bar)</label>
-								<p class="text-label-caps mb-2 text-on-surface-variant/40">Extraction pressure — standard: 9 bar</p>
-								<div class="relative overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
+								<p class="text-label-caps mb-2 text-on-surface-variant/40">{isAeropress ? 'Pressing pressure' : 'Extraction pressure — standard 9 bar'}</p>
+								<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 									<input id="pressure" type="number" bind:value={pressure} class="text-body-md w-full bg-transparent py-4 pl-5 pr-16 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
 									<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">bar</span>
 									<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
@@ -328,29 +332,19 @@
 									</div>
 								</div>
 							</div>
-						{/if}
-					</div>
+						</div>
+					{/if}
 
 					<!-- Advanced fields toggle for beginners -->
 					{#if isBeginner}
 						<button type="button" onclick={() => (showAdvanced = !showAdvanced)}
 							class="flex items-center gap-2 text-label-sm text-crema-gold transition-all hover:brightness-110 active:scale-95">
 							<span class="material-symbols-outlined text-[18px]">{showAdvanced ? 'expand_less' : 'expand_more'}</span>
-							{showAdvanced ? 'Hide' : 'Show'} advanced fields (grind, temperature, notes)
+							{showAdvanced ? 'Hide' : 'Show'} advanced fields (temperature, notes)
 						</button>
 					{/if}
 
 					{#if showAdvanced || !isBeginner}
-						<!-- Grind size -->
-						<div>
-							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind Size</label>
-							{#if isBeginner}<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer grinds = slower extraction</p>{:else}<p class="text-label-caps mb-2 text-on-surface-variant/40">Your grinder setting — finer = slower flow, coarser = faster</p>{/if}
-							<div class="relative">
-								<input id="grind" type="text" bind:value={grind} placeholder="e.g. 2.4 or 14 clicks"
-									class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-bright p-4 pr-12 outline-none transition-colors duration-200 focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
-								<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline/50">tune</span>
-							</div>
-						</div>
 
 						<!-- Temperature slider -->
 						<div>
