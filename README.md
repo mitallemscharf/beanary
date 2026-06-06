@@ -471,68 +471,147 @@ Aufgabe 3: «Sie möchten herausfinden, welche Bohne bisher die besten Bewertung
 
 ## 4. Erweiterungen
 
+Folgende Erweiterungen wurden über den Mindestumfang hinaus implementiert und sind nachfolgend nach dem vorgegebenen Schema dokumentiert.
+
 ### 4.1 User Authentication mit Rollen (Admin/User)
 
-- **Beschreibung & Nutzen:** Vollständiges Auth-System mit JWT, bcrypt, Login/Register/Logout. Jeder User sieht nur eigene Daten. Admin sieht alle Daten.
-- **Wo umgesetzt:** Frontend: /login, /register. Backend: /api/auth/*. DB: User-Model, userId auf Bean+Shot. Middleware: hooks.server.ts
-- **Referenz:** Kap. 3.4.2
-- **Aus Evaluation abgeleitet?:** Ja — Issues mit höchster Priorität aus Evaluation.
+- **Beschreibung & Nutzen:** Vollständiges Auth-System mit JWT (HttpOnly Cookie), bcrypt-Passwort-Hashing, Login/Register/Logout. Jeder User sieht ausschliesslich eigene Beans und Shots. Admin sieht alle Daten aller Nutzer. Schützt alle App-Routen über einen Server-seitigen Auth-Guard.
+- **Wo umgesetzt:** Frontend: `/login`, `/register`. Backend: `/api/auth/*` (login, register, logout, seed). Datenbank: User-Model mit gehashtem Passwort, `userId` als Fremdschlüssel auf Bean und Shot. Middleware: `hooks.server.ts` (Auth-Guard, Redirect-Logik).
+- **Referenz:** Screenshots 02-login.png, 03-register-1.png; Kap. 3.4.2
+- **Aus Evaluation abgeleitet?:** Ja — «Kein Login/Register» und «Kein Logout» waren die Issues mit Schweregrad 3 aus der Evaluation beider Testpersonen.
 
 ### 4.2 Admin Panel
 
-- **Beschreibung & Nutzen:** Exklusiver Bereich /admin. Total Users/Beans/Shots, User-Tabelle, Recent Activity. Admin kann User und Shots löschen.
-- **Wo umgesetzt:** Frontend: /admin. Backend: /api/admin/stats, DELETE-Endpoints.
-- **Referenz:** Kap. 4.1
-- **Aus Evaluation abgeleitet?:** Indirekt.
+- **Beschreibung & Nutzen:** Exklusiver, rollengeschützter Bereich `/admin`. Zeigt Systemstatistiken (Total Users, Beans, Shots), vollständige Nutzertabelle mit Aktivitätsdaten (Bean-Anzahl, Shot-Anzahl, Registrierungsdatum) sowie Recent Activity Feed. Admin kann Nutzer und deren Daten löschen.
+- **Wo umgesetzt:** Frontend: `/admin/+page.svelte`. Backend: `/api/admin/stats` (GET aggregierte Statistiken, DELETE Reset-Endpoint). Route-Schutz: `hooks.server.ts` prüft `user.role === 'admin'`.
+- **Referenz:** Screenshot 18-admin.png
+- **Aus Evaluation abgeleitet?:** Indirekt — Evaluation ergab Bedarf an Benutzerverwaltung; Admin Panel ermöglicht Datenpflege und Systemüberwachung.
 
 ### 4.3 Live Extraction Timer
 
-- **Beschreibung & Nutzen:** START/STOP/RESET Timer im Shot Logger. Zeit wird automatisch eingetragen beim Stoppen. MM:SS-Anzeige mit Pulse-Animation während der Extraktion.
-- **Wo umgesetzt:** Frontend: Timer-Card im Shot Logger, `setInterval` mit `onDestroy`-Cleanup.
-- **Referenz:** Shot Logger Screenshot
-- **Aus Evaluation abgeleitet?:** Nein — aus Nutzerbedürfnis.
+- **Beschreibung & Nutzen:** START/STOP/RESET-Timer direkt im Shot Logger. Zeit wird beim Stoppen automatisch in das Zeitfeld eingetragen. MM:SS-Anzeige mit Pulse-Animation während aktiver Extraktion. Ermöglicht präzises Timing ohne externe Stoppuhr.
+- **Wo umgesetzt:** Frontend: Timer-Card-Komponente im Shot Logger (`/shot-logger/+page.svelte`), `setInterval` mit `onDestroy`-Cleanup für Memory-Leak-Vermeidung.
+- **Referenz:** Screenshot 10-shot-timer.png
+- **Aus Evaluation abgeleitet?:** Nein — aus natürlichem Barista-Workflow abgeleitet (erst brauen, dann dokumentieren).
 
 ### 4.4 Interaktives Flavor Wheel
 
-- **Beschreibung & Nutzen:** SVG-Rad mit 8 Kategorien (Fruity, Floral, Sweet, Nutty, Chocolatey, Roasted, Spicy, Sour). Klick auf Segment öffnet Sub-Flavors als wählbare Pills. Gewählte Flavors werden automatisch in die Shot-Notizen übernommen.
-- **Wo umgesetzt:** Frontend: SVG mit polaren Koordinaten im Shot Logger.
+- **Beschreibung & Nutzen:** SVG-Rad mit 8 Hauptkategorien (Fruity, Floral, Sweet, Nutty, Chocolatey, Roasted, Spicy, Sour). Klick auf ein Segment öffnet Sub-Flavors als auswählbare Pills. Gewählte Geschmacksnoten werden als `flavorTags` automatisch dem Shot zugeordnet und im Shot-Detail angezeigt.
+- **Wo umgesetzt:** Frontend: SVG-Komponente mit polaren Koordinaten im Shot Logger. Zustand: `flavorTags`-Array im Shot-Formular, gespeichert via `/api/shots` POST.
 - **Referenz:** Screenshot 09-shot-logger.png
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Aus Evaluation abgeleitet?:** Nein — ergänzt die sensorische Dokumentation und standardisiert Geschmacksbeschreibungen.
 
 ### 4.5 Automatische Freshness-Berechnung
 
-- **Beschreibung & Nutzen:** Status (TOO FRESH / FRESH / PEAK / PAST PEAK / OLD) automatisch aus Röstdatum. Logik: 0–7d: TOO FRESH, 8–21d: FRESH, 22–35d: PEAK, 36–60d: PAST PEAK, 60+d: OLD.
-- **Wo umgesetzt:** Frontend: Bean-Cards und Detail-Drawer. Berechnung in `getFreshness()` in beans-Store.
-- **Referenz:** Bean Library Screenshots
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Beschreibung & Nutzen:** Freshness-Status (TOO FRESH / FRESH / PEAK / PAST PEAK / OLD) wird automatisch aus dem Röstdatum der Bohne berechnet und als farbiges Badge auf jeder Bean-Card angezeigt. Logik: 0–7d: TOO FRESH, 8–21d: FRESH, 22–35d: PEAK, 36–60d: PAST PEAK, >60d: OLD.
+- **Wo umgesetzt:** Frontend: Bean-Cards in `/library` und Bean-Detail-Drawer. Berechnung in `getFreshness()` im Beans-Store (`src/lib/stores/beans.ts`). Keine Backend-Logik nötig.
+- **Referenz:** Screenshot 06-bean-library.png, Screenshot 08-bean-detail.png
+- **Aus Evaluation abgeleitet?:** Nein — löst ein konkretes Problem der Zielgruppe: Bohnen verlieren nach dem Rösten über Zeit an Qualität.
 
 ### 4.6 Brew Ratio Recommendation Engine
 
-- **Beschreibung & Nutzen:** Nach 3+ Shots pro Bohne zeigt die App eine Empfehlung für optimale Parameter basierend auf den besten Shots (Top-3 nach Rating).
-- **Wo umgesetzt:** Frontend: Recommendation-Card im Bean-Drawer. Aggregation nach Rating in `getRecommendation()`.
-- **Referenz:** Bean Library Detail
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Beschreibung & Nutzen:** Nach mindestens 3 gespeicherten Shots pro Bohne aggregiert die App die Top-3-Shots (nach Rating) und zeigt eine Empfehlung für optimale Dose, Yield, Zeit und Temperatur im Bean-Detail-Drawer an. Hilft beim schnellen Dialing-In auf eine neue Bohne.
+- **Wo umgesetzt:** Frontend: Recommendation-Card im Bean-Drawer (`/library`). Aggregations-Logik in `getRecommendation()` im Beans-Store, sortiert nach Rating.
+- **Referenz:** Screenshot 08-bean-detail.png
+- **Aus Evaluation abgeleitet?:** Nein — Data-Driven Insight aus gespeicherten Shot-Daten; adressiert das Kernziel «Dialing-In».
 
 ### 4.7 Dark Mode Toggle
 
-- **Beschreibung & Nutzen:** Light/Dark Mode umschaltbar. Präferenz in localStorage gespeichert. CSS Custom Properties schalten auf warme Dunkelbraun-Palette.
-- **Wo umgesetzt:** Frontend: Toggle in Sidebar und Settings → Appearance. Store: `src/lib/stores/theme.ts`.
+- **Beschreibung & Nutzen:** Light/Dark Mode jederzeit umschaltbar via Toggle in der Sidebar und unter Settings → Appearance. Präferenz wird in `localStorage` gespeichert und beim nächsten Besuch wiederhergestellt. Dark Mode wechselt auf eine warme Dunkelbraun-Palette mit reduzierten Kontrasten.
+- **Wo umgesetzt:** Frontend: Toggle-Button im App-Layout und Settings-Seite. Store: `src/lib/stores/theme.ts` mit `$effect` für `html.dark`-Klasse. CSS: `@theme` Custom Properties mit Dark-Mode-Overrides in `app.css`.
 - **Referenz:** Screenshot 17-settings.png
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Aus Evaluation abgeleitet?:** Nein — Usability-Best-Practice für Prosumer-Apps die auch abends genutzt werden.
 
 ### 4.8 Mobile Responsive Design
 
-- **Beschreibung & Nutzen:** Vollständige Mobile-Optimierung (375px). Sidebar wird auf Mobile zu einer Bottom Navigation mit 5 Tabs. Touch-Targets mindestens 48px.
-- **Wo umgesetzt:** Frontend: Tailwind Responsive Prefixes (`md:`, `sm:`), Bottom Navigation Komponente im App-Layout.
+- **Beschreibung & Nutzen:** Vollständige Mobile-Optimierung ab 375px Viewport-Breite. Die Desktop-Sidebar wird auf Mobile durch eine fixe Bottom Navigation Bar mit 5 Tabs ersetzt. Alle Touch-Targets sind mindestens 48×48px. Formulare, Karten und Diagramme passen sich dem schmalen Viewport an.
+- **Wo umgesetzt:** Frontend: Tailwind Responsive Prefixes (`md:`, `sm:`), Bottom Navigation Komponente im App-Layout (`/(app)/+layout.svelte`), `safe-area-inset` für iPhone Notch/Home Indicator.
 - **Referenz:** Screenshot 19-mobile.png
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Aus Evaluation abgeleitet?:** Nein — Anforderung für alle Geräte ohne Installation (PWA-Ergänzung).
 
 ### 4.9 Export CSV
 
-- **Beschreibung & Nutzen:** Shot History als CSV exportierbar mit allen Feldern (Bean, Dose, Yield, Time, Temp, Rating, Date, Notes).
-- **Wo umgesetzt:** Frontend: Export-Button in History und Settings → Data.
+- **Beschreibung & Nutzen:** Die vollständige Shot History ist als CSV-Datei exportierbar. Enthält alle Felder: Bean, Dose, Yield, Time, Temperature, Rating, Brew Ratio, Flavor Tags, Notes, Date. Ermöglicht externe Analyse z.B. in Excel oder Numbers.
+- **Wo umgesetzt:** Frontend: Export-Button in `/history` und Settings → Data. Client-seitige Generierung via `Blob` und temporärem `<a download>`-Link — kein Server-Roundtrip.
 - **Referenz:** Screenshot 11-shot-history.png, Screenshot 17-settings.png
-- **Aus Evaluation abgeleitet?:** Nein.
+- **Aus Evaluation abgeleitet?:** Nein — Power-User-Feature für datengetriebene Baristas.
+
+### 4.10 Export PDF
+
+- **Beschreibung & Nutzen:** Shot History alternativ als formatiertes PDF exportierbar. Das PDF enthält alle Shot-Parameter in tabellarischer Form mit Beanery-Branding. Geeignet für Ausdrucke oder Archivierung.
+- **Wo umgesetzt:** Frontend: Export PDF-Button in `/history`. Client-seitige Generierung via dynamisch geladenem `jsPDF` (Lazy Import zur Vermeidung von SSR-Fehlern). Identischer Datensatz wie CSV-Export.
+- **Referenz:** Screenshot 11-shot-history.png
+- **Aus Evaluation abgeleitet?:** Nein — ergänzt den CSV-Export um ein druckfähiges Format.
+
+### 4.11 Shot Comparison
+
+- **Beschreibung & Nutzen:** In der Shot History können zwei Shots selektiert und direkt verglichen werden. Ein Modal zeigt beide Shots nebeneinander, hebt abweichende Felder in Crema-Gold hervor und zeigt einen «Winner»-Banner für den höher bewerteten Shot. Beschleunigt das Erkennen von Optimierungspotenzialen.
+- **Wo umgesetzt:** Frontend: Checkbox-Selektion auf Shot-Cards in `/history`, Vergleichs-Modal als Overlay-Komponente. Diff-Logik in `compareRows()` im `+page.svelte` der History-Seite.
+- **Referenz:** Screenshot 12-shot-expanded.png
+- **Aus Evaluation abgeleitet?:** Nein — aus dem iterativen Verbesserungsansatz des Dialing-In Prozesses abgeleitet.
+
+### 4.12 Bean QR Code Generator
+
+- **Beschreibung & Nutzen:** Für jede Bohne kann ein QR-Code generiert werden, der die Sweet-Spot-Parameter (Dose, Yield, Zeit, Mahlgrad) als JSON-Payload encodiert. Der QR-Code kann ausgedruckt und direkt auf die Kaffeebehältnis-Dose geklebt werden.
+- **Wo umgesetzt:** Frontend: QR-Code-Button im Bean-Detail-Drawer (`/library`). Generierung via `qrcode`-Library (Canvas API). Download als PNG-Datei.
+- **Referenz:** Screenshot 08-bean-detail.png
+- **Aus Evaluation abgeleitet?:** Nein — Convenience-Feature für Baristas mit mehreren Bohnen im Einsatz.
+
+### 4.13 PWA — Progressive Web App
+
+- **Beschreibung & Nutzen:** Beanery ist als PWA installierbar — auf dem iPhone-Homescreen und Android-Launcher wie eine native App. Ermöglicht Offline-Fähigkeit des Shells, eigenes App-Icon und Splash Screen ohne App-Store-Installation.
+- **Wo umgesetzt:** Frontend: `static/manifest.webmanifest` (Name, Icons, Theme Color, Display Mode `standalone`), PWA-Meta-Tags in `app.html` (`apple-mobile-web-app-capable`, `theme-color`). Icons: 180×180 (Apple Touch), 192×192, 512×512 PNG.
+- **Referenz:** Screenshot 19-mobile.png; `static/manifest.webmanifest`
+- **Aus Evaluation abgeleitet?:** Nein — ergänzt das Mobile Responsive Design; Beanery wird plattformübergreifend wie eine native App nutzbar.
+
+### 4.14 Gamification — XP, Badges, Level-System
+
+- **Beschreibung & Nutzen:** Nutzer sammeln Erfahrungspunkte (XP) für Aktionen: Shot loggen (+10 XP), Shot bewerten (+5 XP), Notizen hinzufügen (+5 XP), Bohne hinzufügen (+10 XP). XP schalten Level frei (Novice → Apprentice → Skilled → Expert → Master). Badges (first_drop, getting_started, speed_runner, early_bird, night_owl) werden für besondere Leistungen vergeben und als Toasts angezeigt.
+- **Wo umgesetzt:** Backend: `src/lib/server/gamification.ts` — `awardXP()` und `BADGES`-Logik. JWT wird nach jedem Shot-Log mit aktuellem XP/Level aktualisiert, sodass die Sidebar immer den aktuellen Stand zeigt. Frontend: XP-Fortschrittsbalken und Badge-Grid auf `/profile`, Badge-Toast-Overlay im App-Layout.
+- **Referenz:** Screenshot 13-profile.png
+- **Aus Evaluation abgeleitet?:** Nein — erhöht Langzeitmotivation und Wiederkehr-Rate der Nutzer.
+
+### 4.15 Leaderboard
+
+- **Beschreibung & Nutzen:** Rangliste aller registrierten Nutzer sortiert nach Gesamt-XP. Zeigt Rang, Name, Level-Badge, XP-Anzahl und Anzahl geloggter Shots. Der eigene Eintrag ist farblich hervorgehoben. Fördert Community-Aspekte und sportlichen Wettkampf.
+- **Wo umgesetzt:** Frontend: `/leaderboard/+page.svelte`. Backend: `/api/leaderboard` (GET) — aggregiert alle User nach XP sortiert aus MongoDB.
+- **Referenz:** Screenshot 14-leaderboard.png
+- **Aus Evaluation abgeleitet?:** Nein — Community-Feature für Klassen- und Gruppenkontext.
+
+### 4.16 Profil-Seite
+
+- **Beschreibung & Nutzen:** Persönliche Profilseite mit Name, Avatar-Initial, Skill Level, XP-Fortschrittsbalken zum nächsten Level, aktuellem Level-Badge und allen verdienten Achievement-Badges. Gibt dem Nutzer einen Überblick über seinen Lernfortschritt.
+- **Wo umgesetzt:** Frontend: `/profile/+page.svelte` mit Server-Load-Funktion. Backend: Nutzerdaten aus JWT + `/api/users/profile` für XP/Badges. Keine separate Datenbank-Abfrage nötig — XP ist im JWT-Token gespeichert.
+- **Referenz:** Screenshot 13-profile.png
+- **Aus Evaluation abgeleitet?:** Nein — natürliche Ergänzung des Gamification-Systems (Kap. 4.14).
+
+### 4.17 Brewing Guides
+
+- **Beschreibung & Nutzen:** Öffentlich zugängliche Schritt-für-Schritt-Anleitungen für 6 Brew-Methoden: Espresso, V60, Chemex, AeroPress, French Press, Moka Pot. Jede Anleitung enthält Parameter-Empfehlungen (Ratio, Temperatur, Zeit) und illustrierte Schritte. Senkt die Einstiegshürde für neue Nutzer.
+- **Wo umgesetzt:** Frontend: `/guides/+page.svelte` — statische Inhalte, ohne Backend. Route ist öffentlich (kein Login erforderlich), sodass die Guides auch als Marketing-Inhalt dienen.
+- **Referenz:** Screenshot 15-guides.png
+- **Aus Evaluation abgeleitet?:** Ja — Testperson Subraj Singh fand Fachbegriffe «unklar»; Guides adressieren diesen Onboarding-Gap direkt.
+
+### 4.18 Glossar (27 Begriffe)
+
+- **Beschreibung & Nutzen:** Durchsuchbares Glossar mit 27 Kaffee-Fachbegriffen und ihren Definitionen (z.B. Dose, Yield, TDS, Extraction, Channeling, Bloom). Live-Suchfilter filtert Begriffe in Echtzeit. Öffentlich zugänglich ohne Login.
+- **Wo umgesetzt:** Frontend: `/glossar/+page.svelte` — statische Begriffsdaten mit `$derived`-Filter auf Suchfeld-Input. Route ist öffentlich (kein Auth erforderlich).
+- **Referenz:** Screenshot 16-glossar.png
+- **Aus Evaluation abgeleitet?:** Ja — beide Testpersonen notierten Fachbegriffe als unklar (Schweregrad 2); Glossar behebt diesen Issue direkt.
+
+### 4.19 4-Step Onboarding Registrierung
+
+- **Beschreibung & Nutzen:** Registrierungsprozess in 4 geführten Schritten: (1) Account-Daten (Name, Email, Passwort), (2) Erfahrungslevel (Beginner / Home Barista / Expert), (3) Maschinentyp (8 Optionen: Espresso Semi/Auto, V60, AeroPress etc.), (4) Persönliche Ziele (optional, Mehrfachauswahl). Schritt-Indikator zeigt Fortschritt. Daten werden in einem einzigen API-Call gespeichert.
+- **Wo umgesetzt:** Frontend: `/register/+page.svelte` — `step`-State mit 4 konditionalen Render-Blöcken, Validierung pro Schritt. Backend: `/api/auth/register` speichert `skillLevel`, `machineType`, `goals` direkt im User-Dokument.
+- **Referenz:** Screenshots 03-register-1.png, 04-register-2.png
+- **Aus Evaluation abgeleitet?:** Ja — «Kein Onboarding für Anfänger» wurde als Idee von Metehan Altay eingebracht; 4-Step-Prozess personalisiert die App ab dem ersten Moment.
+
+### 4.20 Adaptives UI (Beginner / Expert Modus)
+
+- **Beschreibung & Nutzen:** Der Shot Logger und andere Bereiche passen sich dem beim Onboarding gewählten Skill Level an. Beginner sehen vereinfachte Ansichten mit weniger Feldern und erklärenden Tooltips für Fachbegriffe (Dose, Yield, TDS). Expert-Nutzer sehen alle Felder und erweiterte Parameter. Das Skill Level ist in Settings jederzeit änderbar.
+- **Wo umgesetzt:** Frontend: Konditionale Render-Blöcke in `/shot-logger/+page.svelte` basierend auf `locals.user.skillLevel`. Tooltips via Tailwind `group`/`title`-Attribut. Settings: `/settings/+page.svelte` erlaubt nachträgliche Änderung des Skill Levels via `/api/users/profile` PATCH.
+- **Referenz:** Screenshot 09-shot-logger.png, Screenshot 17-settings.png
+- **Aus Evaluation abgeleitet?:** Ja — «Shot Logger zu komplex für Einsteiger» (Schweregrad 2) wurde von Subraj Singh gemeldet; adaptives UI ist die direkte Umsetzung.
 
 ---
 
