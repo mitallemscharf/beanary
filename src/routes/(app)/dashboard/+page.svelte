@@ -150,7 +150,7 @@
 		<div class="mb-10 grid grid-cols-1 gap-gutter lg:grid-cols-12" use:reveal={0}>
 
 			<!-- Bar chart card (8 cols) -->
-			<div class="relative col-span-1 h-[440px] overflow-hidden rounded-xl border border-primary/5 bg-surface-container-lowest p-8 lg:col-span-8">
+			<div class="relative col-span-1 h-[300px] overflow-hidden rounded-xl border border-primary/5 bg-surface-container-lowest p-6 md:p-8 lg:col-span-8 lg:h-[440px]">
 				<div class="relative z-10 mb-8 flex items-start justify-between">
 					<div>
 						<h3 class="text-headline-md">Rating History</h3>
@@ -201,7 +201,7 @@
 			<!-- Sensory / Flavor profile card (4 cols) -->
 			<a
 				href="/library"
-				class="group relative col-span-1 h-[440px] cursor-pointer overflow-hidden rounded-xl bg-tertiary-container transition-all duration-300 hover:-translate-y-1 hover:shadow-lg lg:col-span-4"
+				class="group relative col-span-1 h-[260px] cursor-pointer overflow-hidden rounded-xl bg-tertiary-container transition-all duration-300 hover:-translate-y-1 hover:shadow-lg lg:col-span-4 lg:h-[440px]"
 			>
 				<img
 					src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&h=500&auto=format&fit=crop&q=80"

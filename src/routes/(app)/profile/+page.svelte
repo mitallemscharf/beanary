@@ -152,7 +152,7 @@
 
 					{#if earnedBadges.length > 0}
 						<p class="text-label-caps mb-3 text-crema-gold">Earned</p>
-						<div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+						<div class="mb-6 grid grid-cols-3 gap-3">
 							{#each earnedBadges as badge}
 								<div class="group flex flex-col items-center gap-2 rounded-xl border border-crema-gold/20 bg-crema-gold/5 p-4 text-center transition-all hover:-translate-y-0.5 hover:shadow-sm">
 									<span class="text-3xl">{badge.emoji}</span>
@@ -165,7 +165,7 @@
 
 					{#if lockedBadges.length > 0}
 						<p class="text-label-caps mb-3 text-on-surface-variant/40">Locked</p>
-						<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+						<div class="grid grid-cols-3 gap-3">
 							{#each lockedBadges as badge}
 								<div class="flex flex-col items-center gap-2 rounded-xl border border-outline-variant/10 bg-surface-container p-4 text-center opacity-50">
 									<span class="text-3xl grayscale">{badge.emoji}</span>

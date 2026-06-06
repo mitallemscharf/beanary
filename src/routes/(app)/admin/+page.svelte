@@ -188,7 +188,7 @@
 
 						<div class="divide-y divide-outline-variant/10">
 							{#each stats.users as u (u.id)}
-								<div class="flex items-center gap-4 px-7 py-4 transition-colors hover:bg-surface-container {deletingId === u.id ? 'opacity-40' : ''}">
+								<div class="flex items-center gap-3 px-4 py-4 transition-colors hover:bg-surface-container md:gap-4 md:px-7 {deletingId === u.id ? 'opacity-40' : ''}">
 
 									<!-- Avatar -->
 									<div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[16px] font-bold text-white
@@ -208,7 +208,7 @@
 									</div>
 
 									<!-- Counts -->
-									<div class="hidden flex-shrink-0 items-center gap-5 sm:flex">
+									<div class="flex flex-shrink-0 items-center gap-4">
 										<div class="text-center">
 											<p class="font-display text-[20px] font-semibold text-crema-gold">{u.beanCount}</p>
 											<p class="text-label-caps text-on-surface-variant/40">Beans</p>

@@ -362,7 +362,7 @@
 	<div class="mx-auto max-w-[1100px]">
 
 		<!-- Page header -->
-		<header class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between" use:reveal={0}>
+		<header class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between" use:reveal={0}>
 			<div>
 				<p class="text-label-caps mb-2 text-crema-gold">Extraction Records</p>
 				<h1 class="text-headline-xl text-primary">Shot History</h1>
@@ -493,7 +493,7 @@
 									{/if}
 
 									<!-- Left: image + info -->
-									<div class="flex min-w-[200px] flex-1 items-center gap-6">
+									<div class="flex min-w-0 flex-1 items-center gap-4">
 										<div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container">
 											<BeanImage
 												src={shot.img}
@@ -516,7 +516,7 @@
 									</div>
 
 									<!-- Center: data -->
-									<div class="flex flex-wrap items-center gap-4 text-sm sm:gap-10">
+									<div class="flex flex-shrink-0 flex-wrap items-center gap-3 text-sm sm:gap-8">
 										{#each [
 											{ label: 'Ratio', val: `${shot.dose}g / ${shot.yield}g` },
 											{ label: 'Time', val: `${shot.time}s` },

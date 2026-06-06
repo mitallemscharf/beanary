@@ -233,11 +233,11 @@
 			</p>
 		</header>
 
-		<!-- Main grid -->
+		<!-- Main grid — on mobile, analysis (timer) comes first; form below -->
 		<div class="grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
 
-			<!-- ── Form (7 cols) ── -->
-			<div class="rounded-xl border border-primary/5 bg-surface-container-low p-5 shadow-sm md:p-8 lg:col-span-7" use:reveal={0}>
+			<!-- ── Form (7 cols) — order-2 on mobile so timer shows first ── -->
+			<div class="order-2 rounded-xl border border-primary/5 bg-surface-container-low p-5 shadow-sm md:p-8 lg:order-1 lg:col-span-7" use:reveal={0}>
 				<form class="space-y-stack-lg" onsubmit={(e) => e.preventDefault()}>
 
 					<!-- Skill + machine badges -->
@@ -289,8 +289,8 @@
 						</select>
 					</div>
 
-					<!-- Core fields: Dose · Yield · Time · Grind — always visible, 4-col -->
-					<div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+					<!-- Core fields: Dose · Yield · Time · Grind — 2-col on mobile, 4-col on xl -->
+					<div class="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
 						<!-- Dose -->
 						<div>
 							<label class="text-label-sm mb-1 block text-on-surface-variant uppercase" for="dose">{isMokaPot ? 'Coffee (g)' : 'Dose (g)'}</label>
@@ -482,23 +482,18 @@
 					<!-- Star Rating -->
 					<div class="border-t border-outline-variant/10 pt-6">
 						<p class="text-label-sm mb-3 block text-on-surface-variant uppercase">Shot Rating</p>
-						<div class="flex items-center gap-2">
-							<button type="button" onclick={() => (rating = 1)} class="transition-transform hover:scale-125 active:scale-95" aria-label="1 star">
-								<span class="material-symbols-outlined text-[28px]" class:text-crema-gold={rating >= 1} class:text-outline-variant={rating < 1} style="font-variation-settings: 'FILL' {rating >= 1 ? 1 : 0}, 'wght' 300">star</span>
-							</button>
-							<button type="button" onclick={() => (rating = 2)} class="transition-transform hover:scale-125 active:scale-95" aria-label="2 stars">
-								<span class="material-symbols-outlined text-[28px]" class:text-crema-gold={rating >= 2} class:text-outline-variant={rating < 2} style="font-variation-settings: 'FILL' {rating >= 2 ? 1 : 0}, 'wght' 300">star</span>
-							</button>
-							<button type="button" onclick={() => (rating = 3)} class="transition-transform hover:scale-125 active:scale-95" aria-label="3 stars">
-								<span class="material-symbols-outlined text-[28px]" class:text-crema-gold={rating >= 3} class:text-outline-variant={rating < 3} style="font-variation-settings: 'FILL' {rating >= 3 ? 1 : 0}, 'wght' 300">star</span>
-							</button>
-							<button type="button" onclick={() => (rating = 4)} class="transition-transform hover:scale-125 active:scale-95" aria-label="4 stars">
-								<span class="material-symbols-outlined text-[28px]" class:text-crema-gold={rating >= 4} class:text-outline-variant={rating < 4} style="font-variation-settings: 'FILL' {rating >= 4 ? 1 : 0}, 'wght' 300">star</span>
-							</button>
-							<button type="button" onclick={() => (rating = 5)} class="transition-transform hover:scale-125 active:scale-95" aria-label="5 stars">
-								<span class="material-symbols-outlined text-[28px]" class:text-crema-gold={rating >= 5} class:text-outline-variant={rating < 5} style="font-variation-settings: 'FILL' {rating >= 5 ? 1 : 0}, 'wght' 300">star</span>
-							</button>
-							<span class="text-label-caps ml-2 text-on-surface-variant/60">
+						<div class="flex items-center gap-1">
+							{#each [1,2,3,4,5] as n}
+								<button type="button" onclick={() => (rating = n)}
+									class="flex h-11 w-11 items-center justify-center transition-transform hover:scale-110 active:scale-95"
+									aria-label="{n} star{n > 1 ? 's' : ''}">
+									<span class="material-symbols-outlined text-[32px]"
+										class:text-crema-gold={rating >= n}
+										class:text-outline-variant={rating < n}
+										style="font-variation-settings: 'FILL' {rating >= n ? 1 : 0}, 'wght' 300">star</span>
+								</button>
+							{/each}
+							<span class="text-label-caps ml-1 text-on-surface-variant/60">
 								{['', 'Poor', 'Fair', 'Good', 'Great', 'Perfect'][rating]}
 							</span>
 						</div>
@@ -530,8 +525,8 @@
 				</form>
 			</div>
 
-			<!-- ── Analysis visuals (5 cols) ── -->
-			<div class="space-y-gutter lg:col-span-5" use:reveal={150}>
+			<!-- ── Analysis visuals (5 cols) — order-1 on mobile so timer shows first ── -->
+			<div class="order-1 space-y-gutter lg:order-2 lg:col-span-5" use:reveal={150}>
 
 				<!-- ── Extraction Timer ── -->
 				<div class="rounded-xl border border-primary/5 bg-surface-bright p-8 shadow-sm">
@@ -559,27 +554,27 @@
 							type="button"
 							onclick={startTimer}
 							disabled={timerRunning}
-							class="flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed {timerRunning ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-500/10 text-green-700 hover:bg-green-500/20'}"
+							class="flex flex-1 items-center justify-center gap-2 rounded-full py-4 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed {timerRunning ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-500/10 text-green-700 hover:bg-green-500/20'}"
 						>
-							<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+							<span class="material-symbols-outlined text-[22px]">play_arrow</span>
 							Start
 						</button>
 						<button
 							type="button"
 							onclick={stopTimer}
 							disabled={!timerRunning}
-							class="flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed bg-error/10 text-error hover:bg-error/20"
+							class="flex flex-1 items-center justify-center gap-2 rounded-full py-4 text-label-caps uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed bg-error/10 text-error hover:bg-error/20"
 						>
-							<span class="material-symbols-outlined text-[18px]">stop</span>
+							<span class="material-symbols-outlined text-[22px]">stop</span>
 							Stop
 						</button>
 						<button
 							type="button"
 							onclick={resetTimer}
-							class="flex items-center justify-center rounded-full px-4 py-3 text-label-caps text-on-surface-variant/50 transition-all duration-200 hover:bg-surface-container-high hover:text-on-surface active:scale-95"
+							class="flex items-center justify-center rounded-full px-4 py-4 text-label-caps text-on-surface-variant/50 transition-all duration-200 hover:bg-surface-container-high hover:text-on-surface active:scale-95"
 							aria-label="Reset timer"
 						>
-							<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+							<span class="material-symbols-outlined text-[20px]">restart_alt</span>
 						</button>
 					</div>
 

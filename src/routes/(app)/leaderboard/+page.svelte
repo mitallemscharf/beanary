@@ -79,7 +79,7 @@
 		<!-- Full table -->
 		<div class="rounded-xl border border-primary/5 bg-surface-container-low overflow-hidden" use:reveal={200}>
 			<!-- Table header -->
-			<div class="grid grid-cols-[48px_1fr_auto_auto] gap-4 border-b border-outline-variant/10 bg-surface-container px-6 py-3">
+			<div class="grid grid-cols-[40px_1fr_auto_auto] gap-3 border-b border-outline-variant/10 bg-surface-container px-4 py-3 sm:grid-cols-[48px_1fr_auto_auto] sm:gap-4 sm:px-6">
 				<p class="text-label-caps text-on-surface-variant/40">Rank</p>
 				<p class="text-label-caps text-on-surface-variant/40">Brewer</p>
 				<p class="text-label-caps text-on-surface-variant/40 text-right">Level</p>
@@ -87,7 +87,7 @@
 			</div>
 
 			{#each leaderboard as entry}
-				<div class="grid grid-cols-[48px_1fr_auto_auto] items-center gap-4 border-b border-outline-variant/5 px-6 py-4 transition-colors last:border-0
+				<div class="grid grid-cols-[40px_1fr_auto_auto] items-center gap-3 border-b border-outline-variant/5 px-4 py-4 transition-colors last:border-0 sm:grid-cols-[48px_1fr_auto_auto] sm:gap-4 sm:px-6
 					{entry.isCurrentUser ? 'bg-crema-gold/5 border-l-4 border-l-crema-gold' : 'hover:bg-surface-container-low/60'}">
 
 					<!-- Rank -->
