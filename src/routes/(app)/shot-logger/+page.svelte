@@ -85,7 +85,8 @@
 	// ── Adaptive UI ──
 	let { data }: { data: PageData } = $props();
 	const skillLevel = $derived(data.user?.skillLevel ?? 'home_barista');
-	const machineType = $derived(data.user?.machineType ?? 'espresso_semi');
+	let machineType = $state(data.user?.machineType ?? 'espresso_semi');
+	let machinePickerOpen = $state(false);
 	const isBeginner = $derived(skillLevel === 'beginner');
 	const isExpert   = $derived(skillLevel === 'expert');
 	const isEspresso   = $derived(machineType === 'espresso_semi' || machineType === 'espresso_auto');
@@ -230,11 +231,29 @@
 								<p class="text-label-caps text-crema-gold">Beginner mode — <a href="/glossar" class="underline">Glossar</a></p>
 							</div>
 						{/if}
-						<div class="flex items-center gap-2 rounded-lg border border-outline-variant/20 bg-surface-container px-3 py-2">
-							<span class="material-symbols-outlined text-[16px] text-on-surface-variant/40">settings</span>
-							<p class="text-label-caps text-on-surface-variant/50">Optimised for: <span class="text-crema-gold">{machineName}</span></p>
-						</div>
+						<button type="button" onclick={() => machinePickerOpen = !machinePickerOpen}
+							class="flex items-center gap-2 rounded-lg border bg-surface-container px-3 py-2 transition-colors hover:border-crema-gold/40 active:scale-95 {machinePickerOpen ? 'border-crema-gold/40' : 'border-outline-variant/20'}">
+							<span class="material-symbols-outlined text-[16px] {machinePickerOpen ? 'text-crema-gold' : 'text-on-surface-variant/40'}">settings</span>
+							<p class="text-label-caps text-on-surface-variant/50">Machine: <span class="text-crema-gold">{machineName}</span></p>
+							<span class="material-symbols-outlined text-[14px] text-on-surface-variant/30 transition-transform duration-200 {machinePickerOpen ? 'rotate-180' : ''}">expand_more</span>
+						</button>
 					</div>
+
+					<!-- Machine picker (inline) -->
+					{#if machinePickerOpen}
+						<div class="rounded-xl border border-crema-gold/20 bg-surface-container-low p-4">
+							<p class="text-label-caps mb-3 text-on-surface-variant/40">Select your brewing device</p>
+							<div class="flex flex-wrap gap-2">
+								{#each Object.entries(MACHINE_NAMES) as [key, name]}
+									<button type="button"
+										onclick={() => { machineType = key; machinePickerOpen = false; }}
+										class="rounded-full border px-3 py-1.5 text-label-sm uppercase transition-all active:scale-95 {machineType === key ? 'border-crema-gold/60 bg-crema-gold/10 text-crema-gold' : 'border-outline-variant/20 text-on-surface-variant/50 hover:border-crema-gold/30 hover:text-on-surface-variant'}">
+										{name}
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
 
 					<!-- Bean select -->
 					<div>
