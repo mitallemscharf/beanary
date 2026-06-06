@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/stores/toast';
 	import { shots } from '$lib/stores/shots';
 	import { beans } from '$lib/stores/beans';
@@ -14,8 +13,7 @@
 
 	async function logout() {
 		await fetch('/api/auth/logout', { method: 'POST' });
-		showToast('Logged out — see you next time', 'logout');
-		goto('/login');
+		location.href = '/login';
 	}
 
 	let dataLoaded = $state(false);
@@ -46,7 +44,7 @@
 	}
 
 	function closeDrawer() { drawerOpen = false; }
-	function navTo(href: string) { closeDrawer(); goto(href); }
+	function navTo(href: string) { closeDrawer(); location.href = href; }
 
 	const sidebarNavItems = [
 		{ href: '/dashboard',   icon: 'dashboard',         label: 'Dashboard' },
