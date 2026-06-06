@@ -187,6 +187,7 @@
 			const selectedBean = $beans.find((b) => b.name === bean);
 			const finalNotes = [notes.trim(), selectedFlavors.length > 0 ? `Flavors: ${selectedFlavors.join(', ')}` : ''].filter(Boolean).join(' · ');
 			const result = await shots.add({
+				beanId: selectedBean?.id,
 				bean,
 				dose,
 				yield: yieldG,
@@ -194,6 +195,7 @@
 				temp,
 				grind,
 				notes: finalNotes,
+				flavorTags: selectedFlavors,
 				rating,
 				date: 'Today',
 				process: 'Washed',
@@ -337,8 +339,8 @@
 							<label for="grind" class="text-label-sm mb-1 block text-on-surface-variant uppercase">Grind</label>
 							<div class="relative rounded-xl border border-outline-variant/20 bg-surface-bright transition-colors duration-200 focus-within:ring-2 focus-within:ring-crema-gold/60 hover:border-crema-gold/30">
 								<input id="grind" type="number" min="1" max="40" step="0.5" bind:value={grind}
-									class="text-body-md w-full bg-transparent py-4 pl-5 pr-[5rem] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-[9px] font-semibold uppercase tracking-wide text-on-surface-variant/30">clicks</span>
+									class="text-body-md w-full bg-transparent py-4 pl-5 pr-14 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+								<span class="pointer-events-none absolute right-9 top-1/2 -translate-y-1/2 select-none text-label-caps text-on-surface-variant/30">#</span>
 								<div class="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col">
 									<button type="button" onclick={() => grind = Math.min(40, Math.round((grind + 0.5) * 2) / 2)} aria-label="Increase grind size" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_up</span></button>
 									<button type="button" onclick={() => grind = Math.max(1, Math.round((grind - 0.5) * 2) / 2)} aria-label="Decrease grind size" class="flex h-6 w-7 items-center justify-center text-on-surface-variant/30 transition-colors hover:bg-surface-container hover:text-crema-gold active:scale-95"><span class="material-symbols-outlined text-[14px]">keyboard_arrow_down</span></button>
@@ -487,9 +489,7 @@
 								<button type="button" onclick={() => (rating = n)}
 									class="flex h-11 w-11 items-center justify-center transition-transform hover:scale-110 active:scale-95"
 									aria-label="{n} star{n > 1 ? 's' : ''}">
-									<span class="material-symbols-outlined text-[32px]"
-										class:text-crema-gold={rating >= n}
-										class:text-outline-variant={rating < n}
+									<span class="material-symbols-outlined text-[32px] {rating >= n ? 'text-crema-gold' : 'text-outline-variant/40'}"
 										style="font-variation-settings: 'FILL' {rating >= n ? 1 : 0}, 'wght' 300">star</span>
 								</button>
 							{/each}

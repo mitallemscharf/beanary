@@ -6,6 +6,7 @@ export interface IBean extends Document {
 	name: string;
 	roastery: string;
 	origin: string;
+	roastLevel?: 'Light' | 'Medium' | 'Medium-Dark' | 'Dark';
 	tags: string[];
 	dose: string;
 	yield: string;
@@ -22,6 +23,7 @@ const beanSchema = new mongoose.Schema<IBean>(
 		name: { type: String, required: true },
 		roastery: { type: String, default: '' },
 		origin: { type: String, default: '' },
+		roastLevel: { type: String, enum: ['Light', 'Medium', 'Medium-Dark', 'Dark'], default: undefined },
 		tags: { type: [String], default: [] },
 		dose: { type: String, default: '18g' },
 		yield: { type: String, default: '36g' },

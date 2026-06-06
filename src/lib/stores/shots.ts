@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 export interface Shot {
 	id: string;
+	beanId?: string;
 	bean: string;
 	dose: number;
 	yield: number;
@@ -10,6 +11,8 @@ export interface Shot {
 	grind: string;
 	notes: string;
 	rating: number;
+	brewRatio?: number;
+	flavorTags?: string[];
 	date: string;
 	process: string;
 	roast: string;

@@ -3,6 +3,7 @@ import mongoose, { type Document } from 'mongoose';
 export interface IShot extends Document {
 	id: string;
 	userId: string;
+	beanId?: mongoose.Types.ObjectId;
 	bean: string;
 	dose: number;
 	yield: number;
@@ -11,6 +12,8 @@ export interface IShot extends Document {
 	grind: string;
 	notes: string;
 	rating: number;
+	brewRatio?: number;
+	flavorTags: string[];
 	date: string;
 	process: string;
 	roast: string;
@@ -20,6 +23,7 @@ export interface IShot extends Document {
 const shotSchema = new mongoose.Schema<IShot>(
 	{
 		userId: { type: String, default: '' },
+		beanId: { type: mongoose.Schema.Types.ObjectId, ref: 'Bean', required: false },
 		bean: { type: String, required: true },
 		dose: { type: Number, required: true },
 		yield: { type: Number, required: true },
@@ -28,6 +32,8 @@ const shotSchema = new mongoose.Schema<IShot>(
 		grind: { type: String, default: '' },
 		notes: { type: String, default: '' },
 		rating: { type: Number, default: 3, min: 1, max: 5 },
+		brewRatio: { type: Number },
+		flavorTags: { type: [String], default: [] },
 		date: { type: String, default: 'Today' },
 		process: { type: String, default: 'Washed' },
 		roast: { type: String, default: 'Light Roast' },

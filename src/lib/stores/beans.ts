@@ -5,6 +5,7 @@ export interface Bean {
 	name: string;
 	roastery: string;
 	origin: string;
+	roastLevel?: 'Light' | 'Medium' | 'Medium-Dark' | 'Dark';
 	tags: string[];
 	dose: string;
 	yield: string;

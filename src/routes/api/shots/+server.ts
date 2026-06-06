@@ -72,7 +72,7 @@ export async function GET({ locals }) {
 
 		// Admin sees all shots; regular users see only their own
 		const filter = isAdmin ? {} : { userId: user.id };
-		let shots = await Shot.find(filter).sort({ createdAt: -1 });
+		let shots = await Shot.find(filter).populate('beanId').sort({ createdAt: -1 });
 
 		// Auto-seed sample shots only for admin when journal is empty
 		if (shots.length === 0 && isAdmin) {
@@ -91,7 +91,9 @@ export async function POST({ request, locals, cookies }) {
 		await connectDB();
 		const user = locals.user!;
 		const data = await request.json();
-		const shot = new Shot({ ...data, userId: user.id });
+		// Calculate and store brew ratio
+		const brewRatio = data.dose > 0 ? Math.round((data.yield / data.dose) * 100) / 100 : undefined;
+		const shot = new Shot({ ...data, userId: user.id, brewRatio });
 		await shot.save();
 
 		// Award XP

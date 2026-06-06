@@ -99,6 +99,7 @@
 	let editName = $state('');
 	let editRoastery = $state('');
 	let editOrigin = $state('');
+	let editRoastLevel = $state<'Light' | 'Medium' | 'Medium-Dark' | 'Dark' | ''>('');
 	let editTagsStr = $state('');
 	let editDose = $state('');
 	let editYield = $state('');
@@ -123,6 +124,7 @@
 		editName = selectedBean.name;
 		editRoastery = selectedBean.roastery;
 		editOrigin = selectedBean.origin;
+		editRoastLevel = selectedBean.roastLevel ?? '';
 		editTagsStr = selectedBean.tags.join(', ');
 		editDose = selectedBean.dose;
 		editYield = selectedBean.yield;
@@ -141,6 +143,7 @@
 				name: editName.trim(),
 				roastery: editRoastery || 'Unknown Roastery',
 				origin: editOrigin || 'Unknown Origin',
+				roastLevel: (editRoastLevel as 'Light' | 'Medium' | 'Medium-Dark' | 'Dark') || undefined,
 				tags: tags.length ? tags : selectedBean.tags,
 				dose: editDose,
 				yield: editYield,
@@ -162,6 +165,7 @@
 	let newName = $state('');
 	let newRoastery = $state('');
 	let newOrigin = $state('');
+	let newRoastLevel = $state<'Light' | 'Medium' | 'Medium-Dark' | 'Dark' | ''>('');
 	let newTagsStr = $state('');
 	let newDose = $state('18g');
 	let newYield = $state('36g');
@@ -188,6 +192,7 @@
 				name: newName,
 				roastery: newRoastery || 'Unknown Roastery',
 				origin: newOrigin || 'Unknown Origin',
+				roastLevel: (newRoastLevel as 'Light' | 'Medium' | 'Medium-Dark' | 'Dark') || undefined,
 				tags: tags.length ? tags : ['Single Origin'],
 				dose: newDose,
 				yield: newYield,
@@ -201,6 +206,7 @@
 			newName = '';
 			newRoastery = '';
 			newOrigin = '';
+			newRoastLevel = '';
 			newTagsStr = '';
 			newDose = '18g';
 			newYield = '36g';
@@ -336,6 +342,9 @@
 				</div>
 
 				<div class="mb-6 flex flex-wrap gap-2">
+					{#if selectedBean.roastLevel}
+						<span class="rounded bg-crema-gold/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-crema-gold">{selectedBean.roastLevel} Roast</span>
+					{/if}
 					{#each selectedBean.tags as tag}
 						<span class="rounded bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">{tag}</span>
 					{/each}
@@ -443,6 +452,17 @@
 						<input id="edit-origin" type="text" bind:value={editOrigin}
 							class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
 					</div>
+				</div>
+				<div>
+					<label for="edit-roast-level" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Roast Level</label>
+					<select id="edit-roast-level" bind:value={editRoastLevel}
+						class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50">
+						<option value="">— Not specified —</option>
+						<option value="Light">Light</option>
+						<option value="Medium">Medium</option>
+						<option value="Medium-Dark">Medium-Dark</option>
+						<option value="Dark">Dark</option>
+					</select>
 				</div>
 				<div>
 					<label for="edit-tags" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Flavor Tags</label>
@@ -553,6 +573,17 @@
 					<input id="new-origin" type="text" bind:value={newOrigin} placeholder="Ethiopia"
 						class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50" />
 				</div>
+			</div>
+			<div>
+				<label for="new-roast-level" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Roast Level</label>
+				<select id="new-roast-level" bind:value={newRoastLevel}
+					class="text-body-md w-full rounded-lg border border-outline-variant/30 bg-surface-container-low p-3.5 outline-none transition-colors focus:ring-2 focus:ring-crema-gold/60 hover:border-crema-gold/50">
+					<option value="">— Not specified —</option>
+					<option value="Light">Light</option>
+					<option value="Medium">Medium</option>
+					<option value="Medium-Dark">Medium-Dark</option>
+					<option value="Dark">Dark</option>
+				</select>
 			</div>
 			<div>
 				<label for="new-tags" class="text-label-sm mb-2 block text-on-surface-variant uppercase">Flavor Tags</label>

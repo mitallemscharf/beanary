@@ -99,7 +99,7 @@
 		return [
 			{ label: 'Dose',        va: `${a.dose}g`,  vb: `${b.dose}g`,  diff: differs(a.dose, b.dose) },
 			{ label: 'Yield',       va: `${a.yield}g`, vb: `${b.yield}g`, diff: differs(a.yield, b.yield) },
-			{ label: 'Brew Ratio',  va: `1:${(a.yield/a.dose).toFixed(1)}`, vb: `1:${(b.yield/b.dose).toFixed(1)}`, diff: differs((a.yield/a.dose).toFixed(1),(b.yield/b.dose).toFixed(1)) },
+			{ label: 'Brew Ratio',  va: `1:${(a.brewRatio ?? a.yield/a.dose).toFixed(1)}`, vb: `1:${(b.brewRatio ?? b.yield/b.dose).toFixed(1)}`, diff: differs((a.brewRatio ?? a.yield/a.dose).toFixed(1),(b.brewRatio ?? b.yield/b.dose).toFixed(1)) },
 			{ label: 'Grind Size',  va: a.grind||'—',  vb: b.grind||'—',  diff: differs(a.grind, b.grind) },
 			{ label: 'Time',        va: `${a.time}s`,  vb: `${b.time}s`,  diff: differs(a.time, b.time) },
 			{ label: 'Temperature', va: `${a.temp}°C`, vb: `${b.temp}°C`, diff: differs(a.temp, b.temp) },
@@ -184,7 +184,7 @@
 				s.bean.length > 28 ? s.bean.slice(0, 26) + '…' : s.bean,
 				`${s.dose}g`,
 				`${s.yield}g`,
-				`1:${(s.yield / s.dose).toFixed(1)}`,
+				`1:${(s.brewRatio ?? s.yield / s.dose).toFixed(1)}`,
 				`${s.time}s`,
 				`${s.temp}°C`,
 				`${s.rating}/5`,
@@ -585,7 +585,7 @@
 											</div>
 											<div>
 												<p class="text-label-caps mb-1 text-on-surface-variant/50">Brew Ratio</p>
-												<p class="font-mono text-sm font-medium text-crema-gold">1:{(shot.yield / shot.dose).toFixed(1)}</p>
+												<p class="font-mono text-sm font-medium text-crema-gold">1:{(shot.brewRatio ?? shot.yield / shot.dose).toFixed(1)}</p>
 											</div>
 										</div>
 										{#if shot.notes}
