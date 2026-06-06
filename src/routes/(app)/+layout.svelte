@@ -273,7 +273,7 @@
 			<a href="/" class="text-[22px] font-display font-bold tracking-[0.12em] text-crema-gold uppercase transition-opacity duration-300 hover:opacity-75 md:text-[24px]">
 				Beanery
 			</a>
-			<nav class="hidden items-center gap-8 md:flex">
+			<nav class="hidden items-center gap-8 md:flex" data-sveltekit-reload>
 				{#each [{ href: '/dashboard', label: 'Lab' }, { href: '/history', label: 'Journal' }, { href: '/library', label: 'Library' }] as link}
 					<a href={link.href}
 						class="text-label-sm transition-colors duration-200 {$page.url.pathname === link.href ? 'border-b-2 border-crema-gold pb-0.5 text-crema-gold' : 'text-on-surface-variant hover:text-crema-gold'}">
@@ -355,7 +355,7 @@
 			</div>
 		</div>
 
-		<nav class="flex-1 px-3 py-4">
+		<nav class="flex-1 px-3 py-4" data-sveltekit-reload>
 			{#each sidebarNavItems as item}
 				<a
 					href={item.href}
@@ -398,7 +398,7 @@
 			{/if}
 		</nav>
 
-		<div class="border-t border-outline-variant/10 px-4 py-6">
+		<div class="border-t border-outline-variant/10 px-4 py-6" data-sveltekit-reload>
 			<a href="/shot-logger"
 				class="text-label-sm mb-6 block w-full rounded-full bg-crema-gold py-3 text-center text-white uppercase tracking-widest shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95">
 				Start New Brew
@@ -426,7 +426,8 @@
 
 <!-- ── Mobile Bottom Navigation (60px) ── -->
 <nav class="fixed bottom-0 left-0 right-0 z-50 flex h-[60px] items-center justify-around border-t border-outline-variant/20 bg-surface/95 backdrop-blur-md md:hidden"
-	style="padding-bottom: env(safe-area-inset-bottom)">
+	style="padding-bottom: env(safe-area-inset-bottom)"
+	data-sveltekit-reload>
 	{#each [
 		{ href: '/dashboard',   icon: 'home',          label: 'Home' },
 		{ href: '/shot-logger', icon: 'coffee',         label: 'Logger' },
