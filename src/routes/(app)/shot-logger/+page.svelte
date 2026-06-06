@@ -139,11 +139,28 @@
 
 	// SVG circle: circumference = 2π × 88 ≈ 552.9
 	const circumference = 552.9;
+
+	// Espresso: map ratio 1–3 → full arc; Filter: map ratio 22→8 → empty→full (stronger = more arc)
 	const dashOffset = $derived(
-		Math.max(0, Math.min(circumference, circumference - ((ratioNum - 1) / 2) * circumference))
+		isEspresso
+			? Math.max(0, Math.min(circumference, circumference - ((ratioNum - 1) / 2) * circumference))
+			: Math.min(circumference, Math.max(0, (ratioNum - 8) / 14 * circumference))
+	);
+
+	const ratioZone = $derived(
+		isEspresso
+			? (ratioNum < 1.5 ? 'ristretto' : ratioNum <= 2.5 ? 'normale' : 'lungo')
+			: (ratioNum < 13 ? 'strong' : ratioNum <= 17 ? 'balanced' : 'light')
 	);
 	const ratioLabel = $derived(
-		ratioNum < 1.5 ? 'Ristretto' : ratioNum < 2.2 ? 'Balanced' : 'Lungo'
+		isEspresso
+			? (ratioNum < 1.5 ? 'Ristretto' : ratioNum <= 2.5 ? 'Normale' : 'Lungo')
+			: (ratioNum < 13 ? 'Strong' : ratioNum <= 17 ? 'Balanced' : 'Light')
+	);
+	const ratioArcColor = $derived(
+		ratioZone === 'ristretto' || ratioZone === 'strong' ? '#EF4444'
+		: ratioZone === 'normale' || ratioZone === 'balanced' ? '#C5A059'
+		: '#3B82F6'
 	);
 
 	async function handleSave() {
@@ -571,33 +588,41 @@
 
 				<!-- Live Brew Ratio gauge -->
 				<div class="group flex flex-col items-center rounded-xl border border-primary/5 bg-surface-bright p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
-					<p class="text-label-sm mb-7 block text-on-surface-variant uppercase tracking-widest transition-colors group-hover:text-crema-gold">Live Brew Ratio</p>
+					<p class="text-label-sm mb-7 block text-on-surface-variant uppercase tracking-widest transition-colors group-hover:text-crema-gold">
+						{isEspresso ? 'Live Espresso Ratio' : 'Brew Ratio'}
+					</p>
 
 					<div class="relative h-48 w-48 flex-shrink-0 transition-transform duration-500 group-hover:scale-105">
 						<svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 196 196">
+							<!-- Track -->
 							<circle cx="98" cy="98" r="88" fill="none" stroke="currentColor" stroke-width="4" class="text-surface-container-high" />
+							<!-- Arc — both value and color driven via style so CSS transition fires reliably -->
 							<circle
 								cx="98" cy="98" r="88"
 								fill="none"
-								stroke="#C5A059"
-								stroke-width="4"
+								stroke-width="5"
 								stroke-linecap="round"
 								stroke-dasharray={circumference}
-								stroke-dashoffset={dashOffset}
-								style="transition: stroke-dashoffset 0.5s ease"
+								style="stroke: {ratioArcColor}; stroke-dashoffset: {dashOffset}; transition: stroke-dashoffset 0.4s cubic-bezier(0.4,0,0.2,1), stroke 0.3s ease"
 							/>
 						</svg>
 						<div class="absolute inset-0 flex flex-col items-center justify-center">
 							<span class="text-label-caps text-on-surface-variant/50 mb-1">Current</span>
 							<span class="text-headline-lg text-primary font-display">1:{ratio}</span>
-							<span class="text-label-caps mt-1 text-crema-gold">{ratioLabel}</span>
+							<span class="text-label-caps mt-1 font-bold transition-colors duration-300" style="color: {ratioArcColor}">{ratioLabel}</span>
 						</div>
 					</div>
 
 					<div class="mt-7 grid w-full grid-cols-3 gap-1 text-center">
-						<span class="text-label-caps text-on-surface-variant/40 transition-colors hover:text-on-surface cursor-pointer">Ristretto</span>
-						<span class="text-label-caps text-crema-gold">Normale</span>
-						<span class="text-label-caps text-on-surface-variant/40 transition-colors hover:text-on-surface cursor-pointer">Lungo</span>
+						{#if isEspresso}
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'ristretto' ? 'font-bold text-[#EF4444]' : 'text-on-surface-variant/40'}">Ristretto</span>
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'normale'   ? 'font-bold text-crema-gold' : 'text-on-surface-variant/40'}">Normale</span>
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'lungo'     ? 'font-bold text-[#3B82F6]'  : 'text-on-surface-variant/40'}">Lungo</span>
+						{:else}
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'strong'   ? 'font-bold text-[#EF4444]' : 'text-on-surface-variant/40'}">Strong</span>
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'balanced' ? 'font-bold text-crema-gold' : 'text-on-surface-variant/40'}">Balanced</span>
+							<span class="text-label-caps transition-colors duration-300 {ratioZone === 'light'    ? 'font-bold text-[#3B82F6]'  : 'text-on-surface-variant/40'}">Light</span>
+						{/if}
 					</div>
 				</div>
 
