@@ -111,7 +111,7 @@
 		<div class="grid grid-cols-1 gap-gutter md:grid-cols-12">
 			<!-- Shot Logger — 8 cols -->
 			<a
-				href="/shot-logger"
+				href="/login"
 				class="group relative overflow-hidden rounded-xl border border-primary/5 bg-surface-container-low transition-all duration-500 hover:-translate-y-1 hover:border-crema-gold/40 hover:shadow-xl md:col-span-8"
 				use:reveal={0}
 			>
@@ -144,7 +144,7 @@
 
 			<!-- Bean Library — 4 cols -->
 			<a
-				href="/library"
+				href="/login"
 				class="group flex flex-col justify-between overflow-hidden rounded-xl border border-primary/5 bg-surface-container-high/40 transition-all duration-300 hover:-translate-y-1 hover:border-crema-gold/30 hover:shadow-lg md:col-span-4"
 				use:reveal={150}
 			>
@@ -166,7 +166,7 @@
 
 			<!-- Sweet Spot Finder — 4 cols -->
 			<a
-				href="/dashboard"
+				href="/login"
 				class="group flex flex-col justify-between rounded-xl border border-primary/5 bg-surface-container-high/40 p-8 transition-all duration-300 hover:-translate-y-1 hover:border-crema-gold/30 hover:shadow-lg md:col-span-4"
 				use:reveal={300}
 			>
@@ -189,7 +189,7 @@
 
 			<!-- Extraction Intelligence — 8 cols -->
 			<a
-				href="/dashboard"
+				href="/login"
 				class="group flex flex-col items-center gap-8 rounded-xl border border-primary/5 bg-surface-bright p-10 transition-all duration-300 hover:-translate-y-1 hover:border-crema-gold/30 hover:shadow-lg md:col-span-8 md:flex-row"
 				use:reveal={450}
 			>
@@ -224,10 +224,10 @@
 		</div>
 		<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-start md:gap-x-8">
 			{#each [
-				{ href: '/dashboard', label: 'Dashboard' },
-				{ href: '/shot-logger', label: 'Shot Logger' },
-				{ href: '/library', label: 'Library' },
-				{ href: '/history', label: 'History' }
+				{ href: '/login', label: 'Dashboard' },
+				{ href: '/login', label: 'Shot Logger' },
+				{ href: '/login', label: 'Library' },
+				{ href: '/login', label: 'History' }
 			] as link}
 				<a href={link.href} class="text-label-caps text-on-surface-variant/60 transition-all duration-200 hover:text-crema-gold">{link.label}</a>
 			{/each}
