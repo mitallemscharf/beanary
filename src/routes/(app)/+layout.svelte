@@ -404,7 +404,7 @@
 				class="text-label-sm mb-6 block w-full rounded-full bg-crema-gold py-3 text-center text-white uppercase tracking-widest shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-95">
 				Start New Brew
 			</a>
-			<a href="mailto:lenny.frei@hotmail.com?subject=Beanery Support"
+			<a href="mailto:freilen1@students.zhaw.ch?subject=Beanery Support"
 				class="text-label-sm flex items-center gap-3 px-2 py-2 text-on-surface-variant transition-colors hover:text-crema-gold">
 				<span class="material-symbols-outlined text-[18px]">help_outline</span>Support
 			</a>
